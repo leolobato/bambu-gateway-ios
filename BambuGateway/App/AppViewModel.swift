@@ -27,6 +27,8 @@ final class AppViewModel: ObservableObject {
     @Published var selectedPrinterId: String
 
     @Published var amsTrays: [AMSTray] = []
+    @Published var amsUnits: [AMSUnit] = []
+    @Published var vtTray: AMSTray?
     @Published var slicerFilaments: [SlicerProfile] = []
     @Published var amsAssignableFilaments: [SlicerProfile] = []
 
@@ -514,7 +516,7 @@ final class AppViewModel: ObservableObject {
         allSlicerProcesses = await allProcessesResult
         allSlicerFilaments = await allFilamentsResult
 
-        applyAMSTrays(fetchedAMS?.trays ?? [])
+        applyAMSData(fetchedAMS)
         applyPersistedProfileSelections()
         await refreshFilamentMatches()
         applyFilamentMappingFromCurrentData()
@@ -557,16 +559,29 @@ final class AppViewModel: ObservableObject {
         return allMachines.filter { $0.printerModel == printerModel }
     }
 
-    private func applyAMSTrays(_ trays: [AMSTray]) {
-        amsTrays = trays
-            .filter { (0 ... 3).contains($0.slot) }
-            .sorted { $0.slot < $1.slot }
+    private func applyAMSData(_ amsResponse: AMSResponse?) {
+        guard let amsResponse else {
+            amsTrays = []
+            amsUnits = []
+            vtTray = nil
+            trayProfileBySlot = [:]
+            return
+        }
+
+        amsUnits = amsResponse.units.sorted { $0.id < $1.id }
+        vtTray = amsResponse.vtTray
+        amsTrays = amsResponse.trays.sorted { $0.slot < $1.slot }
+
+        var allTrays = amsTrays
+        if let vt = vtTray {
+            allTrays.append(vt)
+        }
 
         var selections: [Int: String] = [:]
         let persisted = perPrinterSelection()
         let validIds = Set(amsAssignableFilaments.map { $0.settingId })
 
-        for tray in amsTrays {
+        for tray in allTrays {
             if let persistedId = persisted.trayProfileBySlot[tray.slot],
                persistedId.isEmpty || validIds.contains(persistedId) {
                 selections[tray.slot] = persistedId
@@ -631,6 +646,15 @@ final class AppViewModel: ObservableObject {
         applyPersistedPlateTypeSelection()
     }
 
+    /// All available tray slots including the external spool holder.
+    var allAvailableTrays: [AMSTray] {
+        var trays = amsTrays
+        if let vt = vtTray {
+            trays.append(vt)
+        }
+        return trays
+    }
+
     private func applyFilamentMappingFromCurrentData() {
         guard let parsedInfo else {
             filamentTrayByIndex = [:]
@@ -638,7 +662,7 @@ final class AppViewModel: ObservableObject {
         }
 
         let persisted = perPrinterSelection()
-        let validSlots = Set(amsTrays.map { $0.slot })
+        let validSlots = Set(allAvailableTrays.map { $0.slot })
 
         var mapping: [Int: Int] = [:]
 
@@ -656,7 +680,7 @@ final class AppViewModel: ObservableObject {
 
             let projectFilamentId = projectFilamentId(for: filament).uppercased()
             if !projectFilamentId.isEmpty,
-               let exactMatch = amsTrays.first(where: {
+               let exactMatch = allAvailableTrays.first(where: {
                    !$0.filamentId.isEmpty && $0.filamentId.uppercased() == projectFilamentId
                }) {
                 mapping[filament.index] = exactMatch.slot
@@ -664,7 +688,7 @@ final class AppViewModel: ObservableObject {
             }
 
             let wantedType = filament.type.uppercased()
-            if let match = amsTrays.first(where: {
+            if let match = allAvailableTrays.first(where: {
                 !$0.trayType.isEmpty && $0.trayType.uppercased() == wantedType
             }) {
                 mapping[filament.index] = match.slot

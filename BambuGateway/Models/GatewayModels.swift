@@ -33,9 +33,30 @@ struct PrintJob: Decodable, Hashable {
     let totalLayers: Int
 }
 
+struct AMSUnit: Decodable, Identifiable, Hashable {
+    var id: Int
+    let humidity: Int
+    let temperature: Double
+    let trayCount: Int
+}
+
 struct AMSResponse: Decodable {
     let printerId: String
     let trays: [AMSTray]
+    let units: [AMSUnit]
+    let vtTray: AMSTray?
+
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        printerId = try container.decode(String.self, forKey: .printerId)
+        trays = try container.decode([AMSTray].self, forKey: .trays)
+        units = try container.decodeIfPresent([AMSUnit].self, forKey: .units) ?? []
+        vtTray = try container.decodeIfPresent(AMSTray.self, forKey: .vtTray)
+    }
+
+    private enum CodingKeys: String, CodingKey {
+        case printerId, trays, units, vtTray
+    }
 }
 
 struct AMSTray: Decodable, Identifiable, Hashable {
@@ -48,7 +69,25 @@ struct AMSTray: Decodable, Identifiable, Hashable {
     let trayColor: String
     let traySubBrands: String
     let filamentId: String
+    let remain: Int
     let matchedFilament: SlicerProfile?
+
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        slot = try container.decode(Int.self, forKey: .slot)
+        amsId = try container.decode(Int.self, forKey: .amsId)
+        trayId = try container.decode(Int.self, forKey: .trayId)
+        trayType = try container.decodeIfPresent(String.self, forKey: .trayType) ?? ""
+        trayColor = try container.decodeIfPresent(String.self, forKey: .trayColor) ?? ""
+        traySubBrands = try container.decodeIfPresent(String.self, forKey: .traySubBrands) ?? ""
+        filamentId = try container.decodeIfPresent(String.self, forKey: .filamentId) ?? ""
+        remain = try container.decodeIfPresent(Int.self, forKey: .remain) ?? -1
+        matchedFilament = try container.decodeIfPresent(SlicerProfile.self, forKey: .matchedFilament)
+    }
+
+    private enum CodingKeys: String, CodingKey {
+        case slot, amsId, trayId, trayType, trayColor, traySubBrands, filamentId, remain, matchedFilament
+    }
 }
 
 struct SlicerProfile: Decodable, Identifiable, Hashable {

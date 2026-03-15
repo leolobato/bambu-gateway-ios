@@ -69,52 +69,87 @@ struct PrinterTab: View {
         }
     }
 
+    @ViewBuilder
     private var amsSection: some View {
-        Section("AMS Trays") {
-            if viewModel.amsTrays.isEmpty {
-                Text("No AMS trays found")
-                    .foregroundStyle(.secondary)
-            } else {
-                ForEach(viewModel.amsTrays) { tray in
-                    VStack(alignment: .leading, spacing: 6) {
-                        HStack {
-                            Text("Tray \(tray.slot + 1)")
-                                .font(.headline)
-                            ColorSwatch(hex: tray.trayColor)
-                            Spacer()
-                            VStack(alignment: .trailing) {
-                                Text(tray.trayType.isEmpty ? "-" : tray.trayType)
-                                    .foregroundStyle(.secondary)
-                                if !tray.filamentId.isEmpty {
-                                    Text(tray.filamentId)
-                                        .font(.caption)
-                                        .foregroundStyle(.tertiary)
-                                }
-                            }
-                        }
+        let hasAMS = !viewModel.amsTrays.isEmpty
+        let hasVT = viewModel.vtTray != nil
 
-                        NavigationLink {
-                            FilamentPickerView(
-                                filaments: viewModel.amsAssignableFilaments,
-                                selection: Binding(
-                                    get: { viewModel.trayProfileSelection(for: tray.slot) },
-                                    set: { viewModel.setTrayProfileSelection(slot: tray.slot, settingId: $0) }
-                                )
-                            )
-                        } label: {
-                            let selectedId = viewModel.trayProfileSelection(for: tray.slot)
-                            let selectedProfile =
-                                viewModel.amsAssignableFilaments.first(where: { $0.settingId == selectedId })
-                                ?? viewModel.slicerFilaments.first(where: { $0.settingId == selectedId })
-                            if !selectedId.isEmpty, let profile = selectedProfile {
-                                Text(profile.name)
-                                    .foregroundStyle(.secondary)
-                            } else {
-                                Text("Keep default")
-                                    .foregroundStyle(.secondary)
-                            }
+        if !hasAMS && !hasVT {
+            Section("AMS") {
+                Text("No AMS or external spool detected")
+                    .foregroundStyle(.secondary)
+            }
+        }
+
+        if hasAMS {
+            ForEach(viewModel.amsUnits) { unit in
+                Section {
+                    let unitTrays = viewModel.amsTrays.filter { $0.amsId == unit.id }
+                    ForEach(unitTrays) { tray in
+                        trayRow(tray, label: "Tray \(tray.trayId + 1)")
+                    }
+                } header: {
+                    HStack {
+                        Text("AMS \(unit.id + 1)")
+                        Spacer()
+                        if unit.humidity >= 0 {
+                            Label("\(unit.humidity)%", systemImage: "humidity")
+                                .font(.caption)
                         }
                     }
+                }
+            }
+        }
+
+        if let vtTray = viewModel.vtTray {
+            Section("External Spool") {
+                trayRow(vtTray, label: "External")
+            }
+        }
+    }
+
+    private func trayRow(_ tray: AMSTray, label: String) -> some View {
+        VStack(alignment: .leading, spacing: 6) {
+            HStack {
+                Text(label)
+                    .font(.headline)
+                ColorSwatch(hex: tray.trayColor)
+                if tray.remain >= 0 {
+                    Text("\(tray.remain)%")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                }
+                Spacer()
+                VStack(alignment: .trailing) {
+                    Text(tray.trayType.isEmpty ? "-" : tray.trayType)
+                        .foregroundStyle(.secondary)
+                    if !tray.filamentId.isEmpty {
+                        Text(tray.filamentId)
+                            .font(.caption)
+                            .foregroundStyle(.tertiary)
+                    }
+                }
+            }
+
+            NavigationLink {
+                FilamentPickerView(
+                    filaments: viewModel.amsAssignableFilaments,
+                    selection: Binding(
+                        get: { viewModel.trayProfileSelection(for: tray.slot) },
+                        set: { viewModel.setTrayProfileSelection(slot: tray.slot, settingId: $0) }
+                    )
+                )
+            } label: {
+                let selectedId = viewModel.trayProfileSelection(for: tray.slot)
+                let selectedProfile =
+                    viewModel.amsAssignableFilaments.first(where: { $0.settingId == selectedId })
+                    ?? viewModel.slicerFilaments.first(where: { $0.settingId == selectedId })
+                if !selectedId.isEmpty, let profile = selectedProfile {
+                    Text(profile.name)
+                        .foregroundStyle(.secondary)
+                } else {
+                    Text("Keep default")
+                        .foregroundStyle(.secondary)
                 }
             }
         }

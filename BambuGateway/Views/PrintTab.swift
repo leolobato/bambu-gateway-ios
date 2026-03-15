@@ -244,7 +244,7 @@ struct PrintTab: View {
     private func trayLink(for filament: ProjectFilament) -> some View {
         NavigationLink {
             TrayPickerView(
-                trays: viewModel.amsTrays,
+                trays: viewModel.allAvailableTrays,
                 trayLabel: { trayPickerLabel(for: $0) },
                 selection: Binding(
                     get: { viewModel.filamentTraySelection(for: filament.index) },
@@ -254,7 +254,7 @@ struct PrintTab: View {
         } label: {
             let selectedSlot = viewModel.filamentTraySelection(for: filament.index)
             if let slot = selectedSlot,
-               let tray = viewModel.amsTrays.first(where: { $0.slot == slot }) {
+               let tray = viewModel.allAvailableTrays.first(where: { $0.slot == slot }) {
                 HStack(spacing: 6) {
                     ColorSwatch(hex: tray.trayColor)
                     Text(trayPickerLabel(for: tray))
@@ -269,12 +269,20 @@ struct PrintTab: View {
 
     private func trayPickerLabel(for tray: AMSTray) -> String {
         let trayName = tray.trayType.isEmpty ? "Unknown" : tray.trayType
+        let label: String
+        if tray.slot == 254 {
+            label = "External (\(trayName))"
+        } else if viewModel.amsUnits.count > 1 {
+            label = "AMS \(tray.amsId + 1) Tray \(tray.trayId + 1) (\(trayName))"
+        } else {
+            label = "Tray \(tray.trayId + 1) (\(trayName))"
+        }
         let profileId = viewModel.trayProfileSelection(for: tray.slot)
         if !profileId.isEmpty,
            let profile = viewModel.slicerFilaments.first(where: { $0.settingId == profileId }) {
-            return "Tray \(tray.slot + 1) (\(trayName)) — \(profile.name)"
+            return "\(label) — \(profile.name)"
         }
-        return "Tray \(tray.slot + 1) (\(trayName))"
+        return label
     }
 
     private var messageColor: Color {

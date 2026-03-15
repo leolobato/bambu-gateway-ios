@@ -7,6 +7,9 @@ iOS client for [Bambu Gateway](../bambu-gateway/) — browse printers, upload 3M
 - Connect to a local Bambu Gateway server
 - Browse and manage 3MF files for printing
 - Preview G-code before printing
+- AMS dashboard with per-unit humidity, filament remaining, and tray details
+- External spool holder support (A1 Mini and other non-AMS setups)
+- Auto-match project filaments to AMS trays by filament ID or type
 - Configure printer profiles, filaments, and plates
 - Browse MakerWorld for models
 - Share Extension for quick file imports from other apps
