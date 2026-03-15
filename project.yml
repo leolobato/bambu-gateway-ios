@@ -1,0 +1,80 @@
+name: BambuGateway
+options:
+  deploymentTarget:
+    iOS: '18.0'
+settings:
+  base:
+    SWIFT_VERSION: 5.0
+    PRODUCT_BUNDLE_IDENTIFIER: $(APP_BUNDLE_ID)
+    CURRENT_PROJECT_VERSION: 1
+    MARKETING_VERSION: 1.0
+    TARGETED_DEVICE_FAMILY: 1,2
+    GENERATE_INFOPLIST_FILE: NO
+    INFOPLIST_FILE: BambuGateway/Support/Info.plist
+    CODE_SIGN_STYLE: Automatic
+targets:
+  BambuGateway:
+    type: application
+    platform: iOS
+    deploymentTarget: '18.0'
+    configFiles:
+      Debug: Configuration/Base.xcconfig
+      Release: Configuration/Base.xcconfig
+    sources:
+      - path: BambuGateway
+        excludes:
+          - '**/*.md'
+    dependencies:
+      - target: ShareExtension
+    settings:
+      base:
+        PRODUCT_NAME: BambuGateway
+        DEVELOPMENT_TEAM: $(DEVELOPMENT_TEAM)
+        SWIFT_STRICT_CONCURRENCY: minimal
+        ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
+        ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME: AccentColor
+        SUPPORTS_MACCATALYST: NO
+        SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD: NO
+        ENABLE_USER_SCRIPT_SANDBOXING: YES
+  ShareExtension:
+    type: app-extension
+    platform: iOS
+    deploymentTarget: '18.0'
+    sources:
+      - path: ShareExtension
+    settings:
+      base:
+        PRODUCT_NAME: ShareExtension
+        PRODUCT_BUNDLE_IDENTIFIER: $(SHARE_EXTENSION_BUNDLE_ID)
+        DEVELOPMENT_TEAM: $(DEVELOPMENT_TEAM)
+        INFOPLIST_FILE: ShareExtension/Info.plist
+        GENERATE_INFOPLIST_FILE: NO
+        CODE_SIGN_STYLE: Automatic
+        SWIFT_VERSION: 5.0
+schemes:
+  BambuGateway:
+    build:
+      targets:
+        BambuGateway: all
+        ShareExtension: [build]
+    run:
+      config: Debug
+    analyze:
+      config: Debug
+    archive:
+      config: Release
+    profile:
+      config: Release
+  ShareExtension:
+    build:
+      targets:
+        ShareExtension: all
+        BambuGateway: [build]
+    run:
+      config: Debug
+    analyze:
+      config: Debug
+    archive:
+      config: Release
+    profile:
+      config: Release

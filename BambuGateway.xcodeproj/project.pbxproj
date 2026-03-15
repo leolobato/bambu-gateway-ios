@@ -1,0 +1,628 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 77;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		0E245E236604EDABE5D36FD2 /* GatewayClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE3B5CC1FCEEEE3F3845ADEC /* GatewayClient.swift */; };
+		10871FDB843342C10253A37A /* Segment.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1ACA6AF2234D28E7AB7FB4A9 /* Segment.swift */; };
+		160AB3CC8EC474155F80A170 /* ShareViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 68FD23DF97AF009395F22F1E /* ShareViewController.swift */; };
+		27F7D8BAF31F903F67EDF118 /* PrintSceneBuilder.swift in Sources */ = {isa = PBXBuildFile; fileRef = B03F371F9A5F56E3367190BB /* PrintSceneBuilder.swift */; };
+		4A5C5379C16C290ACB36F95C /* MoveType.swift in Sources */ = {isa = PBXBuildFile; fileRef = 333E2DBBB261DB5D28C2D1F9 /* MoveType.swift */; };
+		4C1A529AD33EE2A149CD9C0E /* PrinterTab.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2ACB1A998B04E9E9154760AE /* PrinterTab.swift */; };
+		5630E47545F2C30E2CC337C9 /* GCodePreviewView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B93B1DAA8EB50A5D6BC5C61C /* GCodePreviewView.swift */; };
+		5B1DAF338F92BE18208DB698 /* MakerWorldBrowserView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3B46FA0BBEC43DF398153A59 /* MakerWorldBrowserView.swift */; };
+		6326A5843953FCC43B8311EB /* MultipartFormData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 95B3B7F980C0E0EC50EEE372 /* MultipartFormData.swift */; };
+		70CCAF8C0F42A532EBBB3A10 /* AppSettingsStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9C133CBD53A0F28997154461 /* AppSettingsStore.swift */; };
+		722C07A2FE9F8D32DA14CC11 /* PrintTab.swift in Sources */ = {isa = PBXBuildFile; fileRef = 25AA0EB97886F4C8EB4AC476 /* PrintTab.swift */; };
+		ADCBC64C9B307897F63BFD02 /* ThreeMFReader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18DA4243F6F92602106E2C28 /* ThreeMFReader.swift */; };
+		B112E90578486CB35D2277BA /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBEBCED8EAF681F59258D749 /* ContentView.swift */; };
+		BACEC0C3302612B1C7A21088 /* ShareExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 8E99C2EC57D9D732AF5FC476 /* ShareExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		C12344BE79B9169E1A13F066 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 9A064996EB0DA8288274EC27 /* Assets.xcassets */; };
+		C9B3C4A8EF610EBC59EEDCB2 /* BambuGatewayApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9D5542807513C5701CF0BC3D /* BambuGatewayApp.swift */; };
+		CA1468A89E6DEFF522781031 /* GCodePreviewModal.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5AFFC06CAC383459918EF95 /* GCodePreviewModal.swift */; };
+		CB3388B447DBAD970B907E6B /* AppViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9DB60428FD52299388786225 /* AppViewModel.swift */; };
+		DAA6A261BF169E58D43A32F6 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 97E5B232DEE3A55BBBF52FD7 /* SettingsView.swift */; };
+		E397141C8CCBF7DBB82267A5 /* GCodeParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = EE167547BCD2D100BAF278EE /* GCodeParser.swift */; };
+		F6321079052D62AF783281E5 /* GatewayModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 47F98F122F17587AC06D257D /* GatewayModels.swift */; };
+		FD63EED310B3024A91A58F70 /* PrintModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8015B458BAA6A5312EFB2048 /* PrintModel.swift */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		132FC0E9E209FACCA1222825 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 77B531BC7B6BA85A43566826 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = C98CDF8A8045B91E83D80307;
+			remoteInfo = ShareExtension;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		63C04EFF6632C9075D427736 /* Embed Foundation Extensions */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 13;
+			files = (
+				BACEC0C3302612B1C7A21088 /* ShareExtension.appex in Embed Foundation Extensions */,
+			);
+			name = "Embed Foundation Extensions";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
+/* Begin PBXFileReference section */
+		04CB9E2D394BC045B08ADAC9 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
+		18DA4243F6F92602106E2C28 /* ThreeMFReader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ThreeMFReader.swift; sourceTree = "<group>"; };
+		1ACA6AF2234D28E7AB7FB4A9 /* Segment.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Segment.swift; sourceTree = "<group>"; };
+		1F95784351CF8ED3265FC5AF /* BambuGateway.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = BambuGateway.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		25AA0EB97886F4C8EB4AC476 /* PrintTab.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrintTab.swift; sourceTree = "<group>"; };
+		2ACB1A998B04E9E9154760AE /* PrinterTab.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrinterTab.swift; sourceTree = "<group>"; };
+		333E2DBBB261DB5D28C2D1F9 /* MoveType.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MoveType.swift; sourceTree = "<group>"; };
+		3B46FA0BBEC43DF398153A59 /* MakerWorldBrowserView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MakerWorldBrowserView.swift; sourceTree = "<group>"; };
+		47F98F122F17587AC06D257D /* GatewayModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GatewayModels.swift; sourceTree = "<group>"; };
+		68FD23DF97AF009395F22F1E /* ShareViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShareViewController.swift; sourceTree = "<group>"; };
+		7E8DBA7CCF6FB1ACEDDE1120 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
+		8015B458BAA6A5312EFB2048 /* PrintModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrintModel.swift; sourceTree = "<group>"; };
+		8E99C2EC57D9D732AF5FC476 /* ShareExtension.appex */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = "wrapper.app-extension"; path = ShareExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
+		95B3B7F980C0E0EC50EEE372 /* MultipartFormData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MultipartFormData.swift; sourceTree = "<group>"; };
+		97E5B232DEE3A55BBBF52FD7 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
+		9A064996EB0DA8288274EC27 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		9C133CBD53A0F28997154461 /* AppSettingsStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppSettingsStore.swift; sourceTree = "<group>"; };
+		9D5542807513C5701CF0BC3D /* BambuGatewayApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BambuGatewayApp.swift; sourceTree = "<group>"; };
+		9DB60428FD52299388786225 /* AppViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppViewModel.swift; sourceTree = "<group>"; };
+		B03F371F9A5F56E3367190BB /* PrintSceneBuilder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrintSceneBuilder.swift; sourceTree = "<group>"; };
+		B93B1DAA8EB50A5D6BC5C61C /* GCodePreviewView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GCodePreviewView.swift; sourceTree = "<group>"; };
+		C5AFFC06CAC383459918EF95 /* GCodePreviewModal.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GCodePreviewModal.swift; sourceTree = "<group>"; };
+		CE3B5CC1FCEEEE3F3845ADEC /* GatewayClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GatewayClient.swift; sourceTree = "<group>"; };
+		DBEBCED8EAF681F59258D749 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
+		EE167547BCD2D100BAF278EE /* GCodeParser.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GCodeParser.swift; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXGroup section */
+		0E248D1E45C33C0B0D50F35B /* Networking */ = {
+			isa = PBXGroup;
+			children = (
+				CE3B5CC1FCEEEE3F3845ADEC /* GatewayClient.swift */,
+				95B3B7F980C0E0EC50EEE372 /* MultipartFormData.swift */,
+			);
+			path = Networking;
+			sourceTree = "<group>";
+		};
+		1A8BF88F50613D08ACD09FF7 /* Parser */ = {
+			isa = PBXGroup;
+			children = (
+				EE167547BCD2D100BAF278EE /* GCodeParser.swift */,
+				333E2DBBB261DB5D28C2D1F9 /* MoveType.swift */,
+			);
+			path = Parser;
+			sourceTree = "<group>";
+		};
+		2457CA1C0B86D09ACE895EE4 /* Models */ = {
+			isa = PBXGroup;
+			children = (
+				47F98F122F17587AC06D257D /* GatewayModels.swift */,
+			);
+			path = Models;
+			sourceTree = "<group>";
+		};
+		269074A0A69112F9C4C5F67B /* Model */ = {
+			isa = PBXGroup;
+			children = (
+				8015B458BAA6A5312EFB2048 /* PrintModel.swift */,
+				1ACA6AF2234D28E7AB7FB4A9 /* Segment.swift */,
+			);
+			path = Model;
+			sourceTree = "<group>";
+		};
+		4541E3DE5FEACC69CB9230A0 /* GCodeKit */ = {
+			isa = PBXGroup;
+			children = (
+				269074A0A69112F9C4C5F67B /* Model */,
+				1A8BF88F50613D08ACD09FF7 /* Parser */,
+				B788512134AF3F0EA815FB0A /* Renderer */,
+				C93D224AAD3A98A96396543B /* ThreeMF */,
+			);
+			path = GCodeKit;
+			sourceTree = "<group>";
+		};
+		4949B85738896A29666DE8F1 /* App */ = {
+			isa = PBXGroup;
+			children = (
+				9DB60428FD52299388786225 /* AppViewModel.swift */,
+				9D5542807513C5701CF0BC3D /* BambuGatewayApp.swift */,
+			);
+			path = App;
+			sourceTree = "<group>";
+		};
+		4B7DEF7A6DC2F87E9DEBBBFF /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				1F95784351CF8ED3265FC5AF /* BambuGateway.app */,
+				8E99C2EC57D9D732AF5FC476 /* ShareExtension.appex */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		79B5EFE814BB7EB4A5290D8D /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				9A064996EB0DA8288274EC27 /* Assets.xcassets */,
+			);
+			path = Resources;
+			sourceTree = "<group>";
+		};
+		7B8B7E735CE5ED862C5955D2 = {
+			isa = PBXGroup;
+			children = (
+				FA9546B8119F5653FF13933F /* BambuGateway */,
+				E56CDDD34788FBF5F8CF0381 /* ShareExtension */,
+				4B7DEF7A6DC2F87E9DEBBBFF /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		8C58D4E311418E1A5F915F33 /* Data */ = {
+			isa = PBXGroup;
+			children = (
+				9C133CBD53A0F28997154461 /* AppSettingsStore.swift */,
+			);
+			path = Data;
+			sourceTree = "<group>";
+		};
+		B788512134AF3F0EA815FB0A /* Renderer */ = {
+			isa = PBXGroup;
+			children = (
+				B93B1DAA8EB50A5D6BC5C61C /* GCodePreviewView.swift */,
+				B03F371F9A5F56E3367190BB /* PrintSceneBuilder.swift */,
+			);
+			path = Renderer;
+			sourceTree = "<group>";
+		};
+		C93D224AAD3A98A96396543B /* ThreeMF */ = {
+			isa = PBXGroup;
+			children = (
+				18DA4243F6F92602106E2C28 /* ThreeMFReader.swift */,
+			);
+			path = ThreeMF;
+			sourceTree = "<group>";
+		};
+		D12BFF5D1AADFDEE431496E9 /* Views */ = {
+			isa = PBXGroup;
+			children = (
+				DBEBCED8EAF681F59258D749 /* ContentView.swift */,
+				C5AFFC06CAC383459918EF95 /* GCodePreviewModal.swift */,
+				3B46FA0BBEC43DF398153A59 /* MakerWorldBrowserView.swift */,
+				2ACB1A998B04E9E9154760AE /* PrinterTab.swift */,
+				25AA0EB97886F4C8EB4AC476 /* PrintTab.swift */,
+				97E5B232DEE3A55BBBF52FD7 /* SettingsView.swift */,
+			);
+			path = Views;
+			sourceTree = "<group>";
+		};
+		E56CDDD34788FBF5F8CF0381 /* ShareExtension */ = {
+			isa = PBXGroup;
+			children = (
+				7E8DBA7CCF6FB1ACEDDE1120 /* Info.plist */,
+				68FD23DF97AF009395F22F1E /* ShareViewController.swift */,
+			);
+			path = ShareExtension;
+			sourceTree = "<group>";
+		};
+		E800153965F3EBCD92DBE985 /* Support */ = {
+			isa = PBXGroup;
+			children = (
+				04CB9E2D394BC045B08ADAC9 /* Info.plist */,
+			);
+			path = Support;
+			sourceTree = "<group>";
+		};
+		FA9546B8119F5653FF13933F /* BambuGateway */ = {
+			isa = PBXGroup;
+			children = (
+				4949B85738896A29666DE8F1 /* App */,
+				8C58D4E311418E1A5F915F33 /* Data */,
+				4541E3DE5FEACC69CB9230A0 /* GCodeKit */,
+				2457CA1C0B86D09ACE895EE4 /* Models */,
+				0E248D1E45C33C0B0D50F35B /* Networking */,
+				79B5EFE814BB7EB4A5290D8D /* Resources */,
+				E800153965F3EBCD92DBE985 /* Support */,
+				D12BFF5D1AADFDEE431496E9 /* Views */,
+			);
+			path = BambuGateway;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		07C306B2D5C9BA8E92175590 /* BambuGateway */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 860318F84DDED47AA2DA62FD /* Build configuration list for PBXNativeTarget "BambuGateway" */;
+			buildPhases = (
+				8097724E4D7C44DC217B45C0 /* Sources */,
+				9613F594A8004DC1BF0ADBA7 /* Resources */,
+				63C04EFF6632C9075D427736 /* Embed Foundation Extensions */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				3857027E8E1C9C9721A16CCB /* PBXTargetDependency */,
+			);
+			name = BambuGateway;
+			packageProductDependencies = (
+			);
+			productName = BambuGateway;
+			productReference = 1F95784351CF8ED3265FC5AF /* BambuGateway.app */;
+			productType = "com.apple.product-type.application";
+		};
+		C98CDF8A8045B91E83D80307 /* ShareExtension */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = EF8EF2B78283CFAA1B047AAF /* Build configuration list for PBXNativeTarget "ShareExtension" */;
+			buildPhases = (
+				169B9E77C8C77FB7A3543BD1 /* Sources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = ShareExtension;
+			packageProductDependencies = (
+			);
+			productName = ShareExtension;
+			productReference = 8E99C2EC57D9D732AF5FC476 /* ShareExtension.appex */;
+			productType = "com.apple.product-type.app-extension";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		77B531BC7B6BA85A43566826 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = YES;
+				LastUpgradeCheck = 1430;
+				TargetAttributes = {
+					07C306B2D5C9BA8E92175590 = {
+						DevelopmentTeam = 5Z876YNVCP;
+						ProvisioningStyle = Automatic;
+					};
+					C98CDF8A8045B91E83D80307 = {
+						DevelopmentTeam = 5Z876YNVCP;
+						ProvisioningStyle = Automatic;
+					};
+				};
+			};
+			buildConfigurationList = 28FE0E962E93135EDAD5DF0B /* Build configuration list for PBXProject "BambuGateway" */;
+			compatibilityVersion = "Xcode 14.0";
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				Base,
+				en,
+			);
+			mainGroup = 7B8B7E735CE5ED862C5955D2;
+			minimizedProjectReferenceProxies = 1;
+			preferredProjectObjectVersion = 77;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				07C306B2D5C9BA8E92175590 /* BambuGateway */,
+				C98CDF8A8045B91E83D80307 /* ShareExtension */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		9613F594A8004DC1BF0ADBA7 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				C12344BE79B9169E1A13F066 /* Assets.xcassets in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		169B9E77C8C77FB7A3543BD1 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				160AB3CC8EC474155F80A170 /* ShareViewController.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		8097724E4D7C44DC217B45C0 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				70CCAF8C0F42A532EBBB3A10 /* AppSettingsStore.swift in Sources */,
+				CB3388B447DBAD970B907E6B /* AppViewModel.swift in Sources */,
+				C9B3C4A8EF610EBC59EEDCB2 /* BambuGatewayApp.swift in Sources */,
+				B112E90578486CB35D2277BA /* ContentView.swift in Sources */,
+				E397141C8CCBF7DBB82267A5 /* GCodeParser.swift in Sources */,
+				CA1468A89E6DEFF522781031 /* GCodePreviewModal.swift in Sources */,
+				5630E47545F2C30E2CC337C9 /* GCodePreviewView.swift in Sources */,
+				0E245E236604EDABE5D36FD2 /* GatewayClient.swift in Sources */,
+				F6321079052D62AF783281E5 /* GatewayModels.swift in Sources */,
+				5B1DAF338F92BE18208DB698 /* MakerWorldBrowserView.swift in Sources */,
+				4A5C5379C16C290ACB36F95C /* MoveType.swift in Sources */,
+				6326A5843953FCC43B8311EB /* MultipartFormData.swift in Sources */,
+				FD63EED310B3024A91A58F70 /* PrintModel.swift in Sources */,
+				27F7D8BAF31F903F67EDF118 /* PrintSceneBuilder.swift in Sources */,
+				722C07A2FE9F8D32DA14CC11 /* PrintTab.swift in Sources */,
+				4C1A529AD33EE2A149CD9C0E /* PrinterTab.swift in Sources */,
+				10871FDB843342C10253A37A /* Segment.swift in Sources */,
+				DAA6A261BF169E58D43A32F6 /* SettingsView.swift in Sources */,
+				ADCBC64C9B307897F63BFD02 /* ThreeMFReader.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		3857027E8E1C9C9721A16CCB /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = C98CDF8A8045B91E83D80307 /* ShareExtension */;
+			targetProxy = 132FC0E9E209FACCA1222825 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin XCBuildConfiguration section */
+		23D96F97AC995A5907C16809 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = 5Z876YNVCP;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = ShareExtension/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = "org.lobato.bambu-gateway-ios.share-extension";
+				PRODUCT_NAME = ShareExtension;
+				SDKROOT = iphoneos;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		6A801B062AA69BD82A4DB374 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				DEVELOPMENT_TEAM = 5Z876YNVCP;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				INFOPLIST_FILE = BambuGateway/Support/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				PRODUCT_NAME = BambuGateway;
+				SDKROOT = iphoneos;
+				SUPPORTS_MACCATALYST = NO;
+				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SWIFT_STRICT_CONCURRENCY = minimal;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		7926F6C754AD45E37F4B18B5 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_STYLE = Automatic;
+				COPY_PHASE_STRIP = NO;
+				CURRENT_PROJECT_VERSION = 1;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = BambuGateway/Support/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
+				MARKETING_VERSION = 1.0;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				PRODUCT_BUNDLE_IDENTIFIER = "org.lobato.bambu-gateway-ios";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+		C96D97FEF30E118EB512BB7B /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = 5Z876YNVCP;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = ShareExtension/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = "org.lobato.bambu-gateway-ios.share-extension";
+				PRODUCT_NAME = ShareExtension;
+				SDKROOT = iphoneos;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+		CC8B2AE9E6A7CDD89B614CBC /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				DEVELOPMENT_TEAM = 5Z876YNVCP;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				INFOPLIST_FILE = BambuGateway/Support/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				PRODUCT_NAME = BambuGateway;
+				SDKROOT = iphoneos;
+				SUPPORTS_MACCATALYST = NO;
+				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SWIFT_STRICT_CONCURRENCY = minimal;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+		DA5356EB416FE8ED9AE10BB8 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_STYLE = Automatic;
+				COPY_PHASE_STRIP = NO;
+				CURRENT_PROJECT_VERSION = 1;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"$(inherited)",
+					"DEBUG=1",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = BambuGateway/Support/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
+				MARKETING_VERSION = 1.0;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				PRODUCT_BUNDLE_IDENTIFIER = "org.lobato.bambu-gateway-ios";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		28FE0E962E93135EDAD5DF0B /* Build configuration list for PBXProject "BambuGateway" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				DA5356EB416FE8ED9AE10BB8 /* Debug */,
+				7926F6C754AD45E37F4B18B5 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		860318F84DDED47AA2DA62FD /* Build configuration list for PBXNativeTarget "BambuGateway" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				6A801B062AA69BD82A4DB374 /* Debug */,
+				CC8B2AE9E6A7CDD89B614CBC /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		EF8EF2B78283CFAA1B047AAF /* Build configuration list for PBXNativeTarget "ShareExtension" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				23D96F97AC995A5907C16809 /* Debug */,
+				C96D97FEF30E118EB512BB7B /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 77B531BC7B6BA85A43566826 /* Project object */;
+}

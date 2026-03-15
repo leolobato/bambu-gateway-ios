@@ -1,0 +1,912 @@
+import Foundation
+import SceneKit
+import SwiftUI
+
+@MainActor
+final class AppViewModel: ObservableObject {
+    private struct StartedPrintContext: Equatable {
+        let printerId: String
+        let fileName: String
+        let fileSize: Int
+        let plateId: Int?
+        let plateType: String
+        let machineProfile: String
+        let processProfile: String
+        let filamentOverrides: [Int: FilamentOverrideSelection]
+    }
+
+    enum MessageLevel {
+        case info
+        case success
+        case warning
+        case error
+    }
+
+    @Published var gatewayBaseURL: String
+    @Published var printers: [PrinterStatus] = []
+    @Published var selectedPrinterId: String
+
+    @Published var amsTrays: [AMSTray] = []
+    @Published var slicerFilaments: [SlicerProfile] = []
+    @Published var amsAssignableFilaments: [SlicerProfile] = []
+
+    @Published var machineOptions: [ProfileOption] = []
+    @Published var processOptions: [ProfileOption] = []
+    @Published var plateTypeOptions: [ProfileOption] = [ProfileOption(id: "", label: "Use file/default")]
+    @Published var selectedMachineProfileId: String = ""
+    @Published var selectedProcessProfileId: String = ""
+    @Published var selectedPlateType: String = ""
+
+    @Published var selectedFile: Imported3MFFile?
+    @Published var parsedInfo: ThreeMFInfo?
+    @Published var selectedPlateId: Int = 0
+
+    @Published var trayProfileBySlot: [Int: String] = [:]
+    @Published var filamentTrayByIndex: [Int: Int] = [:]
+
+    @Published var selectedTab = 0
+    @Published var makerWorldBrowserURL: URL?
+    @Published var isShowingMakerWorldBrowser = false
+
+    @Published var isLoading: Bool = false
+    @Published var isParsing: Bool = false
+    @Published var isSubmitting: Bool = false
+    @Published var isLoadingPreview: Bool = false
+    @Published var isShowingPreview: Bool = false
+    @Published var previewScene: SCNScene?
+    @Published var currentPreviewId: String?
+    @Published var message: String = ""
+    @Published var messageLevel: MessageLevel = .info
+
+    private let settingsStore: AppSettingsStore
+    private var persistedSettings: PersistedSettings
+    private var allSlicerMachines: [SlicerProfile] = []
+    private var slicerMachines: [SlicerProfile] = []
+    private var allSlicerProcesses: [SlicerProfile] = []
+    private var slicerProcesses: [SlicerProfile] = []
+    private var allSlicerFilaments: [SlicerProfile] = []
+    private var filamentMatchesByIndex: [Int: ProjectFilamentMatch] = [:]
+    private var startedPrintContext: StartedPrintContext?
+
+    private static let defaultPlateTypeOptions: [ProfileOption] = [
+        ProfileOption(id: "", label: "Use file/default"),
+        ProfileOption(id: "cool_plate", label: "Cool Plate"),
+        ProfileOption(id: "engineering_plate", label: "Engineering Plate"),
+        ProfileOption(id: "high_temp_plate", label: "High Temp Plate"),
+        ProfileOption(id: "textured_pei_plate", label: "Textured PEI Plate"),
+        ProfileOption(id: "textured_cool_plate", label: "Textured Cool Plate"),
+        ProfileOption(id: "supertack_plate", label: "Supertack Plate"),
+    ]
+
+    init(settingsStore: AppSettingsStore = AppSettingsStore()) {
+        self.settingsStore = settingsStore
+        let loaded = settingsStore.load()
+        self.persistedSettings = loaded
+        self.gatewayBaseURL = loaded.gatewayBaseURL
+        self.selectedPrinterId = loaded.selectedPrinterId
+    }
+
+    var selectedPrinter: PrinterStatus? {
+        if let explicit = printers.first(where: { $0.id == selectedPrinterId }) {
+            return explicit
+        }
+        return printers.first
+    }
+
+    var shouldAutoUseSinglePrinter: Bool {
+        printers.count == 1
+    }
+
+    var hasParsedFile: Bool {
+        parsedInfo != nil
+    }
+
+    var hasMultiplePlates: Bool {
+        (parsedInfo?.plates.count ?? 0) > 1
+    }
+
+    var hasStartedPrintForCurrentSelection: Bool {
+        guard let currentContext = currentPrintContext() else {
+            return false
+        }
+        return startedPrintContext == currentContext
+    }
+
+    var needsSlicing: Bool {
+        if let parsedInfo {
+            return !parsedInfo.hasGcode
+        }
+        return false
+    }
+
+    var projectDefaultMachineName: String {
+        guard let parsedInfo, !parsedInfo.printer.printerSettingsId.isEmpty else {
+            return "Unknown"
+        }
+        return readableProfileName(
+            settingOrName: parsedInfo.printer.printerSettingsId,
+            profiles: allSlicerMachines
+        )
+    }
+
+    var projectDefaultProcessName: String {
+        guard let parsedInfo, !parsedInfo.printProfile.printSettingsId.isEmpty else {
+            return "Unknown"
+        }
+        return readableProfileName(
+            settingOrName: parsedInfo.printProfile.printSettingsId,
+            profiles: allSlicerProcesses
+        )
+    }
+
+    func refreshAll() async {
+        guard !gatewayBaseURL.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else {
+            setMessage("Set the gateway server address first.", .info)
+            return
+        }
+
+        isLoading = true
+        defer { isLoading = false }
+
+        do {
+            let fetchedPrinters = try await gatewayClient().fetchPrinters()
+            printers = fetchedPrinters
+            applyPrinterSelectionAfterRefresh()
+        } catch {
+            setMessage(error.localizedDescription, .error)
+            return
+        }
+
+        await loadSetupData()
+        if selectedFile != nil {
+            await parseSelectedFile()
+        }
+    }
+
+    func onGatewayAddressSaved() async {
+        persistSettings()
+        await refreshAll()
+    }
+
+    func onPrinterChanged(_ printerId: String) async {
+        selectedPrinterId = printerId
+        persistedSettings.selectedPrinterId = printerId
+        persistSettings()
+        await loadSetupData()
+        applyPersistedProfileSelections()
+        applyFilamentMappingFromCurrentData()
+    }
+
+    func import3MF(from url: URL) async {
+        do {
+            let file = try loadFile(url: url)
+            startedPrintContext = nil
+            selectedFile = file
+            await parseSelectedFile()
+        } catch {
+            setMessage(error.localizedDescription, .error)
+        }
+    }
+
+    func importDownloaded3MF(fileName: String, data: Data) async {
+        startedPrintContext = nil
+        selectedFile = Imported3MFFile(fileName: fileName, data: data)
+        await parseSelectedFile()
+    }
+
+    private static let defaultMakerWorldURL = URL(string: "https://makerworld.com")!
+
+    func openMakerWorldBrowser(url: URL? = nil) {
+        makerWorldBrowserURL = url ?? Self.defaultMakerWorldURL
+        isShowingMakerWorldBrowser = true
+        selectedTab = 1
+    }
+
+    func clearFile() {
+        startedPrintContext = nil
+        selectedFile = nil
+        parsedInfo = nil
+        filamentMatchesByIndex = [:]
+        machineOptions = []
+        processOptions = []
+        plateTypeOptions = Self.defaultPlateTypeOptions
+        selectedMachineProfileId = ""
+        selectedProcessProfileId = ""
+        selectedPlateType = ""
+        selectedPlateId = 0
+        filamentTrayByIndex = [:]
+    }
+
+    func trayProfileSelection(for slot: Int) -> String {
+        trayProfileBySlot[slot] ?? ""
+    }
+
+    func setTrayProfileSelection(slot: Int, settingId: String) {
+        trayProfileBySlot[slot] = settingId
+        updatePerPrinterSelection { selection in
+            selection.trayProfileBySlot[slot] = settingId
+        }
+    }
+
+    func filamentTraySelection(for filamentIndex: Int) -> Int? {
+        filamentTrayByIndex[filamentIndex]
+    }
+
+    func setFilamentTraySelection(index: Int, slot: Int?) {
+        if let slot {
+            filamentTrayByIndex[index] = slot
+        } else {
+            filamentTrayByIndex.removeValue(forKey: index)
+        }
+        updatePerPrinterSelection { selection in
+            if let slot {
+                selection.filamentTrayByIndex[index] = slot
+            } else {
+                selection.filamentTrayByIndex.removeValue(forKey: index)
+            }
+        }
+    }
+
+    func setMachineProfile(_ id: String) {
+        selectedMachineProfileId = id
+        updatePerPrinterSelection { $0.machineProfileId = id }
+    }
+
+    func setProcessProfile(_ id: String) {
+        selectedProcessProfileId = id
+        updatePerPrinterSelection { $0.processProfileId = id }
+    }
+
+    func setPlateType(_ id: String) {
+        selectedPlateType = id
+        updatePerPrinterSelection { $0.plateType = id }
+    }
+
+    func submitPrint() async {
+        guard let submission = buildSubmission() else { return }
+        let printContext = printContext(for: submission)
+
+        isSubmitting = true
+        defer { isSubmitting = false }
+
+        do {
+            let response = try await gatewayClient().submitPrint(submission)
+            handlePrintResponse(response, startedContext: printContext)
+        } catch {
+            setMessage(error.localizedDescription, .error)
+        }
+    }
+
+    func submitPreview() async {
+        guard let selectedFile, let parsedInfo else {
+            setMessage("Select a 3MF file first.", .error)
+            return
+        }
+        let preferredPlateId = parsedInfo.plates.count > 1 ? selectedPlateId : nil
+
+        isLoadingPreview = true
+        defer { isLoadingPreview = false }
+
+        do {
+            if parsedInfo.hasGcode {
+                // Already sliced — extract gcode locally
+                let fileData = selectedFile.data
+                let scene = try await Task.detached {
+                    let reader = ThreeMFReader()
+                    let extracted = try reader.extractGCode(
+                        from: fileData,
+                        preferredPlateId: preferredPlateId
+                    )
+                    let parser = GCodeParser()
+                    let model = try parser.parse(extracted.content)
+                    return PrintSceneBuilder().buildScene(from: model)
+                }.value
+
+                previewScene = scene
+                currentPreviewId = nil
+                isShowingPreview = true
+                setMessage("", .info)
+            } else {
+                // Needs slicing — call the preview API
+                guard let submission = buildSubmission() else { return }
+                let previewResult = try await gatewayClient().fetchPrintPreview(submission)
+
+                let threeMFData = previewResult.threeMFData
+                let scene = try await Task.detached {
+                    let reader = ThreeMFReader()
+                    let extracted = try reader.extractGCode(
+                        from: threeMFData,
+                        preferredPlateId: preferredPlateId
+                    )
+                    let parser = GCodeParser()
+                    let model = try parser.parse(extracted.content)
+                    return PrintSceneBuilder().buildScene(from: model)
+                }.value
+
+                previewScene = scene
+                currentPreviewId = previewResult.previewId
+                isShowingPreview = true
+                setMessage("", .info)
+            }
+        } catch {
+            setMessage(error.localizedDescription, .error)
+        }
+    }
+
+    func confirmPreviewPrint() async {
+        let startedContext = currentPrintContext()
+        isSubmitting = true
+        defer { isSubmitting = false }
+
+        do {
+            if let previewId = currentPreviewId {
+                // Was sliced via API — use the stored preview
+                let response = try await gatewayClient().printFromPreview(
+                    previewId: previewId,
+                    printerId: resolvedPrinterId()
+                )
+                dismissPreview()
+                handlePrintResponse(response, startedContext: startedContext)
+            } else {
+                // Already sliced — use regular print
+                guard let submission = buildSubmission() else { return }
+                let response = try await gatewayClient().submitPrint(submission)
+                dismissPreview()
+                handlePrintResponse(response, startedContext: startedContext ?? printContext(for: submission))
+            }
+        } catch {
+            setMessage(error.localizedDescription, .error)
+        }
+    }
+
+    func cancelPreview() {
+        dismissPreview()
+    }
+
+    private func dismissPreview() {
+        isShowingPreview = false
+        previewScene = nil
+        currentPreviewId = nil
+    }
+
+    private func buildSubmission() -> PrintSubmission? {
+        guard let selectedFile, let parsedInfo else {
+            setMessage("Select a 3MF file first.", .error)
+            return nil
+        }
+
+        if needsSlicing && (selectedMachineProfileId.isEmpty || selectedProcessProfileId.isEmpty) {
+            setMessage("This file needs slicing. Select machine and process profiles.", .error)
+            return nil
+        }
+
+        let plateIdToSend: Int? = parsedInfo.plates.count > 1 ? selectedPlateId : nil
+
+        return PrintSubmission(
+            file: selectedFile,
+            printerId: resolvedPrinterId(),
+            plateId: plateIdToSend,
+            plateType: selectedPlateType,
+            machineProfile: selectedMachineProfileId,
+            processProfile: selectedProcessProfileId,
+            filamentOverrides: buildFilamentOverrides(for: parsedInfo)
+        )
+    }
+
+    private func resolvedPrinterId() -> String {
+        if !selectedPrinterId.isEmpty {
+            return selectedPrinterId
+        }
+        if printers.count == 1 {
+            return printers[0].id
+        }
+        return ""
+    }
+
+    private func handlePrintResponse(_ response: PrintResponse, startedContext: StartedPrintContext?) {
+        startedPrintContext = startedContext
+        var output = "Print started: \(response.fileName)"
+        if response.wasSliced {
+            output += " (sliced)"
+        }
+        let transfer = settingsTransferMessage(response.settingsTransfer)
+        if !transfer.isEmpty {
+            output += "\n\(transfer)"
+        }
+        let level: MessageLevel = response.settingsTransfer?.status == "no_original_profile" ? .warning : .success
+        setMessage(output, level)
+    }
+
+    private func currentPrintContext() -> StartedPrintContext? {
+        guard let selectedFile, let parsedInfo else {
+            return nil
+        }
+
+        let plateIdToSend: Int? = parsedInfo.plates.count > 1 ? selectedPlateId : nil
+
+        return StartedPrintContext(
+            printerId: resolvedPrinterId(),
+            fileName: selectedFile.fileName,
+            fileSize: selectedFile.data.count,
+            plateId: plateIdToSend,
+            plateType: selectedPlateType,
+            machineProfile: selectedMachineProfileId,
+            processProfile: selectedProcessProfileId,
+            filamentOverrides: buildFilamentOverrides(for: parsedInfo)
+        )
+    }
+
+    private func printContext(for submission: PrintSubmission) -> StartedPrintContext {
+        StartedPrintContext(
+            printerId: submission.printerId,
+            fileName: submission.file.fileName,
+            fileSize: submission.file.data.count,
+            plateId: submission.plateId,
+            plateType: submission.plateType,
+            machineProfile: submission.machineProfile,
+            processProfile: submission.processProfile,
+            filamentOverrides: submission.filamentOverrides
+        )
+    }
+
+    private func parseSelectedFile() async {
+        guard let selectedFile else {
+            return
+        }
+
+        isParsing = true
+        defer { isParsing = false }
+
+        parsedInfo = nil
+        machineOptions = []
+        processOptions = []
+        plateTypeOptions = Self.defaultPlateTypeOptions
+        selectedMachineProfileId = ""
+        selectedProcessProfileId = ""
+        selectedPlateType = ""
+        selectedPlateId = 0
+        filamentMatchesByIndex = [:]
+        filamentTrayByIndex = [:]
+
+        do {
+            let info = try await gatewayClient().parse3MF(file: selectedFile)
+            parsedInfo = info
+            selectedPlateId = info.plates.first?.id ?? 0
+            configureProfileOptions(for: info)
+            await refreshFilamentMatches()
+            applyFilamentMappingFromCurrentData()
+
+            if info.hasGcode {
+                setMessage("File parsed: already sliced.", .success)
+            } else {
+                setMessage("File parsed: slicing required.", .info)
+            }
+        } catch {
+            setMessage(error.localizedDescription, .error)
+        }
+    }
+
+    private func loadSetupData() async {
+        let machineFilter = selectedMachineFilterId()
+
+        async let amsResult = fetchAMSGracefully()
+        async let machinesResult = fetchMachinesGracefully()
+        async let plateTypesResult = fetchPlateTypesGracefully()
+
+        let fetchedAMS = await amsResult
+        let fetchedAllMachines = await machinesResult
+        allSlicerMachines = fetchedAllMachines
+        slicerMachines = filterMachinesForSelectedPrinter(allMachines: fetchedAllMachines, machineFilter: machineFilter)
+        plateTypeOptions = buildPlateTypeOptions(await plateTypesResult)
+
+        async let processesResult = fetchProcessesGracefully(machine: machineFilter)
+        async let filamentsResult = fetchFilamentsGracefully(machine: machineFilter)
+        async let allProcessesResult = machineFilter.isEmpty
+            ? fetchProcessesGracefully(machine: machineFilter)
+            : fetchProcessesGracefully(machine: "")
+        async let allFilamentsResult = machineFilter.isEmpty
+            ? fetchFilamentsGracefully(machine: machineFilter)
+            : fetchFilamentsGracefully(machine: "")
+
+        slicerProcesses = await processesResult
+        slicerFilaments = await filamentsResult
+        amsAssignableFilaments = slicerFilaments.filter { $0.amsAssignable == true }
+        allSlicerProcesses = await allProcessesResult
+        allSlicerFilaments = await allFilamentsResult
+
+        applyAMSTrays(fetchedAMS?.trays ?? [])
+        applyPersistedProfileSelections()
+        await refreshFilamentMatches()
+        applyFilamentMappingFromCurrentData()
+    }
+
+    private func applyPrinterSelectionAfterRefresh() {
+        if printers.count == 1 {
+            selectedPrinterId = printers[0].id
+        } else if !selectedPrinterId.isEmpty,
+                  !printers.contains(where: { $0.id == selectedPrinterId }) {
+            selectedPrinterId = ""
+        }
+
+        if selectedPrinterId.isEmpty,
+           !persistedSettings.selectedPrinterId.isEmpty,
+           printers.contains(where: { $0.id == persistedSettings.selectedPrinterId }) {
+            selectedPrinterId = persistedSettings.selectedPrinterId
+        }
+
+        persistedSettings.selectedPrinterId = selectedPrinterId
+        persistSettings()
+    }
+
+    private func selectedMachineFilterId() -> String {
+        if !selectedPrinterId.isEmpty,
+           let selected = printers.first(where: { $0.id == selectedPrinterId }) {
+            return selected.machineModel
+        }
+        return printers.first?.machineModel ?? ""
+    }
+
+    private func filterMachinesForSelectedPrinter(allMachines: [SlicerProfile], machineFilter: String) -> [SlicerProfile] {
+        guard !machineFilter.isEmpty,
+              let current = allMachines.first(where: { $0.settingId == machineFilter }),
+              let printerModel = current.printerModel,
+              !printerModel.isEmpty else {
+            return allMachines
+        }
+
+        return allMachines.filter { $0.printerModel == printerModel }
+    }
+
+    private func applyAMSTrays(_ trays: [AMSTray]) {
+        amsTrays = trays
+            .filter { (0 ... 3).contains($0.slot) }
+            .sorted { $0.slot < $1.slot }
+
+        var selections: [Int: String] = [:]
+        let persisted = perPrinterSelection()
+        let validIds = Set(amsAssignableFilaments.map { $0.settingId })
+
+        for tray in amsTrays {
+            if let persistedId = persisted.trayProfileBySlot[tray.slot],
+               persistedId.isEmpty || validIds.contains(persistedId) {
+                selections[tray.slot] = persistedId
+            } else if let matched = tray.matchedFilament?.settingId,
+                      validIds.contains(matched) {
+                selections[tray.slot] = matched
+            } else {
+                selections[tray.slot] = ""
+            }
+        }
+
+        trayProfileBySlot = selections
+    }
+
+    private func configureProfileOptions(for info: ThreeMFInfo) {
+        let machineBuild = buildProfileOptions(
+            filtered: slicerMachines,
+            fileSettingOrName: info.printer.printerSettingsId,
+            allProfiles: allSlicerMachines
+        )
+        machineOptions = machineBuild.options
+
+        let processBuild = buildProfileOptions(
+            filtered: slicerProcesses,
+            fileSettingOrName: info.printProfile.printSettingsId,
+            allProfiles: allSlicerProcesses
+        )
+        processOptions = processBuild.options
+
+        let persisted = perPrinterSelection()
+
+        let validMachineIds = Set(machineBuild.options.map { $0.id }.filter { !$0.isEmpty })
+        if validMachineIds.contains(persisted.machineProfileId) {
+            selectedMachineProfileId = persisted.machineProfileId
+        } else {
+            selectedMachineProfileId = machineBuild.defaultSelection
+        }
+
+        let validProcessIds = Set(processBuild.options.map { $0.id }.filter { !$0.isEmpty })
+        if validProcessIds.contains(persisted.processProfileId) {
+            selectedProcessProfileId = persisted.processProfileId
+        } else {
+            selectedProcessProfileId = processBuild.defaultSelection
+        }
+
+        applyPersistedPlateTypeSelection()
+    }
+
+    private func applyPersistedProfileSelections() {
+        let persisted = perPrinterSelection()
+
+        let validMachineIds = Set(machineOptions.map { $0.id })
+        if validMachineIds.contains(persisted.machineProfileId) {
+            selectedMachineProfileId = persisted.machineProfileId
+        }
+
+        let validProcessIds = Set(processOptions.map { $0.id })
+        if validProcessIds.contains(persisted.processProfileId) {
+            selectedProcessProfileId = persisted.processProfileId
+        }
+
+        applyPersistedPlateTypeSelection()
+    }
+
+    private func applyFilamentMappingFromCurrentData() {
+        guard let parsedInfo else {
+            filamentTrayByIndex = [:]
+            return
+        }
+
+        let persisted = perPrinterSelection()
+        let validSlots = Set(amsTrays.map { $0.slot })
+
+        var mapping: [Int: Int] = [:]
+
+        for filament in parsedInfo.filaments {
+            if let persistedSlot = persisted.filamentTrayByIndex[filament.index], validSlots.contains(persistedSlot) {
+                mapping[filament.index] = persistedSlot
+                continue
+            }
+
+            if let preferredSlot = filamentMatchesByIndex[filament.index]?.preferredTraySlot,
+               validSlots.contains(preferredSlot) {
+                mapping[filament.index] = preferredSlot
+                continue
+            }
+
+            let projectFilamentId = projectFilamentId(for: filament).uppercased()
+            if !projectFilamentId.isEmpty,
+               let exactMatch = amsTrays.first(where: {
+                   !$0.filamentId.isEmpty && $0.filamentId.uppercased() == projectFilamentId
+               }) {
+                mapping[filament.index] = exactMatch.slot
+                continue
+            }
+
+            let wantedType = filament.type.uppercased()
+            if let match = amsTrays.first(where: {
+                !$0.trayType.isEmpty && $0.trayType.uppercased() == wantedType
+            }) {
+                mapping[filament.index] = match.slot
+            }
+        }
+
+        filamentTrayByIndex = mapping
+    }
+
+    private func refreshFilamentMatches() async {
+        guard let parsedInfo, !parsedInfo.hasGcode else {
+            filamentMatchesByIndex = [:]
+            return
+        }
+
+        do {
+            let response = try await gatewayClient().fetchFilamentMatches(
+                printerId: resolvedPrinterId(),
+                filaments: parsedInfo.filaments
+            )
+            filamentMatchesByIndex = Dictionary(
+                uniqueKeysWithValues: response.matches.map { ($0.index, $0) }
+            )
+        } catch {
+            filamentMatchesByIndex = [:]
+        }
+    }
+
+    private func buildProfileOptions(
+        filtered: [SlicerProfile],
+        fileSettingOrName: String,
+        allProfiles: [SlicerProfile]
+    ) -> (options: [ProfileOption], defaultSelection: String) {
+        var options: [ProfileOption] = [ProfileOption(id: "", label: "Select...")]
+        var defaultSelection = ""
+
+        func isMatch(_ profile: SlicerProfile, _ value: String) -> Bool {
+            profile.settingId == value || profile.name == value
+        }
+
+        let inFiltered = fileSettingOrName.isEmpty
+            ? nil
+            : filtered.first(where: { isMatch($0, fileSettingOrName) })
+        let inAll = fileSettingOrName.isEmpty || inFiltered != nil
+            ? nil
+            : allProfiles.first(where: { isMatch($0, fileSettingOrName) })
+
+        if !fileSettingOrName.isEmpty, inFiltered == nil {
+            if let inAll {
+                options.append(
+                    ProfileOption(
+                        id: inAll.settingId,
+                        label: "\(inAll.name) (from file - different printer)"
+                    )
+                )
+                defaultSelection = inAll.settingId
+            } else {
+                options.append(
+                    ProfileOption(
+                        id: fileSettingOrName,
+                        label: "\(fileSettingOrName) (from file - unknown)"
+                    )
+                )
+                defaultSelection = fileSettingOrName
+            }
+        }
+
+        for profile in filtered {
+            let label: String
+            if let inFiltered, isMatch(profile, fileSettingOrName), profile.settingId == inFiltered.settingId {
+                label = "\(profile.name) (from file)"
+                defaultSelection = profile.settingId
+            } else {
+                label = profile.name
+            }
+
+            options.append(ProfileOption(id: profile.settingId, label: label))
+        }
+
+        return (options, defaultSelection)
+    }
+
+    private func buildFilamentOverrides(for info: ThreeMFInfo) -> [Int: FilamentOverrideSelection] {
+        guard !info.hasGcode else {
+            return [:]
+        }
+
+        var overrides: [Int: FilamentOverrideSelection] = [:]
+        for filament in info.filaments {
+            guard let slot = filamentTrayByIndex[filament.index],
+                  let settingId = trayProfileBySlot[slot],
+                  !settingId.isEmpty else {
+                continue
+            }
+            overrides[filament.index] = FilamentOverrideSelection(
+                profileSettingId: settingId,
+                traySlot: slot
+            )
+        }
+        return overrides
+    }
+
+    private func projectFilamentId(for filament: ProjectFilament) -> String {
+        let wanted = filament.settingId.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !wanted.isEmpty else {
+            return ""
+        }
+
+        let profiles = slicerFilaments + allSlicerFilaments
+        if let profile = profiles.first(where: { $0.settingId == wanted || $0.name == wanted }) {
+            return profile.filamentId ?? ""
+        }
+        return ""
+    }
+
+    private func readableProfileName(settingOrName: String, profiles: [SlicerProfile]) -> String {
+        if let matched = profiles.first(where: { $0.settingId == settingOrName || $0.name == settingOrName }) {
+            return matched.name
+        }
+        return settingOrName
+    }
+
+    private func buildPlateTypeOptions(_ types: [PlateTypeOption]) -> [ProfileOption] {
+        let mapped = types.map { ProfileOption(id: $0.value, label: $0.label) }
+        let source = mapped.isEmpty ? Array(Self.defaultPlateTypeOptions.dropFirst()) : mapped
+        return [ProfileOption(id: "", label: "Use file/default")] + source
+    }
+
+    private func applyPersistedPlateTypeSelection() {
+        let persisted = perPrinterSelection()
+        let validPlateTypes = Set(plateTypeOptions.map { $0.id })
+        selectedPlateType = validPlateTypes.contains(persisted.plateType) ? persisted.plateType : ""
+    }
+
+    private func settingsTransferMessage(_ transfer: SettingsTransferInfo?) -> String {
+        guard let transfer else {
+            return ""
+        }
+
+        if transfer.status == "applied" {
+            let keys = transfer.transferred.map(\.key).joined(separator: ", ")
+            return "Transferred \(transfer.transferred.count) custom setting(s): \(keys)"
+        }
+
+        if transfer.status == "no_original_profile" {
+            return "Could not identify the original profile. Embedded settings were applied as-is."
+        }
+
+        return ""
+    }
+
+    private func perPrinterSelection() -> PerPrinterSelection {
+        let key = perPrinterKey()
+        return persistedSettings.perPrinter[key] ?? .empty
+    }
+
+    private func updatePerPrinterSelection(_ block: (inout PerPrinterSelection) -> Void) {
+        let key = perPrinterKey()
+        var selection = persistedSettings.perPrinter[key] ?? .empty
+        block(&selection)
+        persistedSettings.perPrinter[key] = selection
+        persistSettings()
+    }
+
+    private func perPrinterKey() -> String {
+        if !selectedPrinterId.isEmpty {
+            return selectedPrinterId
+        }
+        if let first = printers.first {
+            return first.id
+        }
+        return "default"
+    }
+
+    private func persistSettings() {
+        persistedSettings.gatewayBaseURL = gatewayBaseURL
+        persistedSettings.selectedPrinterId = selectedPrinterId
+        settingsStore.save(persistedSettings)
+    }
+
+    private func gatewayClient() -> GatewayClient {
+        GatewayClient(baseURLString: gatewayBaseURL)
+    }
+
+    private func loadFile(url: URL) throws -> Imported3MFFile {
+        guard url.pathExtension.lowercased() == "3mf" else {
+            throw GatewayClientError.serverError("Only .3mf files are supported.")
+        }
+
+        let granted = url.startAccessingSecurityScopedResource()
+        defer {
+            if granted {
+                url.stopAccessingSecurityScopedResource()
+            }
+        }
+
+        let data = try Data(contentsOf: url)
+        return Imported3MFFile(fileName: url.lastPathComponent, data: data)
+    }
+
+    private func setMessage(_ text: String, _ level: MessageLevel) {
+        message = text
+        messageLevel = level
+    }
+
+    private func fetchAMSGracefully() async -> AMSResponse? {
+        do {
+            return try await gatewayClient().fetchAMS()
+        } catch {
+            return nil
+        }
+    }
+
+    private func fetchMachinesGracefully() async -> [SlicerProfile] {
+        do {
+            return try await gatewayClient().fetchSlicerMachines()
+        } catch {
+            return []
+        }
+    }
+
+    private func fetchProcessesGracefully(machine: String) async -> [SlicerProfile] {
+        do {
+            return try await gatewayClient().fetchSlicerProcesses(machine: machine)
+        } catch {
+            return []
+        }
+    }
+
+    private func fetchFilamentsGracefully(machine: String) async -> [SlicerProfile] {
+        do {
+            return try await gatewayClient().fetchSlicerFilaments(machine: machine)
+        } catch {
+            return []
+        }
+    }
+
+    private func fetchPlateTypesGracefully() async -> [PlateTypeOption] {
+        do {
+            return try await gatewayClient().fetchSlicerPlateTypes()
+        } catch {
+            return []
+        }
+    }
+}

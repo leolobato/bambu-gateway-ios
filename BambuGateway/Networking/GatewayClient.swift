@@ -1,0 +1,286 @@
+import Foundation
+
+enum GatewayClientError: LocalizedError {
+    case invalidURL
+    case invalidResponse
+    case serverError(String)
+    case decodeError
+
+    var errorDescription: String? {
+        switch self {
+        case .invalidURL:
+            return "Invalid gateway URL."
+        case .invalidResponse:
+            return "Unexpected server response."
+        case .serverError(let detail):
+            return detail
+        case .decodeError:
+            return "Failed to parse server response."
+        }
+    }
+}
+
+struct PrintSubmission {
+    let file: Imported3MFFile
+    let printerId: String
+    let plateId: Int?
+    let plateType: String
+    let machineProfile: String
+    let processProfile: String
+    let filamentOverrides: [Int: FilamentOverrideSelection]
+}
+
+struct GatewayClient {
+    let baseURLString: String
+    let session: URLSession
+
+    init(baseURLString: String, session: URLSession = .shared) {
+        self.baseURLString = baseURLString
+        self.session = session
+    }
+
+    func fetchPrinters() async throws -> [PrinterStatus] {
+        let response: PrinterListResponse = try await get(path: "/api/printers")
+        return response.printers
+    }
+
+    func fetchAMS() async throws -> AMSResponse {
+        try await get(path: "/api/ams")
+    }
+
+    func fetchSlicerMachines() async throws -> [SlicerProfile] {
+        try await get(path: "/api/slicer/machines")
+    }
+
+    func fetchSlicerProcesses(machine: String) async throws -> [SlicerProfile] {
+        let query: [URLQueryItem] = machine.isEmpty ? [] : [URLQueryItem(name: "machine", value: machine)]
+        return try await get(path: "/api/slicer/processes", queryItems: query)
+    }
+
+    func fetchSlicerFilaments(machine: String) async throws -> [SlicerProfile] {
+        let query: [URLQueryItem] = machine.isEmpty ? [] : [URLQueryItem(name: "machine", value: machine)]
+        return try await get(path: "/api/slicer/filaments", queryItems: query)
+    }
+
+    func fetchSlicerPlateTypes() async throws -> [PlateTypeOption] {
+        try await get(path: "/api/slicer/plate-types")
+    }
+
+    func parse3MF(file: Imported3MFFile) async throws -> ThreeMFInfo {
+        var form = MultipartFormData()
+        form.addFile(name: "file", fileName: file.fileName, mimeType: "application/octet-stream", data: file.data)
+        form.finalize()
+
+        let (data, _) = try await request(
+            path: "/api/parse-3mf",
+            method: "POST",
+            body: form.body,
+            contentType: "multipart/form-data; boundary=\(form.boundary)"
+        )
+
+        return try decode(ThreeMFInfo.self, from: data)
+    }
+
+    func fetchFilamentMatches(printerId: String, filaments: [ProjectFilament]) async throws -> FilamentMatchResponse {
+        let payload = FilamentMatchRequest(printerId: printerId, filaments: filaments)
+        let encoder = JSONEncoder()
+        encoder.keyEncodingStrategy = .convertToSnakeCase
+        let body = try encoder.encode(payload)
+
+        let (data, _) = try await request(
+            path: "/api/filament-matches",
+            method: "POST",
+            body: body,
+            contentType: "application/json"
+        )
+
+        return try decode(FilamentMatchResponse.self, from: data)
+    }
+
+    func fetchPrintPreview(_ submission: PrintSubmission) async throws -> PreviewResult {
+        var form = MultipartFormData()
+        form.addFile(name: "file", fileName: submission.file.fileName, mimeType: "application/octet-stream", data: submission.file.data)
+
+        if !submission.printerId.isEmpty {
+            form.addField(name: "printer_id", value: submission.printerId)
+        }
+        if !submission.machineProfile.isEmpty {
+            form.addField(name: "machine_profile", value: submission.machineProfile)
+        }
+        if !submission.processProfile.isEmpty {
+            form.addField(name: "process_profile", value: submission.processProfile)
+        }
+        if let plateId = submission.plateId {
+            form.addField(name: "plate_id", value: String(plateId))
+        }
+        if !submission.plateType.isEmpty {
+            form.addField(name: "plate_type", value: submission.plateType)
+        }
+        if !submission.filamentOverrides.isEmpty {
+            try addFilamentProfilesField(to: &form, overrides: submission.filamentOverrides)
+        }
+
+        form.finalize()
+
+        let (data, response) = try await request(
+            path: "/api/print-preview",
+            method: "POST",
+            body: form.body,
+            contentType: "multipart/form-data; boundary=\(form.boundary)",
+            timeout: 600
+        )
+
+        guard let httpResponse = response as? HTTPURLResponse,
+              let previewId = httpResponse.value(forHTTPHeaderField: "X-Preview-Id"),
+              !previewId.isEmpty else {
+            throw GatewayClientError.serverError("Server did not return a preview ID.")
+        }
+
+        let fileName = parseContentDispositionFilename(httpResponse) ?? submission.file.fileName
+
+        return PreviewResult(threeMFData: data, previewId: previewId, fileName: fileName)
+    }
+
+    func printFromPreview(previewId: String, printerId: String) async throws -> PrintResponse {
+        var form = MultipartFormData()
+        form.addField(name: "preview_id", value: previewId)
+        if !printerId.isEmpty {
+            form.addField(name: "printer_id", value: printerId)
+        }
+        form.finalize()
+
+        let (data, _) = try await request(
+            path: "/api/print",
+            method: "POST",
+            body: form.body,
+            contentType: "multipart/form-data; boundary=\(form.boundary)",
+            timeout: 600
+        )
+
+        return try decode(PrintResponse.self, from: data)
+    }
+
+    func submitPrint(_ submission: PrintSubmission) async throws -> PrintResponse {
+        var form = MultipartFormData()
+        form.addFile(name: "file", fileName: submission.file.fileName, mimeType: "application/octet-stream", data: submission.file.data)
+
+        if !submission.printerId.isEmpty {
+            form.addField(name: "printer_id", value: submission.printerId)
+        }
+        if let plateId = submission.plateId {
+            form.addField(name: "plate_id", value: String(plateId))
+        }
+        if !submission.plateType.isEmpty {
+            form.addField(name: "plate_type", value: submission.plateType)
+        }
+        if !submission.machineProfile.isEmpty {
+            form.addField(name: "machine_profile", value: submission.machineProfile)
+        }
+        if !submission.processProfile.isEmpty {
+            form.addField(name: "process_profile", value: submission.processProfile)
+        }
+        if !submission.filamentOverrides.isEmpty {
+            try addFilamentProfilesField(to: &form, overrides: submission.filamentOverrides)
+        }
+
+        form.finalize()
+
+        let (data, _) = try await request(
+            path: "/api/print",
+            method: "POST",
+            body: form.body,
+            contentType: "multipart/form-data; boundary=\(form.boundary)",
+            timeout: 600
+        )
+
+        return try decode(PrintResponse.self, from: data)
+    }
+
+    private func get<T: Decodable>(path: String, queryItems: [URLQueryItem] = []) async throws -> T {
+        let (data, _) = try await request(path: path, method: "GET", queryItems: queryItems)
+        return try decode(T.self, from: data)
+    }
+
+    private func request(
+        path: String,
+        method: String,
+        queryItems: [URLQueryItem] = [],
+        body: Data? = nil,
+        contentType: String? = nil,
+        timeout: TimeInterval = 60
+    ) async throws -> (Data, URLResponse) {
+        guard var components = URLComponents(string: baseURLString.trimmingCharacters(in: .whitespacesAndNewlines)),
+              let host = components.host,
+              !host.isEmpty else {
+            throw GatewayClientError.invalidURL
+        }
+
+        components.path = path
+        components.queryItems = queryItems.isEmpty ? nil : queryItems
+
+        guard let url = components.url else {
+            throw GatewayClientError.invalidURL
+        }
+
+        var request = URLRequest(url: url)
+        request.httpMethod = method
+        request.httpBody = body
+        request.timeoutInterval = timeout
+
+        if let contentType {
+            request.setValue(contentType, forHTTPHeaderField: "Content-Type")
+        }
+
+        let (data, response) = try await session.data(for: request)
+
+        guard let http = response as? HTTPURLResponse else {
+            throw GatewayClientError.invalidResponse
+        }
+
+        guard (200 ... 299).contains(http.statusCode) else {
+            if let detail = try? JSONDecoder().decode(ErrorDetailResponse.self, from: data).detail {
+                throw GatewayClientError.serverError(detail)
+            }
+            throw GatewayClientError.serverError("Request failed with HTTP \(http.statusCode).")
+        }
+
+        return (data, response)
+    }
+
+    private func parseContentDispositionFilename(_ response: HTTPURLResponse) -> String? {
+        guard let header = response.value(forHTTPHeaderField: "Content-Disposition") else {
+            return nil
+        }
+        // Parse filename="value" from Content-Disposition header
+        let pattern = "filename=\"([^\"]+)\""
+        guard let regex = try? NSRegularExpression(pattern: pattern),
+              let match = regex.firstMatch(in: header, range: NSRange(header.startIndex..., in: header)),
+              let range = Range(match.range(at: 1), in: header) else {
+            return nil
+        }
+        return String(header[range])
+    }
+
+    private func decode<T: Decodable>(_ type: T.Type, from data: Data) throws -> T {
+        let decoder = JSONDecoder()
+        decoder.keyDecodingStrategy = .convertFromSnakeCase
+        do {
+            return try decoder.decode(type, from: data)
+        } catch {
+            throw GatewayClientError.decodeError
+        }
+    }
+
+    private func addFilamentProfilesField(
+        to form: inout MultipartFormData,
+        overrides: [Int: FilamentOverrideSelection]
+    ) throws {
+        let payload = Dictionary(
+            uniqueKeysWithValues: overrides.map { (String($0.key), $0.value) }
+        )
+        let json = try JSONEncoder().encode(payload)
+        if let string = String(data: json, encoding: .utf8) {
+            form.addField(name: "filament_profiles", value: string)
+        }
+    }
+}
