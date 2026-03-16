@@ -12,6 +12,10 @@ settings:
     GENERATE_INFOPLIST_FILE: NO
     INFOPLIST_FILE: BambuGateway/Support/Info.plist
     CODE_SIGN_STYLE: Automatic
+packages:
+  GCodePreview:
+    url: https://github.com/leolobato/GCodePreview
+    exactVersion: 1.0.1
 targets:
   BambuGateway:
     type: application
@@ -24,8 +28,10 @@ targets:
       - path: BambuGateway
         excludes:
           - '**/*.md'
+          - GCodeKit
     dependencies:
       - target: ShareExtension
+      - package: GCodePreview
     settings:
       base:
         PRODUCT_NAME: BambuGateway
@@ -36,10 +42,14 @@ targets:
         SUPPORTS_MACCATALYST: NO
         SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD: NO
         ENABLE_USER_SCRIPT_SANDBOXING: YES
+        OTHER_LDFLAGS: ["-lz"]
   ShareExtension:
     type: app-extension
     platform: iOS
     deploymentTarget: '18.0'
+    configFiles:
+      Debug: Configuration/Base.xcconfig
+      Release: Configuration/Base.xcconfig
     sources:
       - path: ShareExtension
     settings:

@@ -1,17 +1,12 @@
 import Foundation
 import zlib
 
-public struct ExtractedGCode: Sendable, Hashable {
-    public let path: String
-    public let content: String
-
-    public init(path: String, content: String) {
-        self.path = path
-        self.content = content
-    }
+struct ExtractedGCode: Sendable, Hashable {
+    let path: String
+    let content: String
 }
 
-public enum ThreeMFReaderError: Error, LocalizedError {
+enum ThreeMFReaderError: Error, LocalizedError {
     case unreadableArchive
     case invalidArchive
     case noGCodeFound
@@ -19,7 +14,7 @@ public enum ThreeMFReaderError: Error, LocalizedError {
     case decompressionFailed
     case invalidTextEncoding
 
-    public var errorDescription: String? {
+    var errorDescription: String? {
         switch self {
         case .unreadableArchive:
             return "Could not read the .3mf file."
@@ -37,17 +32,15 @@ public enum ThreeMFReaderError: Error, LocalizedError {
     }
 }
 
-public struct ThreeMFReader {
-    public init() {}
-
-    public func extractGCode(from fileURL: URL, preferredPlateId: Int? = nil) throws -> ExtractedGCode {
+struct ThreeMFReader {
+    func extractGCode(from fileURL: URL, preferredPlateId: Int? = nil) throws -> ExtractedGCode {
         guard let archiveData = try? Data(contentsOf: fileURL, options: [.mappedIfSafe]) else {
             throw ThreeMFReaderError.unreadableArchive
         }
         return try extractGCode(from: archiveData, preferredPlateId: preferredPlateId)
     }
 
-    public func extractGCode(from archiveData: Data, preferredPlateId: Int? = nil) throws -> ExtractedGCode {
+    func extractGCode(from archiveData: Data, preferredPlateId: Int? = nil) throws -> ExtractedGCode {
         let archive = ZIPArchive(data: archiveData)
         let entries = try archive.centralDirectoryEntries()
 

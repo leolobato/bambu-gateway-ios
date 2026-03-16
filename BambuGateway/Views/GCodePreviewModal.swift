@@ -1,3 +1,4 @@
+import GCodePreview
 import SwiftUI
 
 struct GCodePreviewModal: View {
