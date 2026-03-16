@@ -16,6 +16,15 @@ No external dependencies — built entirely with Foundation, SwiftUI, and SceneK
 - Browse MakerWorld for models
 - Share Extension for quick file imports from other apps
 
+## Screenshots
+
+<p align="center">
+  <img src="Screenshots/dashboard.png" width="200" alt="Dashboard">
+  <img src="Screenshots/print-import.png" width="200" alt="Print — file import">
+  <img src="Screenshots/print-settings.png" width="200" alt="Print — settings">
+  <img src="Screenshots/gcode-preview.png" width="200" alt="G-code preview">
+</p>
+
 ## How it works
 
 The app does not talk to Bambu printers directly. It communicates with a [Bambu Gateway](../bambu-gateway/) server on your local network that proxies printer commands, handles slicing, and manages profiles.
