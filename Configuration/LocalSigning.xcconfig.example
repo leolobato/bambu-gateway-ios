@@ -1,3 +1,8 @@
 // Copy to LocalSigning.xcconfig (gitignored) and fill in your values.
+//
+// DEVELOPMENT_TEAM: Your Apple Developer Team ID (found in Xcode → Settings → Accounts).
+// APP_BUNDLE_ID:    A unique bundle identifier you control (the Share Extension
+//                   will automatically use APP_BUNDLE_ID.share-extension).
+
 DEVELOPMENT_TEAM = YOUR_TEAM_ID
 APP_BUNDLE_ID = com.yourcompany.BambuGateway

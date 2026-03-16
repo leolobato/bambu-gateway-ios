@@ -2,6 +2,8 @@
 
 iOS client for [Bambu Gateway](../bambu-gateway/) — browse printers, upload 3MF files, preview G-code, and start prints from your phone.
 
+No external dependencies — built entirely with Foundation, SwiftUI, and SceneKit.
+
 ## Features
 
 - Connect to a local Bambu Gateway server
@@ -13,6 +15,29 @@ iOS client for [Bambu Gateway](../bambu-gateway/) — browse printers, upload 3M
 - Configure printer profiles, filaments, and plates
 - Browse MakerWorld for models
 - Share Extension for quick file imports from other apps
+
+## How it works
+
+The app does not talk to Bambu printers directly. It communicates with a [Bambu Gateway](../bambu-gateway/) server on your local network that proxies printer commands, handles slicing, and manages profiles.
+
+### Print workflow
+
+1. Import a `.3mf` file — pick from Files, download from the built-in MakerWorld browser, or share a link from Safari via the Share Extension.
+2. The file is uploaded to the gateway, which returns project metadata (plates, filaments, whether it's pre-sliced).
+3. Configure filament-to-AMS-tray mappings, machine/process profiles, and plate type. The app auto-matches filaments when possible.
+4. Tap **Preview** to slice and render a 3D G-code preview, or **Print** to send the job directly.
+
+### Share Extension
+
+Share a MakerWorld URL (or any page linking to a `.3mf` file) from Safari or another app. The Share Extension converts it into a `bambugateway://open` deep link and hands it off to the main app, which downloads and parses the file automatically.
+
+### Deep links
+
+The app registers the `bambugateway://` URL scheme:
+
+| URL | Action |
+|---|---|
+| `bambugateway://open?url=<encoded-url>` | Download a 3MF from the given URL and open it |
 
 ## Requirements
 
@@ -53,7 +78,7 @@ Point the app at your Bambu Gateway server URL in the Settings screen (e.g. `htt
 
 ## Disclaimer
 
-This project was built almost entirely through agentic programming using [Claude Code](https://claude.ai/code). The architecture, implementation, and tests were generated through AI-assisted development with human guidance and review.
+This project was built almost entirely through agentic programming using [Claude Code](https://claude.ai/code). The architecture and implementation were generated through AI-assisted development with human guidance and review.
 
 ## License
 
