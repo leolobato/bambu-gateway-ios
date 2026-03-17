@@ -63,7 +63,13 @@ struct PrinterTab: View {
                 }
 
                 if let printer = viewModel.selectedPrinter {
-                    PrinterCardView(printer: printer)
+                    PrinterCardView(
+                        printer: printer,
+                        onPause: { await viewModel.pausePrint() },
+                        onResume: { await viewModel.resumePrint() },
+                        onCancel: { await viewModel.cancelPrint() },
+                        onSetSpeed: { await viewModel.setSpeed($0) }
+                    )
                 }
             }
         }
@@ -158,6 +164,10 @@ struct PrinterTab: View {
 
 private struct PrinterCardView: View {
     let printer: PrinterStatus
+    let onPause: () async -> Void
+    let onResume: () async -> Void
+    let onCancel: () async -> Void
+    let onSetSpeed: (SpeedLevel) async -> Void
 
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
@@ -213,6 +223,43 @@ private struct PrinterCardView: View {
                     .foregroundStyle(.secondary)
                 }
             }
+
+            let state = printer.state.lowercased()
+            if state == "printing" || state == "paused" {
+                let currentLevel = SpeedLevel(rawValue: printer.speedLevel) ?? .standard
+                Picker("Speed", selection: Binding(
+                    get: { currentLevel },
+                    set: { level in Task { await onSetSpeed(level) } }
+                )) {
+                    ForEach(SpeedLevel.allCases) { level in
+                        Text(level.label).tag(level)
+                    }
+                }
+                .pickerStyle(.segmented)
+
+                HStack(spacing: 10) {
+                    if state == "printing" {
+                        Button { Task { await onPause() } } label: {
+                            Label("Pause", systemImage: "pause.fill")
+                                .frame(maxWidth: .infinity)
+                        }
+                        .buttonStyle(.bordered)
+                    } else {
+                        Button { Task { await onResume() } } label: {
+                            Label("Resume", systemImage: "play.fill")
+                                .frame(maxWidth: .infinity)
+                        }
+                        .buttonStyle(.bordered)
+                    }
+                    Button(role: .destructive) { Task { await onCancel() } } label: {
+                        Label("Cancel", systemImage: "stop.fill")
+                            .frame(maxWidth: .infinity)
+                    }
+                    .buttonStyle(.bordered)
+                    .tint(.red)
+                }
+                .font(.caption)
+            }
         }
         .padding(.vertical, 4)
     }
@@ -232,11 +279,11 @@ private struct PrinterCardView: View {
         switch printer.state.lowercased() {
         case "idle", "finished":
             return .green
-        case "printing", "running":
+        case "printing", "preparing", "running":
             return .blue
         case "paused":
             return .orange
-        case "error":
+        case "cancelled", "error":
             return .red
         default:
             return .gray

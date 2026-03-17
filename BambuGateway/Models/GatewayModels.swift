@@ -8,14 +8,49 @@ struct PrinterListResponse: Decodable {
     let printers: [PrinterStatus]
 }
 
+enum SpeedLevel: Int, CaseIterable, Identifiable {
+    case silent = 1
+    case standard = 2
+    case sport = 3
+    case ludicrous = 4
+
+    var id: Int { rawValue }
+
+    var label: String {
+        switch self {
+        case .silent: return "Silent"
+        case .standard: return "Standard"
+        case .sport: return "Sport"
+        case .ludicrous: return "Ludicrous"
+        }
+    }
+}
+
 struct PrinterStatus: Decodable, Identifiable, Hashable {
     let id: String
     let name: String
     let machineModel: String
     let online: Bool
     let state: String
+    let speedLevel: Int
     let temperatures: TemperatureInfo
     let job: PrintJob?
+
+    init(from decoder: Decoder) throws {
+        let c = try decoder.container(keyedBy: CodingKeys.self)
+        id = try c.decode(String.self, forKey: .id)
+        name = try c.decode(String.self, forKey: .name)
+        machineModel = try c.decodeIfPresent(String.self, forKey: .machineModel) ?? ""
+        online = try c.decode(Bool.self, forKey: .online)
+        state = try c.decode(String.self, forKey: .state)
+        speedLevel = try c.decodeIfPresent(Int.self, forKey: .speedLevel) ?? 2
+        temperatures = try c.decode(TemperatureInfo.self, forKey: .temperatures)
+        job = try c.decodeIfPresent(PrintJob.self, forKey: .job)
+    }
+
+    private enum CodingKeys: String, CodingKey {
+        case id, name, machineModel, online, state, speedLevel, temperatures, job
+    }
 }
 
 struct TemperatureInfo: Decodable, Hashable {
@@ -174,6 +209,11 @@ struct PrintResponse: Decodable {
     let printerId: String
     let wasSliced: Bool
     let settingsTransfer: SettingsTransferInfo?
+}
+
+struct CommandResponse: Decodable {
+    let printerId: String
+    let command: String
 }
 
 struct SettingsTransferInfo: Decodable {

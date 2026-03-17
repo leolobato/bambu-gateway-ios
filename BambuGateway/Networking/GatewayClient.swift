@@ -196,6 +196,34 @@ struct GatewayClient {
         return try decode(PrintResponse.self, from: data)
     }
 
+    func setSpeed(printerId: String, level: SpeedLevel) async throws {
+        let body = try JSONEncoder().encode(["level": level.rawValue])
+        let (_, _) = try await request(
+            path: "/api/printers/\(printerId)/speed",
+            method: "POST",
+            body: body,
+            contentType: "application/json"
+        )
+    }
+
+    @discardableResult
+    func pausePrint(printerId: String) async throws -> CommandResponse {
+        let (data, _) = try await request(path: "/api/printers/\(printerId)/pause", method: "POST")
+        return try decode(CommandResponse.self, from: data)
+    }
+
+    @discardableResult
+    func resumePrint(printerId: String) async throws -> CommandResponse {
+        let (data, _) = try await request(path: "/api/printers/\(printerId)/resume", method: "POST")
+        return try decode(CommandResponse.self, from: data)
+    }
+
+    @discardableResult
+    func cancelPrint(printerId: String) async throws -> CommandResponse {
+        let (data, _) = try await request(path: "/api/printers/\(printerId)/cancel", method: "POST")
+        return try decode(CommandResponse.self, from: data)
+    }
+
     private func get<T: Decodable>(path: String, queryItems: [URLQueryItem] = []) async throws -> T {
         let (data, _) = try await request(path: path, method: "GET", queryItems: queryItems)
         return try decode(T.self, from: data)

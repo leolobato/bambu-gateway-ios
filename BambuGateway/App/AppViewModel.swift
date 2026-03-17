@@ -366,6 +366,42 @@ final class AppViewModel: ObservableObject {
         dismissPreview()
     }
 
+    func pausePrint() async {
+        guard let printerId = selectedPrinter?.id else { return }
+        do {
+            try await gatewayClient().pausePrint(printerId: printerId)
+        } catch {
+            setMessage(error.localizedDescription, .error)
+        }
+    }
+
+    func resumePrint() async {
+        guard let printerId = selectedPrinter?.id else { return }
+        do {
+            try await gatewayClient().resumePrint(printerId: printerId)
+        } catch {
+            setMessage(error.localizedDescription, .error)
+        }
+    }
+
+    func cancelPrint() async {
+        guard let printerId = selectedPrinter?.id else { return }
+        do {
+            try await gatewayClient().cancelPrint(printerId: printerId)
+        } catch {
+            setMessage(error.localizedDescription, .error)
+        }
+    }
+
+    func setSpeed(_ level: SpeedLevel) async {
+        guard let printerId = selectedPrinter?.id else { return }
+        do {
+            try await gatewayClient().setSpeed(printerId: printerId, level: level)
+        } catch {
+            setMessage(error.localizedDescription, .error)
+        }
+    }
+
     private func dismissPreview() {
         isShowingPreview = false
         previewScene = nil
