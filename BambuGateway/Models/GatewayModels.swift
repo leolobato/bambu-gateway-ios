@@ -73,6 +73,23 @@ struct AMSUnit: Decodable, Identifiable, Hashable {
     let humidity: Int
     let temperature: Double
     let trayCount: Int
+    let amsType: String?
+
+    /// False only when the type is confirmed to be AMS Lite, which has no humidity sensor.
+    var hasHumiditySensor: Bool { amsType != "lite" }
+
+    init(from decoder: Decoder) throws {
+        let c = try decoder.container(keyedBy: CodingKeys.self)
+        id = try c.decode(Int.self, forKey: .id)
+        humidity = try c.decodeIfPresent(Int.self, forKey: .humidity) ?? -1
+        temperature = try c.decodeIfPresent(Double.self, forKey: .temperature) ?? 0
+        trayCount = try c.decodeIfPresent(Int.self, forKey: .trayCount) ?? 0
+        amsType = try c.decodeIfPresent(String.self, forKey: .amsType)
+    }
+
+    private enum CodingKeys: String, CodingKey {
+        case id, humidity, temperature, trayCount, amsType
+    }
 }
 
 struct AMSResponse: Decodable {

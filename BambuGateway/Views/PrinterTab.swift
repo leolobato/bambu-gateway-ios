@@ -98,7 +98,7 @@ struct PrinterTab: View {
                     HStack {
                         Text("AMS \(unit.id + 1)")
                         Spacer()
-                        if unit.humidity >= 0 {
+                        if unit.hasHumiditySensor && unit.humidity >= 0 {
                             Label("\(unit.humidity)%", systemImage: "humidity")
                                 .font(.caption)
                         }
