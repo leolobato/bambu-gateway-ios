@@ -60,7 +60,9 @@ final class AppViewModel: ObservableObject {
     @Published var currentPreviewId: String?
     @Published var message: String = ""
     @Published var messageLevel: MessageLevel = .info
+    @Published var uploadProgress: Double? = nil
 
+    private var uploadPollingTask: Task<Void, Never>?
     private let settingsStore: AppSettingsStore
     private var persistedSettings: PersistedSettings
     private var allSlicerMachines: [SlicerProfile] = []
@@ -206,6 +208,8 @@ final class AppViewModel: ObservableObject {
     }
 
     func clearFile() {
+        uploadPollingTask?.cancel()
+        uploadProgress = nil
         startedPrintContext = nil
         selectedFile = nil
         parsedInfo = nil
@@ -454,6 +458,41 @@ final class AppViewModel: ObservableObject {
         }
         let level: MessageLevel = response.settingsTransfer?.status == "no_original_profile" ? .warning : .success
         setMessage(output, level)
+
+        if let uploadId = response.uploadId {
+            startUploadPolling(uploadId: uploadId)
+        }
+    }
+
+    private func startUploadPolling(uploadId: String) {
+        uploadPollingTask?.cancel()
+        uploadProgress = 0
+
+        uploadPollingTask = Task {
+            repeat {
+                do {
+                    try await Task.sleep(for: .milliseconds(500))
+                } catch {
+                    return
+                }
+                guard !Task.isCancelled else { return }
+                do {
+                    let state = try await gatewayClient().fetchUploadProgress(uploadId: uploadId)
+                    uploadProgress = state.progress
+                    if state.status == "completed" {
+                        uploadProgress = nil
+                        return
+                    }
+                    if state.status == "failed" {
+                        uploadProgress = nil
+                        setMessage(state.error ?? "Upload failed.", .error)
+                        return
+                    }
+                } catch {
+                    // ignore transient network errors
+                }
+            } while !Task.isCancelled
+        }
     }
 
     private func currentPrintContext() -> StartedPrintContext? {

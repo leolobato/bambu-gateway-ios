@@ -194,6 +194,15 @@ struct PrintTab: View {
                     .textSelection(.enabled)
             }
 
+            if let progress = viewModel.uploadProgress {
+                VStack(alignment: .leading, spacing: 4) {
+                    ProgressView(value: progress, total: 100)
+                    Text("Uploading to printer… \(Int(progress))%")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                }
+            }
+
             if viewModel.hasStartedPrintForCurrentSelection {
                 Text("Print already started for this selection. Clear the file or change the print settings to submit again.")
                     .foregroundStyle(.secondary)

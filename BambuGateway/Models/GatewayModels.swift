@@ -209,6 +209,16 @@ struct PrintResponse: Decodable {
     let printerId: String
     let wasSliced: Bool
     let settingsTransfer: SettingsTransferInfo?
+    let uploadId: String?
+}
+
+struct UploadProgressResponse: Decodable {
+    let uploadId: String
+    let status: String
+    let progress: Double
+    let bytesSent: Int
+    let totalBytes: Int
+    let error: String?
 }
 
 struct CommandResponse: Decodable {

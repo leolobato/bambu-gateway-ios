@@ -196,6 +196,10 @@ struct GatewayClient {
         return try decode(PrintResponse.self, from: data)
     }
 
+    func fetchUploadProgress(uploadId: String) async throws -> UploadProgressResponse {
+        try await get(path: "/api/uploads/\(uploadId)")
+    }
+
     func setSpeed(printerId: String, level: SpeedLevel) async throws {
         let body = try JSONEncoder().encode(["level": level.rawValue])
         let (_, _) = try await request(
