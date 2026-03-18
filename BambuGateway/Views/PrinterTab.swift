@@ -120,7 +120,7 @@ struct PrinterTab: View {
                 Text(label)
                     .font(.headline)
                 ColorSwatch(hex: tray.trayColor)
-                if tray.remain >= 0 {
+                if tray.remain > 0 {
                     Text("\(tray.remain)%")
                         .font(.caption)
                         .foregroundStyle(.secondary)
@@ -253,6 +253,7 @@ private struct PrinterCardView: View {
                     }
                     Button(role: .destructive) { Task { await onCancel() } } label: {
                         Label("Cancel", systemImage: "stop.fill")
+                            .foregroundStyle(.red)
                             .frame(maxWidth: .infinity)
                     }
                     .buttonStyle(.bordered)
@@ -264,8 +265,16 @@ private struct PrinterCardView: View {
         .padding(.vertical, 4)
     }
 
+    private var stateLabel: String {
+        if let stageName = printer.stageName,
+           ["preparing", "paused", "error"].contains(printer.state.lowercased()) {
+            return stageName
+        }
+        return printer.state.capitalized
+    }
+
     private var stateBadge: some View {
-        Text(printer.state.capitalized)
+        Text(stateLabel)
             .font(.caption)
             .fontWeight(.medium)
             .padding(.horizontal, 8)

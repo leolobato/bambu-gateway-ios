@@ -32,6 +32,7 @@ struct PrinterStatus: Decodable, Identifiable, Hashable {
     let machineModel: String
     let online: Bool
     let state: String
+    let stageName: String?
     let speedLevel: Int
     let temperatures: TemperatureInfo
     let job: PrintJob?
@@ -43,13 +44,14 @@ struct PrinterStatus: Decodable, Identifiable, Hashable {
         machineModel = try c.decodeIfPresent(String.self, forKey: .machineModel) ?? ""
         online = try c.decode(Bool.self, forKey: .online)
         state = try c.decode(String.self, forKey: .state)
+        stageName = try c.decodeIfPresent(String.self, forKey: .stageName)
         speedLevel = try c.decodeIfPresent(Int.self, forKey: .speedLevel) ?? 2
         temperatures = try c.decode(TemperatureInfo.self, forKey: .temperatures)
         job = try c.decodeIfPresent(PrintJob.self, forKey: .job)
     }
 
     private enum CodingKeys: String, CodingKey {
-        case id, name, machineModel, online, state, speedLevel, temperatures, job
+        case id, name, machineModel, online, state, stageName, speedLevel, temperatures, job
     }
 }
 
@@ -75,8 +77,11 @@ struct AMSUnit: Decodable, Identifiable, Hashable {
     let trayCount: Int
     let amsType: String?
 
-    /// False only when the type is confirmed to be AMS Lite, which has no humidity sensor.
-    var hasHumiditySensor: Bool { amsType != "lite" }
+    /// True only when the AMS type is known and supports humidity sensing.
+    var hasHumiditySensor: Bool {
+        guard let amsType else { return false }
+        return amsType != "lite"
+    }
 
     init(from decoder: Decoder) throws {
         let c = try decoder.container(keyedBy: CodingKeys.self)
