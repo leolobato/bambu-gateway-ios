@@ -216,7 +216,7 @@ private struct PrinterCardView: View {
                             Text("Layer \(job.currentLayer)/\(job.totalLayers)")
                         }
                         if job.remainingMinutes > 0 {
-                            Text("\(job.remainingMinutes)m remaining")
+                            Text("\(Self.formattedRemainingTime(job.remainingMinutes)) remaining")
                         }
                     }
                     .font(.caption2)
@@ -297,6 +297,15 @@ private struct PrinterCardView: View {
         default:
             return .gray
         }
+    }
+
+    private static func formattedRemainingTime(_ minutes: Int) -> String {
+        if minutes >= 60 {
+            let h = minutes / 60
+            let m = minutes % 60
+            return String(format: "%d:%02d", h, m)
+        }
+        return "\(minutes)m"
     }
 
     private func temperatureLabel(icon: String, label: String, actual: Double, target: Double) -> some View {

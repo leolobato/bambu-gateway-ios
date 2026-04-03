@@ -144,6 +144,18 @@ final class AppViewModel: ObservableObject {
         )
     }
 
+    func refreshPrinters() async {
+        guard !gatewayBaseURL.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else { return }
+        guard !isLoading else { return }
+
+        do {
+            let fetchedPrinters = try await gatewayClient().fetchPrinters()
+            printers = fetchedPrinters
+        } catch {
+            // Silently ignore periodic refresh failures
+        }
+    }
+
     func refreshAll() async {
         guard !gatewayBaseURL.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else {
             setMessage("Set the gateway server address first.", .info)
