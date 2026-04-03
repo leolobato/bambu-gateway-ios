@@ -9,13 +9,20 @@
 /* Begin PBXBuildFile section */
 		0E245E236604EDABE5D36FD2 /* GatewayClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE3B5CC1FCEEEE3F3845ADEC /* GatewayClient.swift */; };
 		160AB3CC8EC474155F80A170 /* ShareViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 68FD23DF97AF009395F22F1E /* ShareViewController.swift */; };
+		213CC43D8270AE62370EF492 /* DashboardColors.swift in Sources */ = {isa = PBXBuildFile; fileRef = A3234ED4CB1DEBAF20C20912 /* DashboardColors.swift */; };
+		3170F3853AFAEC0D89898D09 /* AMSTrayCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = A90C3D6C3090D51A24960C1F /* AMSTrayCard.swift */; };
 		4C1A529AD33EE2A149CD9C0E /* PrinterTab.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2ACB1A998B04E9E9154760AE /* PrinterTab.swift */; };
+		5096C194622EACD881757599 /* PrintProgressCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0CACA553E0D70F489079E05 /* PrintProgressCard.swift */; };
 		518938796FA05AE905D80267 /* ThreeMFReader.swift in Sources */ = {isa = PBXBuildFile; fileRef = FFEEE185FB42B56E8BD094C5 /* ThreeMFReader.swift */; };
+		5862EC8951FC76F6FA97B697 /* PrintControlsRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 32780EC48A776B886BDB8B31 /* PrintControlsRow.swift */; };
 		5B1DAF338F92BE18208DB698 /* MakerWorldBrowserView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3B46FA0BBEC43DF398153A59 /* MakerWorldBrowserView.swift */; };
 		6326A5843953FCC43B8311EB /* MultipartFormData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 95B3B7F980C0E0EC50EEE372 /* MultipartFormData.swift */; };
 		6D6F831E399F8EF5C49D1B81 /* GCodePreview in Frameworks */ = {isa = PBXBuildFile; productRef = 85BFD403F2AE24BB83C64D31 /* GCodePreview */; };
 		70CCAF8C0F42A532EBBB3A10 /* AppSettingsStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9C133CBD53A0F28997154461 /* AppSettingsStore.swift */; };
 		722C07A2FE9F8D32DA14CC11 /* PrintTab.swift in Sources */ = {isa = PBXBuildFile; fileRef = 25AA0EB97886F4C8EB4AC476 /* PrintTab.swift */; };
+		7FBB60D7C763B1731A6A7368 /* PrinterStatusCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = C86D1F00D0E5D21411935A5E /* PrinterStatusCard.swift */; };
+		928BE6B468C5B40955A3B029 /* StatusRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 244EB95AFE2F67045E60788A /* StatusRow.swift */; };
+		9838CAA375A45D38455D0394 /* SpeedPickerSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = 450020B566A6C67BC3D57DE2 /* SpeedPickerSheet.swift */; };
 		B112E90578486CB35D2277BA /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBEBCED8EAF681F59258D749 /* ContentView.swift */; };
 		BACEC0C3302612B1C7A21088 /* ShareExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 8E99C2EC57D9D732AF5FC476 /* ShareExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		C12344BE79B9169E1A13F066 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 9A064996EB0DA8288274EC27 /* Assets.xcassets */; };
@@ -53,9 +60,12 @@
 /* Begin PBXFileReference section */
 		04CB9E2D394BC045B08ADAC9 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		1F95784351CF8ED3265FC5AF /* BambuGateway.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = BambuGateway.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		244EB95AFE2F67045E60788A /* StatusRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatusRow.swift; sourceTree = "<group>"; };
 		25AA0EB97886F4C8EB4AC476 /* PrintTab.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrintTab.swift; sourceTree = "<group>"; };
 		2ACB1A998B04E9E9154760AE /* PrinterTab.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrinterTab.swift; sourceTree = "<group>"; };
+		32780EC48A776B886BDB8B31 /* PrintControlsRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrintControlsRow.swift; sourceTree = "<group>"; };
 		3B46FA0BBEC43DF398153A59 /* MakerWorldBrowserView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MakerWorldBrowserView.swift; sourceTree = "<group>"; };
+		450020B566A6C67BC3D57DE2 /* SpeedPickerSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpeedPickerSheet.swift; sourceTree = "<group>"; };
 		47F98F122F17587AC06D257D /* GatewayModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GatewayModels.swift; sourceTree = "<group>"; };
 		68FD23DF97AF009395F22F1E /* ShareViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShareViewController.swift; sourceTree = "<group>"; };
 		7E8DBA7CCF6FB1ACEDDE1120 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
@@ -66,8 +76,12 @@
 		9C133CBD53A0F28997154461 /* AppSettingsStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppSettingsStore.swift; sourceTree = "<group>"; };
 		9D5542807513C5701CF0BC3D /* BambuGatewayApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BambuGatewayApp.swift; sourceTree = "<group>"; };
 		9DB60428FD52299388786225 /* AppViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppViewModel.swift; sourceTree = "<group>"; };
+		A3234ED4CB1DEBAF20C20912 /* DashboardColors.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DashboardColors.swift; sourceTree = "<group>"; };
+		A90C3D6C3090D51A24960C1F /* AMSTrayCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AMSTrayCard.swift; sourceTree = "<group>"; };
 		BB6EAF5F859F19DD2BA7568F /* Base.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Base.xcconfig; sourceTree = "<group>"; };
+		C0CACA553E0D70F489079E05 /* PrintProgressCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrintProgressCard.swift; sourceTree = "<group>"; };
 		C5AFFC06CAC383459918EF95 /* GCodePreviewModal.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GCodePreviewModal.swift; sourceTree = "<group>"; };
+		C86D1F00D0E5D21411935A5E /* PrinterStatusCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrinterStatusCard.swift; sourceTree = "<group>"; };
 		CE3B5CC1FCEEEE3F3845ADEC /* GatewayClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GatewayClient.swift; sourceTree = "<group>"; };
 		DBEBCED8EAF681F59258D749 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		FFEEE185FB42B56E8BD094C5 /* ThreeMFReader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ThreeMFReader.swift; sourceTree = "<group>"; };
@@ -162,6 +176,20 @@
 			path = ThreeMF;
 			sourceTree = "<group>";
 		};
+		CBADEE1334EBDB125AD56B65 /* Dashboard */ = {
+			isa = PBXGroup;
+			children = (
+				A90C3D6C3090D51A24960C1F /* AMSTrayCard.swift */,
+				A3234ED4CB1DEBAF20C20912 /* DashboardColors.swift */,
+				32780EC48A776B886BDB8B31 /* PrintControlsRow.swift */,
+				C86D1F00D0E5D21411935A5E /* PrinterStatusCard.swift */,
+				C0CACA553E0D70F489079E05 /* PrintProgressCard.swift */,
+				450020B566A6C67BC3D57DE2 /* SpeedPickerSheet.swift */,
+				244EB95AFE2F67045E60788A /* StatusRow.swift */,
+			);
+			path = Dashboard;
+			sourceTree = "<group>";
+		};
 		D12BFF5D1AADFDEE431496E9 /* Views */ = {
 			isa = PBXGroup;
 			children = (
@@ -171,6 +199,7 @@
 				2ACB1A998B04E9E9154760AE /* PrinterTab.swift */,
 				25AA0EB97886F4C8EB4AC476 /* PrintTab.swift */,
 				97E5B232DEE3A55BBBF52FD7 /* SettingsView.swift */,
+				CBADEE1334EBDB125AD56B65 /* Dashboard */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -315,18 +344,25 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				3170F3853AFAEC0D89898D09 /* AMSTrayCard.swift in Sources */,
 				70CCAF8C0F42A532EBBB3A10 /* AppSettingsStore.swift in Sources */,
 				CB3388B447DBAD970B907E6B /* AppViewModel.swift in Sources */,
 				C9B3C4A8EF610EBC59EEDCB2 /* BambuGatewayApp.swift in Sources */,
 				B112E90578486CB35D2277BA /* ContentView.swift in Sources */,
+				213CC43D8270AE62370EF492 /* DashboardColors.swift in Sources */,
 				CA1468A89E6DEFF522781031 /* GCodePreviewModal.swift in Sources */,
 				0E245E236604EDABE5D36FD2 /* GatewayClient.swift in Sources */,
 				F6321079052D62AF783281E5 /* GatewayModels.swift in Sources */,
 				5B1DAF338F92BE18208DB698 /* MakerWorldBrowserView.swift in Sources */,
 				6326A5843953FCC43B8311EB /* MultipartFormData.swift in Sources */,
+				5862EC8951FC76F6FA97B697 /* PrintControlsRow.swift in Sources */,
+				5096C194622EACD881757599 /* PrintProgressCard.swift in Sources */,
 				722C07A2FE9F8D32DA14CC11 /* PrintTab.swift in Sources */,
+				7FBB60D7C763B1731A6A7368 /* PrinterStatusCard.swift in Sources */,
 				4C1A529AD33EE2A149CD9C0E /* PrinterTab.swift in Sources */,
 				DAA6A261BF169E58D43A32F6 /* SettingsView.swift in Sources */,
+				9838CAA375A45D38455D0394 /* SpeedPickerSheet.swift in Sources */,
+				928BE6B468C5B40955A3B029 /* StatusRow.swift in Sources */,
 				518938796FA05AE905D80267 /* ThreeMFReader.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

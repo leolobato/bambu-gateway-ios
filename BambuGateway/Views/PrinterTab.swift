@@ -4,13 +4,21 @@ struct PrinterTab: View {
     @ObservedObject var viewModel: AppViewModel
 
     @State private var isShowingSettings = false
+    @State private var isShowingSpeedPicker = false
 
     var body: some View {
         NavigationStack {
-            Form {
-                printerSection
-                amsSection
+            ScrollView {
+                VStack(spacing: 12) {
+                    printerSection
+                    heroSection
+                    printingControls
+                    amsSection
+                }
+                .padding(.horizontal, 16)
+                .padding(.vertical, 8)
             }
+            .background(Color.dashboardBackground)
             .navigationTitle("Dashboard")
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
@@ -37,43 +45,91 @@ struct PrinterTab: View {
         .sheet(isPresented: $isShowingSettings) {
             SettingsView(viewModel: viewModel)
         }
-    }
-
-    private var printerSection: some View {
-        Section {
-            if viewModel.printers.isEmpty {
-                Text("No printers available")
-                    .foregroundStyle(.secondary)
-            } else {
-                if !viewModel.shouldAutoUseSinglePrinter {
-                    Picker("Printer", selection: Binding(
-                        get: { viewModel.selectedPrinterId },
-                        set: { newValue in
-                            Task {
-                                await viewModel.onPrinterChanged(newValue)
-                            }
-                        }
-                    )) {
-                        Text("Default").tag("")
-                        ForEach(viewModel.printers) { printer in
-                            Text(printer.online ? printer.name : "\(printer.name) (offline)")
-                                .tag(printer.id)
-                        }
-                    }
-                }
-
-                if let printer = viewModel.selectedPrinter {
-                    PrinterCardView(
-                        printer: printer,
-                        onPause: { await viewModel.pausePrint() },
-                        onResume: { await viewModel.resumePrint() },
-                        onCancel: { await viewModel.cancelPrint() },
-                        onSetSpeed: { await viewModel.setSpeed($0) }
-                    )
+        .sheet(isPresented: $isShowingSpeedPicker) {
+            if let printer = viewModel.selectedPrinter {
+                let currentLevel = SpeedLevel(rawValue: printer.speedLevel) ?? .standard
+                SpeedPickerSheet(currentLevel: currentLevel) { level in
+                    await viewModel.setSpeed(level)
                 }
             }
         }
     }
+
+    // MARK: - Printer Picker
+
+    @ViewBuilder
+    private var printerSection: some View {
+        if viewModel.printers.isEmpty {
+            Text("No printers available")
+                .foregroundStyle(.secondary)
+                .frame(maxWidth: .infinity)
+                .padding(.vertical, 20)
+        } else if !viewModel.shouldAutoUseSinglePrinter {
+            HStack {
+                Text("Printer")
+                    .font(.subheadline)
+                    .foregroundStyle(.secondary)
+                Spacer()
+                Picker("Printer", selection: Binding(
+                    get: { viewModel.selectedPrinterId },
+                    set: { newValue in
+                        Task {
+                            await viewModel.onPrinterChanged(newValue)
+                        }
+                    }
+                )) {
+                    Text("Default").tag("")
+                    ForEach(viewModel.printers) { printer in
+                        Text(printer.online ? printer.name : "\(printer.name) (offline)")
+                            .tag(printer.id)
+                    }
+                }
+                .labelsHidden()
+            }
+            .padding(.horizontal, 12)
+            .padding(.vertical, 8)
+            .background(Color.cardBackground)
+            .clipShape(RoundedRectangle(cornerRadius: 10))
+        }
+    }
+
+    // MARK: - Hero Section
+
+    @ViewBuilder
+    private var heroSection: some View {
+        if let printer = viewModel.selectedPrinter {
+            if let job = printer.job {
+                PrintProgressCard(printer: printer, job: job)
+            } else {
+                PrinterStatusCard(printer: printer)
+            }
+        }
+    }
+
+    // MARK: - Printing Controls (status row + buttons)
+
+    @ViewBuilder
+    private var printingControls: some View {
+        if let printer = viewModel.selectedPrinter {
+            let state = printer.state.lowercased()
+            if state == "printing" || state == "paused" {
+                StatusRow(
+                    temperatures: printer.temperatures,
+                    speedLevel: SpeedLevel(rawValue: printer.speedLevel) ?? .standard,
+                    isShowingSpeedPicker: $isShowingSpeedPicker
+                )
+
+                PrintControlsRow(
+                    state: printer.state,
+                    onPause: { await viewModel.pausePrint() },
+                    onResume: { await viewModel.resumePrint() },
+                    onCancel: { await viewModel.cancelPrint() }
+                )
+            }
+        }
+    }
+
+    // MARK: - AMS Section
 
     @ViewBuilder
     private var amsSection: some View {
@@ -81,26 +137,38 @@ struct PrinterTab: View {
         let hasVT = viewModel.vtTray != nil
 
         if !hasAMS && !hasVT {
-            Section("AMS") {
-                Text("No AMS or external spool detected")
-                    .foregroundStyle(.secondary)
+            HStack {
+                Text("AMS")
+                    .font(.subheadline)
+                    .fontWeight(.semibold)
+                Spacer()
             }
+            .padding(.top, 8)
+
+            Text("No AMS or external spool detected")
+                .foregroundStyle(.secondary)
+                .frame(maxWidth: .infinity, alignment: .leading)
         }
 
         if hasAMS {
             ForEach(viewModel.amsUnits) { unit in
-                Section {
-                    let unitTrays = viewModel.amsTrays.filter { $0.amsId == unit.id }
+                amsSectionHeader(unit: unit)
+
+                let unitTrays = viewModel.amsTrays.filter { $0.amsId == unit.id }
+                VStack(spacing: 6) {
                     ForEach(unitTrays) { tray in
-                        trayRow(tray, label: "Tray \(tray.trayId + 1)")
-                    }
-                } header: {
-                    HStack {
-                        Text("AMS \(unit.id + 1)")
-                        Spacer()
-                        if unit.hasHumiditySensor && unit.humidity >= 0 {
-                            Label("\(unit.humidity)%", systemImage: "humidity")
-                                .font(.caption)
+                        AMSTrayCard(
+                            tray: tray,
+                            label: "Tray \(tray.trayId + 1)",
+                            selectedProfileName: resolvedProfileName(for: tray.slot)
+                        ) {
+                            FilamentPickerView(
+                                filaments: viewModel.amsAssignableFilaments,
+                                selection: Binding(
+                                    get: { viewModel.trayProfileSelection(for: tray.slot) },
+                                    set: { viewModel.setTrayProfileSelection(slot: tray.slot, settingId: $0) }
+                                )
+                            )
                         }
                     }
                 }
@@ -108,212 +176,51 @@ struct PrinterTab: View {
         }
 
         if let vtTray = viewModel.vtTray {
-            Section("External Spool") {
-                trayRow(vtTray, label: "External")
-            }
-        }
-    }
-
-    private func trayRow(_ tray: AMSTray, label: String) -> some View {
-        VStack(alignment: .leading, spacing: 6) {
             HStack {
-                Text(label)
-                    .font(.headline)
-                ColorSwatch(hex: tray.trayColor)
-                if tray.remain > 0 {
-                    Text("\(tray.remain)%")
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
-                }
+                Text("External Spool")
+                    .font(.subheadline)
+                    .fontWeight(.semibold)
                 Spacer()
-                VStack(alignment: .trailing) {
-                    Text(tray.trayType.isEmpty ? "-" : tray.trayType)
-                        .foregroundStyle(.secondary)
-                    if !tray.filamentId.isEmpty {
-                        Text(tray.filamentId)
-                            .font(.caption)
-                            .foregroundStyle(.tertiary)
-                    }
-                }
             }
+            .padding(.top, 8)
 
-            NavigationLink {
+            AMSTrayCard(
+                tray: vtTray,
+                label: "External",
+                selectedProfileName: resolvedProfileName(for: vtTray.slot)
+            ) {
                 FilamentPickerView(
                     filaments: viewModel.amsAssignableFilaments,
                     selection: Binding(
-                        get: { viewModel.trayProfileSelection(for: tray.slot) },
-                        set: { viewModel.setTrayProfileSelection(slot: tray.slot, settingId: $0) }
+                        get: { viewModel.trayProfileSelection(for: vtTray.slot) },
+                        set: { viewModel.setTrayProfileSelection(slot: vtTray.slot, settingId: $0) }
                     )
                 )
-            } label: {
-                let selectedId = viewModel.trayProfileSelection(for: tray.slot)
-                let selectedProfile =
-                    viewModel.amsAssignableFilaments.first(where: { $0.settingId == selectedId })
-                    ?? viewModel.slicerFilaments.first(where: { $0.settingId == selectedId })
-                if !selectedId.isEmpty, let profile = selectedProfile {
-                    Text(profile.name)
-                        .foregroundStyle(.secondary)
-                } else {
-                    Text("Keep default")
-                        .foregroundStyle(.secondary)
-                }
             }
         }
     }
-}
 
-private struct PrinterCardView: View {
-    let printer: PrinterStatus
-    let onPause: () async -> Void
-    let onResume: () async -> Void
-    let onCancel: () async -> Void
-    let onSetSpeed: (SpeedLevel) async -> Void
+    private func resolvedProfileName(for slot: Int) -> String? {
+        let selectedId = viewModel.trayProfileSelection(for: slot)
+        guard !selectedId.isEmpty else { return nil }
+        let profile = viewModel.amsAssignableFilaments.first(where: { $0.settingId == selectedId })
+            ?? viewModel.slicerFilaments.first(where: { $0.settingId == selectedId })
+        return profile?.name
+    }
 
-    var body: some View {
-        VStack(alignment: .leading, spacing: 8) {
-            HStack {
-                VStack(alignment: .leading) {
-                    Text(printer.name)
-                        .font(.headline)
-                    if !printer.machineModel.isEmpty {
-                        Text(printer.machineModel)
-                            .font(.caption)
-                            .foregroundStyle(.secondary)
-                    }
-                }
-                Spacer()
-                stateBadge
-            }
-
-            HStack(spacing: 16) {
-                temperatureLabel(
-                    icon: "flame",
-                    label: "Nozzle",
-                    actual: printer.temperatures.nozzleTemp,
-                    target: printer.temperatures.nozzleTarget
-                )
-                temperatureLabel(
-                    icon: "square.grid.2x2",
-                    label: "Bed",
-                    actual: printer.temperatures.bedTemp,
-                    target: printer.temperatures.bedTarget
-                )
-            }
-            .font(.caption)
-
-            if let job = printer.job {
-                VStack(alignment: .leading, spacing: 4) {
-                    if !job.fileName.isEmpty {
-                        Text(job.fileName)
-                            .font(.caption)
-                            .lineLimit(1)
-                    }
-                    ProgressView(value: Double(job.progress), total: 100)
-                    HStack {
-                        Text("\(job.progress)%")
-                        Spacer()
-                        if job.totalLayers > 0 {
-                            Text("Layer \(job.currentLayer)/\(job.totalLayers)")
-                        }
-                        if job.remainingMinutes > 0 {
-                            Text("\(Self.formattedRemainingTime(job.remainingMinutes)) remaining")
-                        }
-                    }
-                    .font(.caption2)
+    private func amsSectionHeader(unit: AMSUnit) -> some View {
+        HStack {
+            Text("AMS \(unit.id + 1)")
+                .font(.subheadline)
+                .fontWeight(.semibold)
+            Spacer()
+            if unit.hasHumiditySensor && unit.humidity >= 0 {
+                Label("\(unit.humidity)%", systemImage: "humidity")
+                    .font(.caption)
                     .foregroundStyle(.secondary)
-                }
-            }
-
-            let state = printer.state.lowercased()
-            if state == "printing" || state == "paused" {
-                let currentLevel = SpeedLevel(rawValue: printer.speedLevel) ?? .standard
-                Picker("Speed", selection: Binding(
-                    get: { currentLevel },
-                    set: { level in Task { await onSetSpeed(level) } }
-                )) {
-                    ForEach(SpeedLevel.allCases) { level in
-                        Text(level.label).tag(level)
-                    }
-                }
-                .pickerStyle(.segmented)
-
-                HStack(spacing: 10) {
-                    if state == "printing" {
-                        Button { Task { await onPause() } } label: {
-                            Label("Pause", systemImage: "pause.fill")
-                                .frame(maxWidth: .infinity)
-                        }
-                        .buttonStyle(.bordered)
-                    } else {
-                        Button { Task { await onResume() } } label: {
-                            Label("Resume", systemImage: "play.fill")
-                                .frame(maxWidth: .infinity)
-                        }
-                        .buttonStyle(.bordered)
-                    }
-                    Button(role: .destructive) { Task { await onCancel() } } label: {
-                        Label("Cancel", systemImage: "stop.fill")
-                            .foregroundStyle(.red)
-                            .frame(maxWidth: .infinity)
-                    }
-                    .buttonStyle(.bordered)
-                    .tint(.red)
-                }
-                .font(.caption)
             }
         }
-        .padding(.vertical, 4)
-    }
-
-    private var stateLabel: String {
-        if let stageName = printer.stageName,
-           ["preparing", "paused", "error"].contains(printer.state.lowercased()) {
-            return stageName
-        }
-        return printer.state.capitalized
-    }
-
-    private var stateBadge: some View {
-        Text(stateLabel)
-            .font(.caption)
-            .fontWeight(.medium)
-            .padding(.horizontal, 8)
-            .padding(.vertical, 3)
-            .background(stateColor.opacity(0.15))
-            .foregroundStyle(stateColor)
-            .clipShape(Capsule())
-    }
-
-    private var stateColor: Color {
-        switch printer.state.lowercased() {
-        case "idle", "finished":
-            return .green
-        case "printing", "preparing", "running":
-            return .blue
-        case "paused":
-            return .orange
-        case "cancelled", "error":
-            return .red
-        default:
-            return .gray
-        }
-    }
-
-    private static func formattedRemainingTime(_ minutes: Int) -> String {
-        if minutes >= 60 {
-            let h = minutes / 60
-            let m = minutes % 60
-            return String(format: "%d:%02d", h, m)
-        }
-        return "\(minutes)m"
-    }
-
-    private func temperatureLabel(icon: String, label: String, actual: Double, target: Double) -> some View {
-        HStack(spacing: 4) {
-            Image(systemName: icon)
-                .foregroundStyle(.secondary)
-            Text("\(label): \(Int(actual))/\(Int(target))°C")
-        }
+        .padding(.top, 8)
     }
 }
 

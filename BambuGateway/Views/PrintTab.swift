@@ -357,11 +357,12 @@ private struct TrayPickerView: View {
 
 struct ColorSwatch: View {
     let hex: String
+    var size: CGFloat = 12
 
     var body: some View {
         Circle()
             .fill(Color(uiColor: UIColor(hex: hex) ?? .systemGray4))
-            .frame(width: 12, height: 12)
+            .frame(width: size, height: size)
     }
 }
 

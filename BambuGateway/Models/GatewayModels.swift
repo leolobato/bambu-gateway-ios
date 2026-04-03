@@ -24,6 +24,15 @@ enum SpeedLevel: Int, CaseIterable, Identifiable {
         case .ludicrous: return "Ludicrous"
         }
     }
+
+    var description: String {
+        switch self {
+        case .silent: return "Quietest, slowest"
+        case .standard: return "Balanced speed & quality"
+        case .sport: return "Faster, more noise"
+        case .ludicrous: return "Maximum speed"
+        }
+    }
 }
 
 struct PrinterStatus: Decodable, Identifiable, Hashable {
