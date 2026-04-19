@@ -5,26 +5,45 @@ struct PrintTab: View {
     @ObservedObject var viewModel: AppViewModel
 
     @State private var isShowingFileImporter = false
+    @State private var isShowingSettings = false
 
     var body: some View {
         NavigationStack {
-            Form {
-                fileSection
-                if viewModel.isParsing {
-                    Section("Project") {
-                        HStack(spacing: 10) {
-                            ProgressView()
-                            Text("Loading project...")
-                                .foregroundStyle(.secondary)
+            ScrollView {
+                VStack(spacing: 12) {
+                    fileArea
+
+                    if viewModel.isParsing {
+                        loadingCard
+                    } else if viewModel.hasParsedFile {
+                        projectCard
+
+                        if viewModel.needsSlicing {
+                            slicingSettingsSection
                         }
+
+                        filamentsSection
+
+                        messageCard
+                        uploadCard
+                        submitArea
                     }
-                } else if viewModel.hasParsedFile {
-                    parsedSection
-                    filamentsSection
-                    submitSection
+                }
+                .padding(.horizontal, 16)
+                .padding(.vertical, 8)
+            }
+            .background(Color.dashboardBackground)
+            .navigationTitle("Print")
+            .toolbar {
+                ToolbarItem(placement: .topBarTrailing) {
+                    Button("Settings") {
+                        isShowingSettings = true
+                    }
                 }
             }
-            .navigationTitle("Print")
+        }
+        .sheet(isPresented: $isShowingSettings) {
+            SettingsView(viewModel: viewModel)
         }
         .fileImporter(
             isPresented: $isShowingFileImporter,
@@ -47,230 +66,320 @@ struct PrintTab: View {
         }
     }
 
-    private var fileSection: some View {
-        Section("3MF File") {
-            Button("Import from Files") {
+    // MARK: - File area
+
+    @ViewBuilder
+    private var fileArea: some View {
+        if viewModel.selectedFile == nil, !viewModel.isGatewayConfigured {
+            gatewayEmptyStateCard
+        } else if let file = viewModel.selectedFile {
+            fileHeaderCard(file: file)
+        } else {
+            importTilesRow
+        }
+    }
+
+    private var gatewayEmptyStateCard: some View {
+        VStack(spacing: 12) {
+            Image(systemName: "gearshape.2.fill")
+                .font(.system(size: 36))
+                .foregroundStyle(Color.accentBlue)
+                .padding(.top, 4)
+
+            Text("Gateway not configured")
+                .font(.headline)
+
+            Text("Set the gateway server address to import 3MF files and submit prints.")
+                .font(.subheadline)
+                .foregroundStyle(.secondary)
+                .multilineTextAlignment(.center)
+                .fixedSize(horizontal: false, vertical: true)
+
+            Button {
+                isShowingSettings = true
+            } label: {
+                Label("Open Settings", systemImage: "gear")
+                    .frame(maxWidth: .infinity)
+                    .padding(.vertical, 4)
+            }
+            .buttonStyle(.borderedProminent)
+            .controlSize(.large)
+            .padding(.top, 4)
+        }
+        .padding(20)
+        .frame(maxWidth: .infinity)
+        .background(Color.cardBackground)
+        .clipShape(RoundedRectangle(cornerRadius: 16))
+    }
+
+    private var importTilesRow: some View {
+        HStack(spacing: 10) {
+            importTile(
+                title: "Files",
+                caption: "Import from device",
+                systemImage: "folder.fill"
+            ) {
                 isShowingFileImporter = true
             }
-            .disabled(!viewModel.isGatewayConfigured)
-
-            Button("Import from MakerWorld") {
+            importTile(
+                title: "MakerWorld",
+                caption: "Browse & download",
+                systemImage: "globe"
+            ) {
                 viewModel.openMakerWorldBrowser()
-            }
-            .disabled(!viewModel.isGatewayConfigured)
-
-            if let selectedFile = viewModel.selectedFile {
-                HStack {
-                    Text(selectedFile.fileName)
-                        .lineLimit(1)
-                        .truncationMode(.middle)
-                    Spacer()
-                    Button("Clear") {
-                        viewModel.clearFile()
-                    }
-                    .foregroundStyle(.red)
-                }
-            } else if !viewModel.isGatewayConfigured {
-                Text("Set the gateway server address in Settings first.")
-                    .foregroundStyle(.secondary)
-            } else {
-                Text("Use Files picker, Share Sheet, or MakerWorld")
-                    .foregroundStyle(.secondary)
             }
         }
     }
 
-    private var parsedSection: some View {
-        Section("Project") {
-            if let parsedInfo = viewModel.parsedInfo {
-                Text(parsedInfo.hasGcode ? "Already sliced" : "Needs slicing")
-                    .foregroundStyle(parsedInfo.hasGcode ? .green : .orange)
+    private func importTile(
+        title: String,
+        caption: String,
+        systemImage: String,
+        action: @escaping () -> Void
+    ) -> some View {
+        Button(action: action) {
+            VStack(spacing: 6) {
+                Image(systemName: systemImage)
+                    .font(.system(size: 24, weight: .medium))
+                    .foregroundStyle(Color.accentBlue)
+                    .frame(height: 32)
+
+                Text(title)
+                    .font(.subheadline)
+                    .fontWeight(.semibold)
+                    .foregroundStyle(.primary)
+
+                Text(caption)
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+            }
+            .frame(maxWidth: .infinity)
+            .padding(.vertical, 18)
+            .background(Color.cardBackground)
+            .clipShape(RoundedRectangle(cornerRadius: 12))
+        }
+        .buttonStyle(.plain)
+    }
+
+    private func fileHeaderCard(file: Imported3MFFile) -> some View {
+        HStack(spacing: 12) {
+            Image(systemName: "doc.fill")
+                .font(.system(size: 22))
+                .foregroundStyle(Color.accentBlue)
+                .frame(width: 28)
+
+            VStack(alignment: .leading, spacing: 2) {
+                Text(file.fileName)
+                    .font(.subheadline)
+                    .fontWeight(.semibold)
+                    .foregroundStyle(.primary)
+                    .lineLimit(1)
+                    .truncationMode(.middle)
+
+                Text(ByteCountFormatter.string(fromByteCount: Int64(file.data.count), countStyle: .file))
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+            }
+
+            Spacer()
+
+            Button {
+                viewModel.clearFile()
+            } label: {
+                Image(systemName: "xmark.circle.fill")
+                    .font(.system(size: 22))
+                    .foregroundStyle(.secondary)
+            }
+            .buttonStyle(.plain)
+            .accessibilityLabel("Remove file")
+        }
+        .padding(.horizontal, 14)
+        .padding(.vertical, 12)
+        .background(Color.cardBackground)
+        .clipShape(RoundedRectangle(cornerRadius: 12))
+    }
+
+    private var loadingCard: some View {
+        HStack(spacing: 10) {
+            ProgressView()
+            Text("Parsing project…")
+                .font(.subheadline)
+                .foregroundStyle(.secondary)
+            Spacer()
+        }
+        .padding(14)
+        .frame(maxWidth: .infinity)
+        .background(Color.cardBackground)
+        .clipShape(RoundedRectangle(cornerRadius: 12))
+    }
+
+    // MARK: - Project card
+
+    @ViewBuilder
+    private var projectCard: some View {
+        if let parsedInfo = viewModel.parsedInfo {
+            VStack(spacing: 12) {
+                sliceStatusBadge
 
                 if let currentPlate = parsedInfo.plates.first(where: { $0.id == viewModel.selectedPlateId }) {
                     PlateThumbnailView(dataURL: currentPlate.thumbnail)
                         .frame(maxWidth: .infinity)
-                        .padding(.vertical, 4)
                 }
 
                 if viewModel.hasMultiplePlates {
-                    Picker("Plate", selection: Binding(
-                        get: { viewModel.selectedPlateId },
-                        set: { viewModel.selectedPlateId = $0 }
-                    )) {
-                        ForEach(parsedInfo.plates) { plate in
-                            if plate.name.isEmpty {
-                                Text("Plate \(plate.id)").tag(plate.id)
-                            } else {
-                                Text("Plate \(plate.id) - \(plate.name)").tag(plate.id)
+                    HStack {
+                        Text("Plate")
+                            .font(.subheadline)
+                            .fontWeight(.medium)
+                        Spacer()
+                        Picker("Plate", selection: Binding(
+                            get: { viewModel.selectedPlateId },
+                            set: { viewModel.selectedPlateId = $0 }
+                        )) {
+                            ForEach(parsedInfo.plates) { plate in
+                                if plate.name.isEmpty {
+                                    Text("Plate \(plate.id)").tag(plate.id)
+                                } else {
+                                    Text("Plate \(plate.id) — \(plate.name)").tag(plate.id)
+                                }
                             }
                         }
+                        .labelsHidden()
                     }
+                    .padding(.top, 2)
                 }
+            }
+            .padding(16)
+            .frame(maxWidth: .infinity)
+            .background(Color.cardBackground)
+            .clipShape(RoundedRectangle(cornerRadius: 16))
+        }
+    }
 
-                if viewModel.needsSlicing {
-                    VStack(alignment: .leading, spacing: 4) {
-                        Text("Project machine")
-                            .font(.subheadline)
-                            .foregroundStyle(.secondary)
-                        Text(viewModel.projectDefaultMachineName)
-                    }
-                    VStack(alignment: .leading, spacing: 4) {
-                        Text("Project process")
-                            .font(.subheadline)
-                            .foregroundStyle(.secondary)
-                        Text(viewModel.projectDefaultProcessName)
-                    }
+    private var sliceStatusBadge: some View {
+        let sliced = viewModel.parsedInfo?.hasGcode ?? false
+        let color: Color = sliced ? .green : .orange
+        let label = sliced ? "Already sliced" : "Needs slicing"
+        let icon = sliced ? "checkmark.circle.fill" : "scissors"
 
-                    Picker("Machine profile", selection: Binding(
+        return HStack {
+            HStack(spacing: 5) {
+                Image(systemName: icon)
+                    .font(.system(size: 11, weight: .semibold))
+                Text(label)
+                    .font(.caption)
+                    .fontWeight(.semibold)
+            }
+            .padding(.horizontal, 10)
+            .padding(.vertical, 4)
+            .background(color.opacity(0.15))
+            .foregroundStyle(color)
+            .clipShape(Capsule())
+
+            Spacer()
+        }
+    }
+
+    // MARK: - Slicing settings
+
+    private var slicingSettingsSection: some View {
+        VStack(alignment: .leading, spacing: 6) {
+            sectionHeader("Slicing Settings")
+
+            VStack(spacing: 0) {
+                profileRow(
+                    label: "Machine",
+                    selection: Binding(
                         get: { viewModel.selectedMachineProfileId },
                         set: { viewModel.setMachineProfile($0) }
-                    )) {
-                        ForEach(viewModel.machineOptions) { option in
-                            Text(option.label).tag(option.id)
-                        }
-                    }
-                    .pickerStyle(.navigationLink)
-
-                    Picker("Process profile", selection: Binding(
+                    ),
+                    options: viewModel.machineOptions
+                )
+                Divider().padding(.leading, 14)
+                profileRow(
+                    label: "Process",
+                    selection: Binding(
                         get: { viewModel.selectedProcessProfileId },
                         set: { viewModel.setProcessProfile($0) }
-                    )) {
-                        ForEach(viewModel.processOptions) { option in
-                            Text(option.label).tag(option.id)
-                        }
-                    }
-                    .pickerStyle(.navigationLink)
-
-                    Picker("Plate type", selection: Binding(
+                    ),
+                    options: viewModel.processOptions
+                )
+                Divider().padding(.leading, 14)
+                profileRow(
+                    label: "Plate type",
+                    selection: Binding(
                         get: { viewModel.selectedPlateType },
                         set: { viewModel.setPlateType($0) }
-                    )) {
-                        ForEach(viewModel.plateTypeOptions) { option in
-                            Text(option.label).tag(option.id)
-                        }
-                    }
-                    .pickerStyle(.navigationLink)
-                }
-
-            } else {
-                Text("Import a 3MF file to inspect plates, profiles, and filaments.")
-                    .foregroundStyle(.secondary)
+                    ),
+                    options: viewModel.plateTypeOptions
+                )
             }
+            .background(Color.cardBackground)
+            .clipShape(RoundedRectangle(cornerRadius: 12))
         }
     }
 
-    private var filamentsSection: some View {
-        Section("Filaments") {
-            if let parsedInfo = viewModel.parsedInfo {
-                if parsedInfo.filaments.isEmpty {
-                    Text("No project filaments")
-                        .foregroundStyle(.secondary)
-                } else {
-                    ForEach(parsedInfo.filaments, id: \.index) { filament in
-                        VStack(alignment: .leading, spacing: 6) {
-                            HStack {
-                                ColorSwatch(hex: filament.color)
-                                if filament.settingId.isEmpty {
-                                    Text("Filament \(filament.index)")
-                                        .font(.headline)
-                                } else {
-                                    Text("\(filament.index): \(filament.settingId)")
-                                        .font(.headline)
-                                }
-                                Spacer()
-                                Text(filament.type.isEmpty ? "-" : filament.type)
-                                    .foregroundStyle(.secondary)
-                            }
-
-                            trayLink(for: filament)
-                        }
-                    }
-                }
-            }
-        }
-    }
-
-    private var submitSection: some View {
-        Section("Submit") {
-            if !viewModel.message.isEmpty {
-                Text(viewModel.message)
-                    .foregroundStyle(messageColor)
-                    .font(.subheadline)
-                    .textSelection(.enabled)
-            }
-
-            if let progress = viewModel.uploadProgress {
-                VStack(alignment: .leading, spacing: 6) {
-                    ProgressView(value: progress, total: 100)
-                    HStack {
-                        Text(viewModel.isCancellingUpload
-                             ? "Cancelling…"
-                             : "Uploading to printer… \(Int(progress))%")
-                            .font(.caption)
-                            .foregroundStyle(.secondary)
-                        Spacer()
-                        Button("Cancel") {
-                            Task {
-                                await viewModel.cancelUpload()
-                            }
-                        }
-                        .buttonStyle(.borderless)
-                        .font(.caption)
-                        .foregroundStyle(.red)
-                        .disabled(viewModel.isCancellingUpload)
-                    }
-                }
-            }
-
-            if viewModel.hasStartedPrintForCurrentSelection {
-                Text("Print already started for this selection. Clear the file or change the print settings to submit again.")
-                    .foregroundStyle(.secondary)
-                    .font(.subheadline)
-            } else {
-                HStack(spacing: 16) {
-                    Button {
-                        Task {
-                            await viewModel.submitPreview()
-                        }
-                    } label: {
-                        HStack {
-                            if viewModel.isLoadingPreview {
-                                ProgressView()
-                            }
-                            Text("Preview")
-                        }
-                        .frame(maxWidth: .infinity)
-                    }
-                    .buttonStyle(.bordered)
-                    .disabled(!canSubmit)
-
-                    Button {
-                        Task {
-                            await viewModel.submitPrint()
-                        }
-                    } label: {
-                        HStack {
-                            if viewModel.isSubmitting {
-                                ProgressView()
-                            }
-                            Text("Print")
-                        }
-                        .frame(maxWidth: .infinity)
-                    }
-                    .buttonStyle(.borderedProminent)
-                    .disabled(!canSubmit)
-                }
-                .listRowInsets(EdgeInsets(top: 8, leading: 16, bottom: 8, trailing: 16))
-            }
-        }
-    }
-
-    private var canSubmit: Bool {
-        viewModel.hasParsedFile && !viewModel.isSubmitting && !viewModel.isLoadingPreview
-    }
-
-    private func trayLink(for filament: ProjectFilament) -> some View {
+    private func profileRow(
+        label: String,
+        selection: Binding<String>,
+        options: [ProfileOption]
+    ) -> some View {
         NavigationLink {
+            ProfilePickerView(title: label, selection: selection, options: options)
+        } label: {
+            HStack(spacing: 8) {
+                Text(label)
+                    .font(.subheadline)
+                    .fontWeight(.medium)
+                    .foregroundStyle(.primary)
+
+                Spacer(minLength: 12)
+
+                Text(currentLabel(for: selection.wrappedValue, in: options))
+                    .font(.subheadline)
+                    .foregroundStyle(.secondary)
+                    .lineLimit(1)
+                    .truncationMode(.middle)
+
+                Image(systemName: "chevron.right")
+                    .font(.system(size: 12, weight: .medium))
+                    .foregroundStyle(.tertiary)
+            }
+            .padding(.horizontal, 14)
+            .padding(.vertical, 12)
+            .contentShape(Rectangle())
+        }
+        .buttonStyle(.plain)
+    }
+
+    private func currentLabel(for id: String, in options: [ProfileOption]) -> String {
+        options.first(where: { $0.id == id })?.label ?? "—"
+    }
+
+    // MARK: - Filaments
+
+    @ViewBuilder
+    private var filamentsSection: some View {
+        if let parsedInfo = viewModel.parsedInfo, !parsedInfo.filaments.isEmpty {
+            VStack(alignment: .leading, spacing: 6) {
+                sectionHeader("Filaments")
+
+                VStack(spacing: 6) {
+                    ForEach(parsedInfo.filaments, id: \.index) { filament in
+                        filamentRow(for: filament)
+                    }
+                }
+            }
+        }
+    }
+
+    private func filamentRow(for filament: ProjectFilament) -> some View {
+        let selectedSlot = viewModel.filamentTraySelection(for: filament.index)
+        let tray = selectedSlot.flatMap { slot in
+            viewModel.allAvailableTrays.first(where: { $0.slot == slot })
+        }
+
+        return NavigationLink {
             TrayPickerView(
                 trays: viewModel.allAvailableTrays,
                 trayLabel: { trayPickerLabel(for: $0) },
@@ -280,19 +389,77 @@ struct PrintTab: View {
                 )
             )
         } label: {
-            let selectedSlot = viewModel.filamentTraySelection(for: filament.index)
-            if let slot = selectedSlot,
-               let tray = viewModel.allAvailableTrays.first(where: { $0.slot == slot }) {
-                HStack(spacing: 6) {
-                    ColorSwatch(hex: tray.trayColor)
-                    Text(trayPickerLabel(for: tray))
-                        .foregroundStyle(.secondary)
+            HStack(spacing: 12) {
+                ColorSwatch(hex: filament.color, size: 28)
+
+                VStack(alignment: .leading, spacing: 3) {
+                    Text(filamentTitle(for: filament))
+                        .font(.subheadline)
+                        .fontWeight(.semibold)
+                        .foregroundStyle(.primary)
+                        .lineLimit(1)
+
+                    if !filament.type.isEmpty {
+                        Text(filament.type)
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                    }
+
+                    trayAssignmentLabel(tray: tray)
                 }
-            } else {
-                Text("Keep default")
-                    .foregroundStyle(.secondary)
+
+                Spacer()
+
+                Image(systemName: "chevron.right")
+                    .font(.system(size: 12, weight: .medium))
+                    .foregroundStyle(.tertiary)
             }
+            .padding(.horizontal, 14)
+            .padding(.vertical, 10)
+            .background(Color.cardBackground)
+            .clipShape(RoundedRectangle(cornerRadius: 12))
+            .contentShape(Rectangle())
         }
+        .buttonStyle(.plain)
+    }
+
+    private func filamentTitle(for filament: ProjectFilament) -> String {
+        if filament.settingId.isEmpty {
+            return "Filament \(filament.index)"
+        }
+        return "\(filament.index): \(filament.settingId)"
+    }
+
+    @ViewBuilder
+    private func trayAssignmentLabel(tray: AMSTray?) -> some View {
+        if let tray {
+            HStack(spacing: 5) {
+                Image(systemName: "arrow.right")
+                    .font(.system(size: 9, weight: .semibold))
+                    .foregroundStyle(.tertiary)
+                ColorSwatch(hex: tray.trayColor, size: 10)
+                Text(trayShortLabel(for: tray))
+                    .font(.caption)
+                    .fontWeight(.medium)
+                    .foregroundStyle(Color.accentBlue)
+                    .lineLimit(1)
+                    .truncationMode(.tail)
+            }
+        } else {
+            Text("Keep default")
+                .font(.caption)
+                .foregroundStyle(.tertiary)
+        }
+    }
+
+    private func trayShortLabel(for tray: AMSTray) -> String {
+        if tray.slot == 254 {
+            return "External spool"
+        }
+        if viewModel.amsUnits.count > 1 {
+            return "AMS \(tray.amsId + 1) · Tray \(tray.trayId + 1)"
+        }
+        return "Tray \(tray.trayId + 1)"
     }
 
     private func trayPickerLabel(for tray: AMSTray) -> String {
@@ -313,20 +480,243 @@ struct PrintTab: View {
         return label
     }
 
-    private var messageColor: Color {
-        switch viewModel.messageLevel {
-        case .info:
-            return .secondary
-        case .success:
-            return .green
-        case .warning:
-            return .orange
-        case .error:
-            return .red
+    // MARK: - Message
+
+    @ViewBuilder
+    private var messageCard: some View {
+        if !viewModel.message.isEmpty {
+            HStack(alignment: .top, spacing: 10) {
+                Image(systemName: messageIcon)
+                    .font(.system(size: 14, weight: .medium))
+                    .foregroundStyle(messageColor)
+                    .padding(.top, 2)
+
+                Text(viewModel.message)
+                    .font(.subheadline)
+                    .foregroundStyle(.primary)
+                    .textSelection(.enabled)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+            .padding(12)
+            .background(messageColor.opacity(0.12))
+            .overlay(
+                RoundedRectangle(cornerRadius: 12)
+                    .strokeBorder(messageColor.opacity(0.25), lineWidth: 1)
+            )
+            .clipShape(RoundedRectangle(cornerRadius: 12))
         }
     }
 
+    private var messageIcon: String {
+        switch viewModel.messageLevel {
+        case .success: return "checkmark.circle.fill"
+        case .warning: return "exclamationmark.triangle.fill"
+        case .error: return "xmark.octagon.fill"
+        case .info: return "info.circle.fill"
+        }
+    }
+
+    private var messageColor: Color {
+        switch viewModel.messageLevel {
+        case .info: return Color.accentBlue
+        case .success: return .green
+        case .warning: return .orange
+        case .error: return .red
+        }
+    }
+
+    // MARK: - Upload progress
+
+    @ViewBuilder
+    private var uploadCard: some View {
+        if let progress = viewModel.uploadProgress {
+            VStack(alignment: .leading, spacing: 10) {
+                HStack {
+                    Label(
+                        viewModel.isCancellingUpload ? "Cancelling…" : "Uploading to printer",
+                        systemImage: "arrow.up.circle.fill"
+                    )
+                    .font(.subheadline)
+                    .fontWeight(.semibold)
+                    .foregroundStyle(Color.accentBlue)
+
+                    Spacer()
+
+                    Text("\(Int(progress))%")
+                        .font(.subheadline)
+                        .fontWeight(.semibold)
+                        .monospacedDigit()
+                        .foregroundStyle(.secondary)
+                }
+
+                ProgressView(value: progress, total: 100)
+                    .tint(Color.accentBlue)
+
+                Button(role: .destructive) {
+                    Task { await viewModel.cancelUpload() }
+                } label: {
+                    Label("Cancel upload", systemImage: "xmark")
+                        .frame(maxWidth: .infinity)
+                }
+                .buttonStyle(.bordered)
+                .tint(.red)
+                .disabled(viewModel.isCancellingUpload)
+            }
+            .padding(14)
+            .frame(maxWidth: .infinity)
+            .background(Color.cardBackground)
+            .clipShape(RoundedRectangle(cornerRadius: 12))
+        }
+    }
+
+    // MARK: - Submit area
+
+    @ViewBuilder
+    private var submitArea: some View {
+        if viewModel.hasStartedPrintForCurrentSelection {
+            Text("Print already started for this selection. Clear the file or change the print settings to submit again.")
+                .font(.subheadline)
+                .foregroundStyle(.secondary)
+                .multilineTextAlignment(.center)
+                .fixedSize(horizontal: false, vertical: true)
+                .padding(14)
+                .frame(maxWidth: .infinity)
+                .background(Color.cardBackground)
+                .clipShape(RoundedRectangle(cornerRadius: 12))
+        } else {
+            VStack(spacing: 8) {
+                Button {
+                    Task { await viewModel.submitPreview() }
+                } label: {
+                    submitButtonLabel(
+                        title: "Preview",
+                        systemImage: "eye.fill",
+                        isBusy: viewModel.isLoadingPreview
+                    )
+                }
+                .buttonStyle(TonalButtonStyle(tint: Color.accentBlue))
+                .disabled(!canSubmit)
+
+                Button {
+                    Task { await viewModel.submitPrint() }
+                } label: {
+                    submitButtonLabel(
+                        title: "Print",
+                        systemImage: "printer.fill",
+                        isBusy: viewModel.isSubmitting,
+                        spinnerOnLight: true
+                    )
+                }
+                .buttonStyle(FilledButtonStyle(tint: Color.accentBlue))
+                .disabled(!canSubmit)
+            }
+            .padding(.top, 4)
+        }
+    }
+
+    private func submitButtonLabel(
+        title: String,
+        systemImage: String,
+        isBusy: Bool,
+        spinnerOnLight: Bool = false
+    ) -> some View {
+        HStack(spacing: 8) {
+            if isBusy {
+                ProgressView()
+                    .tint(spinnerOnLight ? .white : Color.accentBlue)
+            } else {
+                Image(systemName: systemImage)
+            }
+            Text(title)
+                .fontWeight(.semibold)
+        }
+    }
+
+    private var canSubmit: Bool {
+        viewModel.hasParsedFile && !viewModel.isSubmitting && !viewModel.isLoadingPreview
+    }
+
+    // MARK: - Section header
+
+    private func sectionHeader(_ title: String) -> some View {
+        HStack {
+            Text(title)
+                .font(.subheadline)
+                .fontWeight(.semibold)
+            Spacer()
+        }
+        .padding(.top, 4)
+    }
 }
+
+// MARK: - Button styles
+
+private struct FilledButtonStyle: ButtonStyle {
+    let tint: Color
+    @Environment(\.isEnabled) private var isEnabled
+
+    func makeBody(configuration: Configuration) -> some View {
+        configuration.label
+            .font(.body)
+            .frame(maxWidth: .infinity)
+            .padding(.vertical, 14)
+            .background(tint.opacity(configuration.isPressed ? 0.8 : 1))
+            .foregroundStyle(.white)
+            .clipShape(RoundedRectangle(cornerRadius: 12))
+            .opacity(isEnabled ? 1 : 0.5)
+    }
+}
+
+private struct TonalButtonStyle: ButtonStyle {
+    let tint: Color
+    @Environment(\.isEnabled) private var isEnabled
+
+    func makeBody(configuration: Configuration) -> some View {
+        configuration.label
+            .font(.body)
+            .frame(maxWidth: .infinity)
+            .padding(.vertical, 14)
+            .background(tint.opacity(configuration.isPressed ? 0.22 : 0.15))
+            .foregroundStyle(tint)
+            .clipShape(RoundedRectangle(cornerRadius: 12))
+            .opacity(isEnabled ? 1 : 0.5)
+    }
+}
+
+// MARK: - Profile picker
+
+private struct ProfilePickerView: View {
+    let title: String
+    @Binding var selection: String
+    let options: [ProfileOption]
+    @Environment(\.dismiss) private var dismiss
+
+    var body: some View {
+        List {
+            ForEach(options) { option in
+                Button {
+                    selection = option.id
+                    dismiss()
+                } label: {
+                    HStack {
+                        Text(option.label)
+                            .foregroundStyle(.primary)
+                        Spacer()
+                        if selection == option.id {
+                            Image(systemName: "checkmark")
+                                .foregroundStyle(Color.accentColor)
+                        }
+                    }
+                }
+            }
+        }
+        .navigationTitle(title)
+        .navigationBarTitleDisplayMode(.inline)
+    }
+}
+
+// MARK: - Tray picker
 
 private struct TrayPickerView: View {
     let trays: [AMSTray]
@@ -374,6 +764,8 @@ private struct TrayPickerView: View {
     }
 }
 
+// MARK: - Shared helpers
+
 struct ColorSwatch: View {
     let hex: String
     var size: CGFloat = 12
@@ -393,7 +785,7 @@ private struct PlateThumbnailView: View {
             Image(uiImage: image)
                 .resizable()
                 .scaledToFit()
-                .clipShape(RoundedRectangle(cornerRadius: 8))
+                .clipShape(RoundedRectangle(cornerRadius: 10))
         }
     }
 
