@@ -260,12 +260,22 @@ struct CommandResponse: Decodable {
 struct SettingsTransferInfo: Decodable {
     let status: String
     let transferred: [TransferredSetting]
+    let filaments: [FilamentTransferEntry]
 }
 
 struct TransferredSetting: Decodable, Hashable {
     let key: String
     let value: String
     let original: String?
+}
+
+struct FilamentTransferEntry: Decodable, Hashable {
+    let slot: Int
+    let originalFilament: String
+    let selectedFilament: String
+    let status: String
+    let transferred: [TransferredSetting]
+    let discarded: [String]
 }
 
 struct ErrorDetailResponse: Decodable {

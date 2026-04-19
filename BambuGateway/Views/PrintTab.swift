@@ -52,10 +52,12 @@ struct PrintTab: View {
             Button("Import from Files") {
                 isShowingFileImporter = true
             }
+            .disabled(!viewModel.isGatewayConfigured)
 
             Button("Import from MakerWorld") {
                 viewModel.openMakerWorldBrowser()
             }
+            .disabled(!viewModel.isGatewayConfigured)
 
             if let selectedFile = viewModel.selectedFile {
                 HStack {
@@ -68,6 +70,9 @@ struct PrintTab: View {
                     }
                     .foregroundStyle(.red)
                 }
+            } else if !viewModel.isGatewayConfigured {
+                Text("Set the gateway server address in Settings first.")
+                    .foregroundStyle(.secondary)
             } else {
                 Text("Use Files picker, Share Sheet, or MakerWorld")
                     .foregroundStyle(.secondary)
@@ -195,11 +200,25 @@ struct PrintTab: View {
             }
 
             if let progress = viewModel.uploadProgress {
-                VStack(alignment: .leading, spacing: 4) {
+                VStack(alignment: .leading, spacing: 6) {
                     ProgressView(value: progress, total: 100)
-                    Text("Uploading to printer… \(Int(progress))%")
+                    HStack {
+                        Text(viewModel.isCancellingUpload
+                             ? "Cancelling…"
+                             : "Uploading to printer… \(Int(progress))%")
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                        Spacer()
+                        Button("Cancel") {
+                            Task {
+                                await viewModel.cancelUpload()
+                            }
+                        }
+                        .buttonStyle(.borderless)
                         .font(.caption)
-                        .foregroundStyle(.secondary)
+                        .foregroundStyle(.red)
+                        .disabled(viewModel.isCancellingUpload)
+                    }
                 }
             }
 

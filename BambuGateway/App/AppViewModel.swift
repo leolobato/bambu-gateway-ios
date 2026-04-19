@@ -61,8 +61,10 @@ final class AppViewModel: ObservableObject {
     @Published var message: String = ""
     @Published var messageLevel: MessageLevel = .info
     @Published var uploadProgress: Double? = nil
+    @Published var isCancellingUpload: Bool = false
 
     private var uploadPollingTask: Task<Void, Never>?
+    private var activeUploadId: String?
     private let settingsStore: AppSettingsStore
     private var persistedSettings: PersistedSettings
     private var allSlicerMachines: [SlicerProfile] = []
@@ -104,6 +106,10 @@ final class AppViewModel: ObservableObject {
 
     var hasParsedFile: Bool {
         parsedInfo != nil
+    }
+
+    var isGatewayConfigured: Bool {
+        !gatewayBaseURL.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
     }
 
     var hasMultiplePlates: Bool {
@@ -222,6 +228,8 @@ final class AppViewModel: ObservableObject {
     func clearFile() {
         uploadPollingTask?.cancel()
         uploadProgress = nil
+        activeUploadId = nil
+        isCancellingUpload = false
         startedPrintContext = nil
         selectedFile = nil
         parsedInfo = nil
@@ -468,7 +476,7 @@ final class AppViewModel: ObservableObject {
         if !transfer.isEmpty {
             output += "\n\(transfer)"
         }
-        let level: MessageLevel = response.settingsTransfer?.status == "no_original_profile" ? .warning : .success
+        let level: MessageLevel = hasDiscardedFilamentCustomizations(response.settingsTransfer) ? .warning : .success
         setMessage(output, level)
 
         if let uploadId = response.uploadId {
@@ -478,6 +486,7 @@ final class AppViewModel: ObservableObject {
 
     private func startUploadPolling(uploadId: String) {
         uploadPollingTask?.cancel()
+        activeUploadId = uploadId
         uploadProgress = 0
 
         uploadPollingTask = Task {
@@ -492,11 +501,17 @@ final class AppViewModel: ObservableObject {
                     let state = try await gatewayClient().fetchUploadProgress(uploadId: uploadId)
                     uploadProgress = state.progress
                     if state.status == "completed" {
-                        uploadProgress = nil
+                        finishUploadPolling()
+                        return
+                    }
+                    if state.status == "cancelled" {
+                        finishUploadPolling()
+                        startedPrintContext = nil
+                        setMessage("Upload cancelled.", .info)
                         return
                     }
                     if state.status == "failed" {
-                        uploadProgress = nil
+                        finishUploadPolling()
                         setMessage(state.error ?? "Upload failed.", .error)
                         return
                     }
@@ -504,6 +519,23 @@ final class AppViewModel: ObservableObject {
                     // ignore transient network errors
                 }
             } while !Task.isCancelled
+        }
+    }
+
+    private func finishUploadPolling() {
+        uploadProgress = nil
+        activeUploadId = nil
+        isCancellingUpload = false
+    }
+
+    func cancelUpload() async {
+        guard let uploadId = activeUploadId, !isCancellingUpload else { return }
+        isCancellingUpload = true
+        do {
+            try await gatewayClient().cancelUpload(uploadId: uploadId)
+        } catch {
+            isCancellingUpload = false
+            setMessage(error.localizedDescription, .error)
         }
     }
 
@@ -916,16 +948,33 @@ final class AppViewModel: ObservableObject {
             return ""
         }
 
-        if transfer.status == "applied" {
+        var parts: [String] = []
+
+        if transfer.status == "applied", !transfer.transferred.isEmpty {
             let keys = transfer.transferred.map(\.key).joined(separator: ", ")
-            return "Transferred \(transfer.transferred.count) custom setting(s): \(keys)"
+            parts.append("Transferred \(transfer.transferred.count) process setting(s): \(keys)")
         }
 
-        if transfer.status == "no_original_profile" {
-            return "Could not identify the original profile. Embedded settings were applied as-is."
+        for entry in transfer.filaments {
+            if entry.status == "applied", !entry.transferred.isEmpty {
+                let keys = entry.transferred.map(\.key).joined(separator: ", ")
+                parts.append("Filament slot \(entry.slot): applied \(entry.transferred.count) customization(s) (\(keys)).")
+            } else if entry.status == "filament_changed", !entry.discarded.isEmpty {
+                let discarded = entry.discarded.joined(separator: ", ")
+                let original = entry.originalFilament.isEmpty ? "(unknown)" : entry.originalFilament
+                let selected = entry.selectedFilament.isEmpty ? "(unknown)" : entry.selectedFilament
+                parts.append("Filament slot \(entry.slot): discarded \(entry.discarded.count) customization(s) (\(discarded)) — replaced \(original) with \(selected).")
+            }
         }
 
-        return ""
+        return parts.joined(separator: " ")
+    }
+
+    private func hasDiscardedFilamentCustomizations(_ transfer: SettingsTransferInfo?) -> Bool {
+        guard let transfer else { return false }
+        return transfer.filaments.contains { entry in
+            entry.status == "filament_changed" && !entry.discarded.isEmpty
+        }
     }
 
     private func perPrinterSelection() -> PerPrinterSelection {

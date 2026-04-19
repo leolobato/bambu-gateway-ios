@@ -200,6 +200,10 @@ struct GatewayClient {
         try await get(path: "/api/uploads/\(uploadId)")
     }
 
+    func cancelUpload(uploadId: String) async throws {
+        _ = try await request(path: "/api/uploads/\(uploadId)/cancel", method: "POST")
+    }
+
     func setSpeed(printerId: String, level: SpeedLevel) async throws {
         let body = try JSONEncoder().encode(["level": level.rawValue])
         let (_, _) = try await request(
