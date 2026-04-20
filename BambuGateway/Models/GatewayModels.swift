@@ -307,3 +307,39 @@ struct PreviewResult {
     let previewId: String
     let fileName: String
 }
+
+struct GatewayCapabilities: Codable {
+    let push: Bool
+    let liveActivities: Bool
+
+    enum CodingKeys: String, CodingKey {
+        case push
+        case liveActivities = "live_activities"
+    }
+}
+
+struct DeviceRegisterPayload: Codable {
+    let id: String
+    let name: String
+    let deviceToken: String
+    let liveActivityStartToken: String?
+    let subscribedPrinters: [String]
+
+    enum CodingKeys: String, CodingKey {
+        case id
+        case name
+        case deviceToken = "device_token"
+        case liveActivityStartToken = "live_activity_start_token"
+        case subscribedPrinters = "subscribed_printers"
+    }
+}
+
+struct ActivityRegisterPayload: Codable {
+    let printerId: String
+    let activityUpdateToken: String
+
+    enum CodingKeys: String, CodingKey {
+        case printerId = "printer_id"
+        case activityUpdateToken = "activity_update_token"
+    }
+}

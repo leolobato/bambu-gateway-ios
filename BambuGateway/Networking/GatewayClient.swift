@@ -200,6 +200,47 @@ struct GatewayClient {
         try await get(path: "/api/uploads/\(uploadId)")
     }
 
+    func fetchCapabilities() async throws -> GatewayCapabilities {
+        try await get(path: "/api/capabilities")
+    }
+
+    func registerDevice(_ payload: DeviceRegisterPayload) async throws {
+        let body = try JSONEncoder().encode(payload)
+        _ = try await request(
+            path: "/api/devices/register",
+            method: "POST",
+            body: body,
+            contentType: "application/json"
+        )
+    }
+
+    func unregisterDevice(id: String) async throws {
+        _ = try await request(path: "/api/devices/\(id)", method: "DELETE")
+    }
+
+    func registerActivity(
+        deviceId: String,
+        payload: ActivityRegisterPayload
+    ) async throws {
+        let body = try JSONEncoder().encode(payload)
+        _ = try await request(
+            path: "/api/devices/\(deviceId)/activities",
+            method: "POST",
+            body: body,
+            contentType: "application/json"
+        )
+    }
+
+    func unregisterActivity(
+        deviceId: String,
+        printerId: String
+    ) async throws {
+        _ = try await request(
+            path: "/api/devices/\(deviceId)/activities/\(printerId)",
+            method: "DELETE"
+        )
+    }
+
     func cancelUpload(uploadId: String) async throws {
         _ = try await request(path: "/api/uploads/\(uploadId)/cancel", method: "POST")
     }
