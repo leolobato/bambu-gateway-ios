@@ -309,13 +309,11 @@ struct PreviewResult {
 }
 
 struct GatewayCapabilities: Codable {
+    // Decoded via GatewayClient's `convertFromSnakeCase` strategy — do not add
+    // explicit `CodingKeys` here. An explicit mapping would shadow the global
+    // strategy and fail to decode `live_activities`.
     let push: Bool
     let liveActivities: Bool
-
-    enum CodingKeys: String, CodingKey {
-        case push
-        case liveActivities = "live_activities"
-    }
 }
 
 struct DeviceRegisterPayload: Codable {
