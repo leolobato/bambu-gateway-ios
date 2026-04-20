@@ -550,7 +550,7 @@ final class AppViewModel: ObservableObject {
             let wasActive = prev.map(Self.activeStateKeys.contains) ?? false
             let isActive = Self.activeStateKeys.contains(stateKey)
 
-            if isActive && !wasActive {
+            if isActive && !liveActivityService.hasActivity(for: status.id) {
                 await liveActivityService.startActivity(
                     printerId: status.id,
                     printerName: status.name,

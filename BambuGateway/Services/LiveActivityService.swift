@@ -15,6 +15,14 @@ final class LiveActivityService {
     init(client: GatewayClient, pushService: PushService?) {
         self.client = client
         self.pushService = pushService
+        adoptExistingActivities()
+    }
+
+    /// Returns true if a Live Activity is currently live for the given printer.
+    /// Dismissed or ended activities don't count — callers should recreate.
+    func hasActivity(for printerId: String) -> Bool {
+        guard let activity = activities[printerId] else { return false }
+        return activity.activityState == .active || activity.activityState == .stale
     }
 
     /// Starts or reuses a Live Activity for the given printer/job.
@@ -31,8 +39,12 @@ final class LiveActivityService {
             Self.log.error("startActivity: skipped, Live Activities not enabled (check NSSupportsLiveActivities and system toggle)")
             return
         }
-        if activities[printerId] != nil {
-            Self.log.info("startActivity: already running for printerId=\(printerId, privacy: .public), skipping")
+        if let existing = Activity<PrintActivityAttributes>.activities.first(where: {
+            $0.attributes.printerId == printerId &&
+            ($0.activityState == .active || $0.activityState == .stale)
+        }) {
+            Self.log.info("startActivity: adopting live system activity id=\(existing.id, privacy: .public) for printerId=\(printerId, privacy: .public)")
+            adopt(existing)
             return
         }
 
@@ -50,12 +62,7 @@ final class LiveActivityService {
             )
             activities[printerId] = activity
             Self.log.info("startActivity: requested id=\(activity.id, privacy: .public) for printerId=\(printerId, privacy: .public)")
-            tokenObservers[printerId] = Task { [weak self] in
-                for await tokenData in activity.pushTokenUpdates {
-                    let hex = tokenData.map { String(format: "%02x", $0) }.joined()
-                    await self?.registerUpdateToken(printerId: printerId, token: hex)
-                }
-            }
+            observePushToken(printerId: printerId, activity: activity)
         } catch {
             Self.log.error("startActivity: Activity.request failed: \(error.localizedDescription, privacy: .public)")
         }
@@ -88,6 +95,46 @@ final class LiveActivityService {
                 deviceId: pushService.deviceId,
                 printerId: printerId
             )
+        }
+    }
+
+    private func adoptExistingActivities() {
+        var keeper: [String: Activity<PrintActivityAttributes>] = [:]
+        var duplicates: [Activity<PrintActivityAttributes>] = []
+        for activity in Activity<PrintActivityAttributes>.activities {
+            guard activity.activityState == .active || activity.activityState == .stale else { continue }
+            let printerId = activity.attributes.printerId
+            if keeper[printerId] == nil {
+                keeper[printerId] = activity
+            } else {
+                duplicates.append(activity)
+            }
+        }
+        for activity in duplicates {
+            Self.log.info("adoptExistingActivities: ending duplicate id=\(activity.id, privacy: .public) printerId=\(activity.attributes.printerId, privacy: .public)")
+            Task {
+                await activity.end(nil, dismissalPolicy: .immediate)
+            }
+        }
+        for activity in keeper.values {
+            Self.log.info("adoptExistingActivities: adopting id=\(activity.id, privacy: .public) printerId=\(activity.attributes.printerId, privacy: .public)")
+            adopt(activity)
+        }
+    }
+
+    private func adopt(_ activity: Activity<PrintActivityAttributes>) {
+        let printerId = activity.attributes.printerId
+        activities[printerId] = activity
+        observePushToken(printerId: printerId, activity: activity)
+    }
+
+    private func observePushToken(printerId: String, activity: Activity<PrintActivityAttributes>) {
+        tokenObservers[printerId]?.cancel()
+        tokenObservers[printerId] = Task { [weak self] in
+            for await tokenData in activity.pushTokenUpdates {
+                let hex = tokenData.map { String(format: "%02x", $0) }.joined()
+                await self?.registerUpdateToken(printerId: printerId, token: hex)
+            }
         }
     }
 
