@@ -20,6 +20,30 @@ struct SettingsView: View {
                         .keyboardType(.URL)
                         .autocorrectionDisabled()
                 }
+
+                Section("Notifications") {
+                    if viewModel.pushService.capabilitiesEnabled {
+                        HStack {
+                            Text("Push notifications")
+                            Spacer()
+                            Text("Enabled")
+                                .foregroundStyle(.secondary)
+                        }
+                        Text("Your device receives alerts when prints pause, fail, complete, or go offline. Live Activities appear on the Lock Screen during prints.")
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                    } else {
+                        HStack {
+                            Text("Push notifications")
+                            Spacer()
+                            Text("Unavailable")
+                                .foregroundStyle(.secondary)
+                        }
+                        Text("Push requires APNs credentials on the gateway. See the README to configure your Apple Developer key.")
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                    }
+                }
             }
             .navigationTitle("Settings")
             .toolbar {
