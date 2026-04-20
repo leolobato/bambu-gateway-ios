@@ -14,6 +14,7 @@
 		213CC43D8270AE62370EF492 /* DashboardColors.swift in Sources */ = {isa = PBXBuildFile; fileRef = A3234ED4CB1DEBAF20C20912 /* DashboardColors.swift */; };
 		2291CCBDE336DA4AED20DE24 /* PrintLiveActivity.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE9094B53DAFDF244C615D34 /* PrintLiveActivity.swift */; };
 		3170F3853AFAEC0D89898D09 /* AMSTrayCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = A90C3D6C3090D51A24960C1F /* AMSTrayCard.swift */; };
+		49397CEDE4D75E47854A886C /* PrinterOfflineCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1A82C8C3C49F519579B64E2 /* PrinterOfflineCard.swift */; };
 		4C1A529AD33EE2A149CD9C0E /* PrinterTab.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2ACB1A998B04E9E9154760AE /* PrinterTab.swift */; };
 		5096C194622EACD881757599 /* PrintProgressCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0CACA553E0D70F489079E05 /* PrintProgressCard.swift */; };
 		518938796FA05AE905D80267 /* ThreeMFReader.swift in Sources */ = {isa = PBXBuildFile; fileRef = FFEEE185FB42B56E8BD094C5 /* ThreeMFReader.swift */; };
@@ -102,6 +103,7 @@
 		9DB60428FD52299388786225 /* AppViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppViewModel.swift; sourceTree = "<group>"; };
 		A3234ED4CB1DEBAF20C20912 /* DashboardColors.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DashboardColors.swift; sourceTree = "<group>"; };
 		A90C3D6C3090D51A24960C1F /* AMSTrayCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AMSTrayCard.swift; sourceTree = "<group>"; };
+		B1A82C8C3C49F519579B64E2 /* PrinterOfflineCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrinterOfflineCard.swift; sourceTree = "<group>"; };
 		B52D3475F8383A6C96754E03 /* ToastOverlay.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ToastOverlay.swift; sourceTree = "<group>"; };
 		BAE8CE9E59006DF49C051762 /* LiveActivityService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LiveActivityService.swift; sourceTree = "<group>"; };
 		BB2F9E774CDDFF1ABAEFCB11 /* ToastCenter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ToastCenter.swift; sourceTree = "<group>"; };
@@ -227,6 +229,7 @@
 				A90C3D6C3090D51A24960C1F /* AMSTrayCard.swift */,
 				A3234ED4CB1DEBAF20C20912 /* DashboardColors.swift */,
 				32780EC48A776B886BDB8B31 /* PrintControlsRow.swift */,
+				B1A82C8C3C49F519579B64E2 /* PrinterOfflineCard.swift */,
 				C86D1F00D0E5D21411935A5E /* PrinterStatusCard.swift */,
 				C0CACA553E0D70F489079E05 /* PrintProgressCard.swift */,
 				450020B566A6C67BC3D57DE2 /* SpeedPickerSheet.swift */,
@@ -444,6 +447,7 @@
 				5862EC8951FC76F6FA97B697 /* PrintControlsRow.swift in Sources */,
 				5096C194622EACD881757599 /* PrintProgressCard.swift in Sources */,
 				722C07A2FE9F8D32DA14CC11 /* PrintTab.swift in Sources */,
+				49397CEDE4D75E47854A886C /* PrinterOfflineCard.swift in Sources */,
 				7FBB60D7C763B1731A6A7368 /* PrinterStatusCard.swift in Sources */,
 				4C1A529AD33EE2A149CD9C0E /* PrinterTab.swift in Sources */,
 				91FB314780FCE460E7C2F783 /* PushService.swift in Sources */,

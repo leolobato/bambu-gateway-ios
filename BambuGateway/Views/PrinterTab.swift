@@ -14,6 +14,8 @@ struct PrinterTab: View {
                     heroSection
                     printingControls
                     amsSection
+                        .opacity(isSelectedPrinterOffline ? 0.5 : 1)
+                        .allowsHitTesting(!isSelectedPrinterOffline)
                 }
                 .padding(.horizontal, 16)
                 .padding(.vertical, 8)
@@ -53,6 +55,11 @@ struct PrinterTab: View {
                 }
             }
         }
+    }
+
+    private var isSelectedPrinterOffline: Bool {
+        guard let printer = viewModel.selectedPrinter else { return false }
+        return !printer.online
     }
 
     // MARK: - Printer Picker
@@ -98,7 +105,16 @@ struct PrinterTab: View {
     @ViewBuilder
     private var heroSection: some View {
         if let printer = viewModel.selectedPrinter {
-            if let job = printer.job {
+            if !printer.online {
+                PrinterOfflineCard(
+                    printer: printer,
+                    isRetrying: viewModel.isLoading
+                ) {
+                    Task {
+                        await viewModel.refreshAll()
+                    }
+                }
+            } else if let job = printer.job {
                 PrintProgressCard(printer: printer, job: job)
             } else {
                 PrinterStatusCard(printer: printer)
@@ -110,7 +126,7 @@ struct PrinterTab: View {
 
     @ViewBuilder
     private var printingControls: some View {
-        if let printer = viewModel.selectedPrinter {
+        if let printer = viewModel.selectedPrinter, printer.online {
             let state = printer.state.lowercased()
             if state == "printing" || state == "paused" {
                 StatusRow(
