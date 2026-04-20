@@ -742,7 +742,13 @@ final class AppViewModel: ObservableObject {
         filamentTrayByIndex = [:]
 
         do {
-            let info = try await gatewayClient().parse3MF(file: selectedFile)
+            var info = try await gatewayClient().parse3MF(file: selectedFile)
+            info.filaments = trimUnusedFilaments(
+                declared: info.filaments,
+                fileData: selectedFile.data,
+                plate: info.plates.first?.id ?? 1,
+                hasGcode: info.hasGcode
+            )
             parsedInfo = info
             selectedPlateId = info.plates.first?.id ?? 0
             configureProfileOptions(for: info)
@@ -1040,6 +1046,32 @@ final class AppViewModel: ObservableObject {
         }
 
         return (options, defaultSelection)
+    }
+
+    /// Trim filament slots the active plate doesn't reference, so downstream
+    /// calls (`/api/print-preview`, `/api/print`) only send overrides for slots
+    /// the model actually uses. Passing extra slots has been observed to fail
+    /// slicing on multi-filament projects where only one slot is used. The
+    /// server (bambu-gateway + orcaslicer-cli) also does its own trim — this
+    /// is defense in depth so an older server still works.
+    private func trimUnusedFilaments(
+        declared: [ProjectFilament],
+        fileData: Data,
+        plate: Int,
+        hasGcode: Bool
+    ) -> [ProjectFilament] {
+        guard !hasGcode, !declared.isEmpty else {
+            return declared
+        }
+        guard let usedSlots = ThreeMFReader().readUsedFilamentSlots(from: fileData, plate: plate),
+              !usedSlots.isEmpty else {
+            return declared
+        }
+        let filtered = declared.filter { usedSlots.contains($0.index) }
+        if filtered.count < declared.count && !filtered.isEmpty {
+            return filtered
+        }
+        return declared
     }
 
     private func buildFilamentOverrides(for info: ThreeMFInfo) -> [Int: FilamentOverrideSelection] {

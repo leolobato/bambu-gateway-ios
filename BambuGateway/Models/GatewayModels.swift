@@ -176,7 +176,9 @@ struct PlateTypeOption: Decodable, Identifiable, Hashable {
 
 struct ThreeMFInfo: Decodable {
     let plates: [PlateInfo]
-    let filaments: [ProjectFilament]
+    // `var` so the app can trim filament slots that the 3MF's slice_info.config
+    // reports as unused for the active plate, before building filament overrides.
+    var filaments: [ProjectFilament]
     let printProfile: PrintProfileInfo
     let printer: PrinterInfo
     let hasGcode: Bool

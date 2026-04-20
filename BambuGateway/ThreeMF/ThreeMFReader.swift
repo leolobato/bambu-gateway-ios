@@ -40,6 +40,77 @@ struct ThreeMFReader {
         return try extractGCode(from: archiveData, preferredPlateId: preferredPlateId)
     }
 
+    /// Returns the 0-indexed filament slots the given plate actually references,
+    /// parsed from the archive's `Metadata/slice_info.config`.
+    ///
+    /// Returns `nil` when the config is missing/malformed or the plate isn't listed
+    /// (caller should then assume every declared slot may be used). Returns an
+    /// empty set when the plate exists but references no filaments.
+    func readUsedFilamentSlots(from archiveData: Data, plate: Int) -> Set<Int>? {
+        let archive = ZIPArchive(data: archiveData)
+        guard let entries = try? archive.centralDirectoryEntries() else {
+            return nil
+        }
+        guard let entry = entries.first(where: { $0.fileName == "Metadata/slice_info.config" }) else {
+            return nil
+        }
+        guard let payload = try? archive.extractData(for: entry),
+              let xml = String(data: payload, encoding: .utf8) else {
+            return nil
+        }
+        return Self.parseUsedFilamentSlots(xml: xml, plate: plate)
+    }
+
+    /// Exposed for testing — parses the slice_info.config XML body directly.
+    static func parseUsedFilamentSlots(xml: String, plate: Int) -> Set<Int>? {
+        let plateBlockPattern = #"<plate>([\s\S]*?)</plate>"#
+        guard let blockRegex = try? NSRegularExpression(pattern: plateBlockPattern) else {
+            return nil
+        }
+        let nsXML = xml as NSString
+        let blockMatches = blockRegex.matches(
+            in: xml,
+            range: NSRange(location: 0, length: nsXML.length)
+        )
+        for match in blockMatches {
+            guard let blockRange = Range(match.range(at: 1), in: xml) else { continue }
+            let block = String(xml[blockRange])
+            guard let index = Self.plateIndex(in: block), index == plate else {
+                continue
+            }
+            return Self.filamentSlots(in: block)
+        }
+        return nil
+    }
+
+    private static func plateIndex(in block: String) -> Int? {
+        let pattern = #"<metadata\s+key="index"\s+value="(\d+)""#
+        guard let regex = try? NSRegularExpression(pattern: pattern) else { return nil }
+        let ns = block as NSString
+        guard let match = regex.firstMatch(in: block, range: NSRange(location: 0, length: ns.length)),
+              let idRange = Range(match.range(at: 1), in: block) else {
+            return nil
+        }
+        return Int(block[idRange])
+    }
+
+    private static func filamentSlots(in block: String) -> Set<Int> {
+        let pattern = #"<filament\s+id="(\d+)""#
+        guard let regex = try? NSRegularExpression(pattern: pattern) else { return [] }
+        let ns = block as NSString
+        let matches = regex.matches(in: block, range: NSRange(location: 0, length: ns.length))
+        var slots: Set<Int> = []
+        for match in matches {
+            guard let range = Range(match.range(at: 1), in: block),
+                  let oneBased = Int(block[range]),
+                  oneBased >= 1 else {
+                continue
+            }
+            slots.insert(oneBased - 1)
+        }
+        return slots
+    }
+
     func extractGCode(from archiveData: Data, preferredPlateId: Int? = nil) throws -> ExtractedGCode {
         let archive = ZIPArchive(data: archiveData)
         let entries = try archive.centralDirectoryEntries()
