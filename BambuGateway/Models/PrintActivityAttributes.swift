@@ -1,5 +1,7 @@
-import ActivityKit
 import Foundation
+#if os(iOS)
+import ActivityKit
+#endif
 
 enum PrinterStateBadge: String, Codable, Hashable {
     case idle
@@ -12,6 +14,7 @@ enum PrinterStateBadge: String, Codable, Hashable {
     case offline
 }
 
+#if os(iOS)
 struct PrintActivityAttributes: ActivityAttributes {
     // Static, set once at Activity creation
     let printerId: String
@@ -29,3 +32,4 @@ struct PrintActivityAttributes: ActivityAttributes {
         var updatedAt: Date
     }
 }
+#endif
