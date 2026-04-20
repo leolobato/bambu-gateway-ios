@@ -1,3 +1,4 @@
+#if os(iOS)
 import SwiftUI
 
 struct SettingsView: View {
@@ -65,3 +66,4 @@ struct SettingsView: View {
         }
     }
 }
+#endif
