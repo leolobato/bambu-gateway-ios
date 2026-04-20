@@ -15,6 +15,15 @@ No external dependencies — built entirely with Foundation, SwiftUI, and SceneK
 - Browse MakerWorld for models
 - Share Extension for quick file imports from MakerWorld and other apps
 
+### Live Activities and notifications
+
+- Live Activity on the Lock Screen / Dynamic Island during prints, with
+  progress %, remaining time, and current layer.
+- Push notifications when prints pause, fail, complete, or go offline.
+- Requires the gateway to have APNs credentials configured. Without them,
+  the Live Activity still runs while the app is foregrounded, but remote
+  updates are disabled.
+
 ## Screenshots
 
 <p align="center">
