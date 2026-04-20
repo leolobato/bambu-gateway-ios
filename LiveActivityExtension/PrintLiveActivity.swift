@@ -81,7 +81,7 @@ struct PrintLiveActivity: Widget {
             RoundedRectangle(cornerRadius: 8)
                 .fill(Color.white.opacity(0.1))
                 .frame(width: size, height: size)
-                .overlay(Image(systemName: "printer.fill").foregroundStyle(.white.opacity(0.6)))
+                .overlay(Image(systemName: "cube.fill").foregroundStyle(.white.opacity(0.6)))
         }
     }
 
@@ -102,21 +102,27 @@ struct PrintLiveActivity: Widget {
                 parts.append("Layer \(state.currentLayer)/\(state.totalLayers)")
             }
             if state.remainingMinutes > 0 {
-                parts.append("\(state.remainingMinutes) min left")
+                parts.append("\(formattedRemaining(state.remainingMinutes)) left")
             }
             return parts.joined(separator: " · ")
         }
     }
 
+    private func formattedRemaining(_ minutes: Int) -> String {
+        let h = minutes / 60
+        let m = minutes % 60
+        return String(format: "%d:%02d", h, m)
+    }
+
     private func iconName(for state: PrinterStateBadge) -> String {
         switch state {
-        case .printing, .preparing: return "printer.fill"
+        case .printing, .preparing: return "cube.fill"
         case .paused: return "pause.circle.fill"
         case .finished: return "checkmark.circle.fill"
         case .cancelled: return "xmark.circle.fill"
         case .error: return "exclamationmark.triangle.fill"
         case .offline: return "wifi.slash"
-        case .idle: return "printer"
+        case .idle: return "cube"
         }
     }
 }
