@@ -1,3 +1,4 @@
+#if os(iOS)
 import Combine
 import SwiftUI
 
@@ -44,3 +45,4 @@ struct BambuGatewayApp: App {
         }
     }
 }
+#endif
