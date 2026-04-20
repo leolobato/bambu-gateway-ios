@@ -44,6 +44,7 @@ targets:
         SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD: NO
         ENABLE_USER_SCRIPT_SANDBOXING: YES
         OTHER_LDFLAGS: ["-lz"]
+        CODE_SIGN_ENTITLEMENTS: BambuGateway/Support/BambuGateway.entitlements
   ShareExtension:
     type: app-extension
     platform: iOS
