@@ -1,3 +1,4 @@
+#if os(iOS)
 import SwiftUI
 import WidgetKit
 
@@ -7,3 +8,4 @@ struct LiveActivityBundle: WidgetBundle {
         PrintLiveActivity()
     }
 }
+#endif
