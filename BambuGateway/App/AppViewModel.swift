@@ -538,16 +538,30 @@ final class AppViewModel: ObservableObject {
         return printerId
     }
 
+    private static let activeStateKeys: Set<String> = ["preparing", "printing", "paused"]
+
     private func handlePolledTransitions(newStatuses: [PrinterStatus]) async {
         for status in newStatuses {
             let stateKey = status.state.lowercased()
             let prev = previousStates[status.id]
             previousStates[status.id] = stateKey
 
+            let content = makeContentState(from: status)
+            let wasActive = prev.map(Self.activeStateKeys.contains) ?? false
+            let isActive = Self.activeStateKeys.contains(stateKey)
+
+            if isActive && !wasActive {
+                await liveActivityService.startActivity(
+                    printerId: status.id,
+                    printerName: status.name,
+                    fileName: status.job?.fileName ?? "",
+                    thumbnail: nil,
+                    initialState: content
+                )
+            }
+
             guard let prev else { continue }
             if prev == stateKey { continue }
-
-            let content = makeContentState(from: status)
 
             switch stateKey {
             case "printing":

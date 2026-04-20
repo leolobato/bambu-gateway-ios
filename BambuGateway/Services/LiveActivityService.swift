@@ -1,9 +1,12 @@
 #if os(iOS)
 import ActivityKit
 import Foundation
+import OSLog
 
 @MainActor
 final class LiveActivityService {
+    private static let log = Logger(subsystem: "com.bambugateway.ios", category: "LiveActivityService")
+
     private let client: GatewayClient
     private weak var pushService: PushService?
     private var activities: [String: Activity<PrintActivityAttributes>] = [:]
@@ -22,8 +25,16 @@ final class LiveActivityService {
         thumbnail: Data?,
         initialState: PrintActivityAttributes.ContentState
     ) async {
-        guard ActivityAuthorizationInfo().areActivitiesEnabled else { return }
-        if activities[printerId] != nil { return }
+        let enabled = ActivityAuthorizationInfo().areActivitiesEnabled
+        Self.log.info("startActivity: printerId=\(printerId, privacy: .public) fileName=\(fileName, privacy: .public) areActivitiesEnabled=\(enabled, privacy: .public)")
+        guard enabled else {
+            Self.log.error("startActivity: skipped, Live Activities not enabled (check NSSupportsLiveActivities and system toggle)")
+            return
+        }
+        if activities[printerId] != nil {
+            Self.log.info("startActivity: already running for printerId=\(printerId, privacy: .public), skipping")
+            return
+        }
 
         let attrs = PrintActivityAttributes(
             printerId: printerId,
@@ -38,6 +49,7 @@ final class LiveActivityService {
                 pushType: .token
             )
             activities[printerId] = activity
+            Self.log.info("startActivity: requested id=\(activity.id, privacy: .public) for printerId=\(printerId, privacy: .public)")
             tokenObservers[printerId] = Task { [weak self] in
                 for await tokenData in activity.pushTokenUpdates {
                     let hex = tokenData.map { String(format: "%02x", $0) }.joined()
@@ -45,7 +57,7 @@ final class LiveActivityService {
                 }
             }
         } catch {
-            // ActivityKit refused; silently skip
+            Self.log.error("startActivity: Activity.request failed: \(error.localizedDescription, privacy: .public)")
         }
     }
 
@@ -80,7 +92,11 @@ final class LiveActivityService {
     }
 
     private func registerUpdateToken(printerId: String, token: String) async {
-        guard let pushService, pushService.capabilitiesEnabled else { return }
+        Self.log.info("activity pushToken update printerId=\(printerId, privacy: .public) token=\(token, privacy: .public)")
+        guard let pushService, pushService.capabilitiesEnabled else {
+            Self.log.debug("registerUpdateToken: skipped (capabilitiesEnabled=\(self.pushService?.capabilitiesEnabled ?? false, privacy: .public))")
+            return
+        }
         do {
             try await client.registerActivity(
                 deviceId: pushService.deviceId,
@@ -89,8 +105,9 @@ final class LiveActivityService {
                     activityUpdateToken: token
                 )
             )
+            Self.log.info("registerActivity: success printerId=\(printerId, privacy: .public)")
         } catch {
-            // Retry handled by next token rotation
+            Self.log.error("registerActivity: failed printerId=\(printerId, privacy: .public) error=\(error.localizedDescription, privacy: .public)")
         }
     }
 }
