@@ -13,9 +13,9 @@ struct PrinterTab: View {
                     printerSection
                     heroSection
                     printingControls
-                    amsSection
-                        .opacity(isSelectedPrinterOffline ? 0.5 : 1)
-                        .allowsHitTesting(!isSelectedPrinterOffline)
+                    if !isSelectedPrinterOffline {
+                        amsSection
+                    }
                 }
                 .padding(.horizontal, 16)
                 .padding(.vertical, 8)
