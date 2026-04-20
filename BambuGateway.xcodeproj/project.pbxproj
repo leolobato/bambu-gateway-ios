@@ -23,6 +23,7 @@
 		70CCAF8C0F42A532EBBB3A10 /* AppSettingsStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9C133CBD53A0F28997154461 /* AppSettingsStore.swift */; };
 		722C07A2FE9F8D32DA14CC11 /* PrintTab.swift in Sources */ = {isa = PBXBuildFile; fileRef = 25AA0EB97886F4C8EB4AC476 /* PrintTab.swift */; };
 		7FBB60D7C763B1731A6A7368 /* PrinterStatusCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = C86D1F00D0E5D21411935A5E /* PrinterStatusCard.swift */; };
+		91FB314780FCE460E7C2F783 /* PushService.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC2E5A494F474B1D3D2EF4B7 /* PushService.swift */; };
 		928BE6B468C5B40955A3B029 /* StatusRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 244EB95AFE2F67045E60788A /* StatusRow.swift */; };
 		9838CAA375A45D38455D0394 /* SpeedPickerSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = 450020B566A6C67BC3D57DE2 /* SpeedPickerSheet.swift */; };
 		B112E90578486CB35D2277BA /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBEBCED8EAF681F59258D749 /* ContentView.swift */; };
@@ -34,6 +35,7 @@
 		CA1468A89E6DEFF522781031 /* GCodePreviewModal.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5AFFC06CAC383459918EF95 /* GCodePreviewModal.swift */; };
 		CB3388B447DBAD970B907E6B /* AppViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9DB60428FD52299388786225 /* AppViewModel.swift */; };
 		DAA6A261BF169E58D43A32F6 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 97E5B232DEE3A55BBBF52FD7 /* SettingsView.swift */; };
+		E47A2305B530F74D478F50A1 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0F1801F617DE01B7AC244E3E /* AppDelegate.swift */; };
 		F6321079052D62AF783281E5 /* GatewayModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 47F98F122F17587AC06D257D /* GatewayModels.swift */; };
 		F825FBCBD5B632A2E4E11F16 /* LiveActivityBundle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 863502189CB276B2AC75D17C /* LiveActivityBundle.swift */; };
 /* End PBXBuildFile section */
@@ -72,6 +74,7 @@
 
 /* Begin PBXFileReference section */
 		04CB9E2D394BC045B08ADAC9 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
+		0F1801F617DE01B7AC244E3E /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		1F95784351CF8ED3265FC5AF /* BambuGateway.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = BambuGateway.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		244EB95AFE2F67045E60788A /* StatusRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatusRow.swift; sourceTree = "<group>"; };
 		25AA0EB97886F4C8EB4AC476 /* PrintTab.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrintTab.swift; sourceTree = "<group>"; };
@@ -95,6 +98,7 @@
 		A3234ED4CB1DEBAF20C20912 /* DashboardColors.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DashboardColors.swift; sourceTree = "<group>"; };
 		A90C3D6C3090D51A24960C1F /* AMSTrayCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AMSTrayCard.swift; sourceTree = "<group>"; };
 		BB6EAF5F859F19DD2BA7568F /* Base.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Base.xcconfig; sourceTree = "<group>"; };
+		BC2E5A494F474B1D3D2EF4B7 /* PushService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PushService.swift; sourceTree = "<group>"; };
 		C0CACA553E0D70F489079E05 /* PrintProgressCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrintProgressCard.swift; sourceTree = "<group>"; };
 		C5AFFC06CAC383459918EF95 /* GCodePreviewModal.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GCodePreviewModal.swift; sourceTree = "<group>"; };
 		C86D1F00D0E5D21411935A5E /* PrinterStatusCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrinterStatusCard.swift; sourceTree = "<group>"; };
@@ -149,6 +153,7 @@
 		4949B85738896A29666DE8F1 /* App */ = {
 			isa = PBXGroup;
 			children = (
+				0F1801F617DE01B7AC244E3E /* AppDelegate.swift */,
 				9DB60428FD52299388786225 /* AppViewModel.swift */,
 				9D5542807513C5701CF0BC3D /* BambuGatewayApp.swift */,
 			);
@@ -254,6 +259,14 @@
 			path = Support;
 			sourceTree = "<group>";
 		};
+		F5715E5504CD4B726915D1FB /* Services */ = {
+			isa = PBXGroup;
+			children = (
+				BC2E5A494F474B1D3D2EF4B7 /* PushService.swift */,
+			);
+			path = Services;
+			sourceTree = "<group>";
+		};
 		FA9546B8119F5653FF13933F /* BambuGateway */ = {
 			isa = PBXGroup;
 			children = (
@@ -262,6 +275,7 @@
 				2457CA1C0B86D09ACE895EE4 /* Models */,
 				0E248D1E45C33C0B0D50F35B /* Networking */,
 				79B5EFE814BB7EB4A5290D8D /* Resources */,
+				F5715E5504CD4B726915D1FB /* Services */,
 				E800153965F3EBCD92DBE985 /* Support */,
 				9BDAE05EA0C57DFE8E7377AD /* ThreeMF */,
 				D12BFF5D1AADFDEE431496E9 /* Views */,
@@ -401,6 +415,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				3170F3853AFAEC0D89898D09 /* AMSTrayCard.swift in Sources */,
+				E47A2305B530F74D478F50A1 /* AppDelegate.swift in Sources */,
 				70CCAF8C0F42A532EBBB3A10 /* AppSettingsStore.swift in Sources */,
 				CB3388B447DBAD970B907E6B /* AppViewModel.swift in Sources */,
 				C9B3C4A8EF610EBC59EEDCB2 /* BambuGatewayApp.swift in Sources */,
@@ -417,6 +432,7 @@
 				722C07A2FE9F8D32DA14CC11 /* PrintTab.swift in Sources */,
 				7FBB60D7C763B1731A6A7368 /* PrinterStatusCard.swift in Sources */,
 				4C1A529AD33EE2A149CD9C0E /* PrinterTab.swift in Sources */,
+				91FB314780FCE460E7C2F783 /* PushService.swift in Sources */,
 				DAA6A261BF169E58D43A32F6 /* SettingsView.swift in Sources */,
 				9838CAA375A45D38455D0394 /* SpeedPickerSheet.swift in Sources */,
 				928BE6B468C5B40955A3B029 /* StatusRow.swift in Sources */,
