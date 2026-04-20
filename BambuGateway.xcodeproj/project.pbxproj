@@ -7,9 +7,11 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		0A2274DC8B4E7E9B301C33A2 /* PrintActivityAttributes.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E70DDBC904B734FBBB17271 /* PrintActivityAttributes.swift */; };
 		0E245E236604EDABE5D36FD2 /* GatewayClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE3B5CC1FCEEEE3F3845ADEC /* GatewayClient.swift */; };
 		160AB3CC8EC474155F80A170 /* ShareViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 68FD23DF97AF009395F22F1E /* ShareViewController.swift */; };
 		213CC43D8270AE62370EF492 /* DashboardColors.swift in Sources */ = {isa = PBXBuildFile; fileRef = A3234ED4CB1DEBAF20C20912 /* DashboardColors.swift */; };
+		2291CCBDE336DA4AED20DE24 /* PrintLiveActivity.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE9094B53DAFDF244C615D34 /* PrintLiveActivity.swift */; };
 		3170F3853AFAEC0D89898D09 /* AMSTrayCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = A90C3D6C3090D51A24960C1F /* AMSTrayCard.swift */; };
 		4C1A529AD33EE2A149CD9C0E /* PrinterTab.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2ACB1A998B04E9E9154760AE /* PrinterTab.swift */; };
 		5096C194622EACD881757599 /* PrintProgressCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0CACA553E0D70F489079E05 /* PrintProgressCard.swift */; };
@@ -24,6 +26,8 @@
 		928BE6B468C5B40955A3B029 /* StatusRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 244EB95AFE2F67045E60788A /* StatusRow.swift */; };
 		9838CAA375A45D38455D0394 /* SpeedPickerSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = 450020B566A6C67BC3D57DE2 /* SpeedPickerSheet.swift */; };
 		B112E90578486CB35D2277BA /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBEBCED8EAF681F59258D749 /* ContentView.swift */; };
+		B30AD4F02ACBB47DD4CAB1AF /* PrintActivityAttributes.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E70DDBC904B734FBBB17271 /* PrintActivityAttributes.swift */; };
+		B5431F4CFCEB61B700345680 /* LiveActivityExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = CAD2B6571B7210AD007472D2 /* LiveActivityExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		BACEC0C3302612B1C7A21088 /* ShareExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 8E99C2EC57D9D732AF5FC476 /* ShareExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		C12344BE79B9169E1A13F066 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 9A064996EB0DA8288274EC27 /* Assets.xcassets */; };
 		C9B3C4A8EF610EBC59EEDCB2 /* BambuGatewayApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9D5542807513C5701CF0BC3D /* BambuGatewayApp.swift */; };
@@ -31,6 +35,7 @@
 		CB3388B447DBAD970B907E6B /* AppViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9DB60428FD52299388786225 /* AppViewModel.swift */; };
 		DAA6A261BF169E58D43A32F6 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 97E5B232DEE3A55BBBF52FD7 /* SettingsView.swift */; };
 		F6321079052D62AF783281E5 /* GatewayModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 47F98F122F17587AC06D257D /* GatewayModels.swift */; };
+		F825FBCBD5B632A2E4E11F16 /* LiveActivityBundle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 863502189CB276B2AC75D17C /* LiveActivityBundle.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -40,6 +45,13 @@
 			proxyType = 1;
 			remoteGlobalIDString = C98CDF8A8045B91E83D80307;
 			remoteInfo = ShareExtension;
+		};
+		741F9487ADD8E701B5D0C75B /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 77B531BC7B6BA85A43566826 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 31529554D8DA0DB5FB58CFBE;
+			remoteInfo = LiveActivityExtension;
 		};
 /* End PBXContainerItemProxy section */
 
@@ -51,6 +63,7 @@
 			dstSubfolderSpec = 13;
 			files = (
 				BACEC0C3302612B1C7A21088 /* ShareExtension.appex in Embed Foundation Extensions */,
+				B5431F4CFCEB61B700345680 /* LiveActivityExtension.appex in Embed Foundation Extensions */,
 			);
 			name = "Embed Foundation Extensions";
 			runOnlyForDeploymentPostprocessing = 0;
@@ -68,7 +81,10 @@
 		450020B566A6C67BC3D57DE2 /* SpeedPickerSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpeedPickerSheet.swift; sourceTree = "<group>"; };
 		47F98F122F17587AC06D257D /* GatewayModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GatewayModels.swift; sourceTree = "<group>"; };
 		68FD23DF97AF009395F22F1E /* ShareViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShareViewController.swift; sourceTree = "<group>"; };
+		6DAA1E9A81B3A274FD5044DD /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		7E8DBA7CCF6FB1ACEDDE1120 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
+		863502189CB276B2AC75D17C /* LiveActivityBundle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LiveActivityBundle.swift; sourceTree = "<group>"; };
+		8E70DDBC904B734FBBB17271 /* PrintActivityAttributes.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrintActivityAttributes.swift; sourceTree = "<group>"; };
 		8E99C2EC57D9D732AF5FC476 /* ShareExtension.appex */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = "wrapper.app-extension"; path = ShareExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		95B3B7F980C0E0EC50EEE372 /* MultipartFormData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MultipartFormData.swift; sourceTree = "<group>"; };
 		97E5B232DEE3A55BBBF52FD7 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
@@ -82,7 +98,9 @@
 		C0CACA553E0D70F489079E05 /* PrintProgressCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrintProgressCard.swift; sourceTree = "<group>"; };
 		C5AFFC06CAC383459918EF95 /* GCodePreviewModal.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GCodePreviewModal.swift; sourceTree = "<group>"; };
 		C86D1F00D0E5D21411935A5E /* PrinterStatusCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrinterStatusCard.swift; sourceTree = "<group>"; };
+		CAD2B6571B7210AD007472D2 /* LiveActivityExtension.appex */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = "wrapper.app-extension"; path = LiveActivityExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		CE3B5CC1FCEEEE3F3845ADEC /* GatewayClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GatewayClient.swift; sourceTree = "<group>"; };
+		CE9094B53DAFDF244C615D34 /* PrintLiveActivity.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrintLiveActivity.swift; sourceTree = "<group>"; };
 		DBEBCED8EAF681F59258D749 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		FFEEE185FB42B56E8BD094C5 /* ThreeMFReader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ThreeMFReader.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -99,6 +117,16 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		0AB25DCFFA9C18E411FF6066 /* LiveActivityExtension */ = {
+			isa = PBXGroup;
+			children = (
+				6DAA1E9A81B3A274FD5044DD /* Info.plist */,
+				863502189CB276B2AC75D17C /* LiveActivityBundle.swift */,
+				CE9094B53DAFDF244C615D34 /* PrintLiveActivity.swift */,
+			);
+			path = LiveActivityExtension;
+			sourceTree = "<group>";
+		};
 		0E248D1E45C33C0B0D50F35B /* Networking */ = {
 			isa = PBXGroup;
 			children = (
@@ -112,6 +140,7 @@
 			isa = PBXGroup;
 			children = (
 				47F98F122F17587AC06D257D /* GatewayModels.swift */,
+				8E70DDBC904B734FBBB17271 /* PrintActivityAttributes.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -129,6 +158,7 @@
 			isa = PBXGroup;
 			children = (
 				1F95784351CF8ED3265FC5AF /* BambuGateway.app */,
+				CAD2B6571B7210AD007472D2 /* LiveActivityExtension.appex */,
 				8E99C2EC57D9D732AF5FC476 /* ShareExtension.appex */,
 			);
 			name = Products;
@@ -147,6 +177,7 @@
 			children = (
 				FA9546B8119F5653FF13933F /* BambuGateway */,
 				7ED3FE26DF1B65569C58C57B /* Configuration */,
+				0AB25DCFFA9C18E411FF6066 /* LiveActivityExtension */,
 				E56CDDD34788FBF5F8CF0381 /* ShareExtension */,
 				4B7DEF7A6DC2F87E9DEBBBFF /* Products */,
 			);
@@ -252,6 +283,7 @@
 			);
 			dependencies = (
 				3857027E8E1C9C9721A16CCB /* PBXTargetDependency */,
+				21E860E2216B3017FA9A7585 /* PBXTargetDependency */,
 			);
 			name = BambuGateway;
 			packageProductDependencies = (
@@ -260,6 +292,23 @@
 			productName = BambuGateway;
 			productReference = 1F95784351CF8ED3265FC5AF /* BambuGateway.app */;
 			productType = "com.apple.product-type.application";
+		};
+		31529554D8DA0DB5FB58CFBE /* LiveActivityExtension */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = E7143E82E3A218A39DBDEA4E /* Build configuration list for PBXNativeTarget "LiveActivityExtension" */;
+			buildPhases = (
+				BD8A95EDC27AE96182C1368F /* Sources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = LiveActivityExtension;
+			packageProductDependencies = (
+			);
+			productName = LiveActivityExtension;
+			productReference = CAD2B6571B7210AD007472D2 /* LiveActivityExtension.appex */;
+			productType = "com.apple.product-type.app-extension";
 		};
 		C98CDF8A8045B91E83D80307 /* ShareExtension */ = {
 			isa = PBXNativeTarget;
@@ -291,6 +340,10 @@
 						DevelopmentTeam = "$(DEVELOPMENT_TEAM)";
 						ProvisioningStyle = Automatic;
 					};
+					31529554D8DA0DB5FB58CFBE = {
+						DevelopmentTeam = "$(DEVELOPMENT_TEAM)";
+						ProvisioningStyle = Automatic;
+					};
 					C98CDF8A8045B91E83D80307 = {
 						DevelopmentTeam = "$(DEVELOPMENT_TEAM)";
 						ProvisioningStyle = Automatic;
@@ -315,6 +368,7 @@
 			projectRoot = "";
 			targets = (
 				07C306B2D5C9BA8E92175590 /* BambuGateway */,
+				31529554D8DA0DB5FB58CFBE /* LiveActivityExtension */,
 				C98CDF8A8045B91E83D80307 /* ShareExtension */,
 			);
 		};
@@ -355,6 +409,7 @@
 				F6321079052D62AF783281E5 /* GatewayModels.swift in Sources */,
 				5B1DAF338F92BE18208DB698 /* MakerWorldBrowserView.swift in Sources */,
 				6326A5843953FCC43B8311EB /* MultipartFormData.swift in Sources */,
+				0A2274DC8B4E7E9B301C33A2 /* PrintActivityAttributes.swift in Sources */,
 				5862EC8951FC76F6FA97B697 /* PrintControlsRow.swift in Sources */,
 				5096C194622EACD881757599 /* PrintProgressCard.swift in Sources */,
 				722C07A2FE9F8D32DA14CC11 /* PrintTab.swift in Sources */,
@@ -367,9 +422,24 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		BD8A95EDC27AE96182C1368F /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				F825FBCBD5B632A2E4E11F16 /* LiveActivityBundle.swift in Sources */,
+				B30AD4F02ACBB47DD4CAB1AF /* PrintActivityAttributes.swift in Sources */,
+				2291CCBDE336DA4AED20DE24 /* PrintLiveActivity.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
+		21E860E2216B3017FA9A7585 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 31529554D8DA0DB5FB58CFBE /* LiveActivityExtension */;
+			targetProxy = 741F9487ADD8E701B5D0C75B /* PBXContainerItemProxy */;
+		};
 		3857027E8E1C9C9721A16CCB /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = C98CDF8A8045B91E83D80307 /* ShareExtension */;
@@ -378,6 +448,28 @@
 /* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
+		16FFD95C75DDB4007B783CF4 /* Release */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = BB6EAF5F859F19DD2BA7568F /* Base.xcconfig */;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = "$(DEVELOPMENT_TEAM)";
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = LiveActivityExtension/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = "$(LIVE_ACTIVITY_BUNDLE_ID)";
+				PRODUCT_NAME = LiveActivityExtension;
+				SDKROOT = iphoneos;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
 		23D96F97AC995A5907C16809 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = BB6EAF5F859F19DD2BA7568F /* Base.xcconfig */;
@@ -488,6 +580,28 @@
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Release;
+		};
+		804E66E514E0B3CC9C0D9282 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = BB6EAF5F859F19DD2BA7568F /* Base.xcconfig */;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = "$(DEVELOPMENT_TEAM)";
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = LiveActivityExtension/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = "$(LIVE_ACTIVITY_BUNDLE_ID)";
+				PRODUCT_NAME = LiveActivityExtension;
+				SDKROOT = iphoneos;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
 		};
 		C96D97FEF30E118EB512BB7B /* Release */ = {
 			isa = XCBuildConfiguration;
@@ -624,6 +738,15 @@
 			buildConfigurations = (
 				6A801B062AA69BD82A4DB374 /* Debug */,
 				CC8B2AE9E6A7CDD89B614CBC /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		E7143E82E3A218A39DBDEA4E /* Build configuration list for PBXNativeTarget "LiveActivityExtension" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				804E66E514E0B3CC9C0D9282 /* Debug */,
+				16FFD95C75DDB4007B783CF4 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Debug;

@@ -31,6 +31,7 @@ targets:
           - GCodeKit
     dependencies:
       - target: ShareExtension
+      - target: LiveActivityExtension
       - package: GCodePreview
     settings:
       base:
@@ -61,12 +62,32 @@ targets:
         GENERATE_INFOPLIST_FILE: NO
         CODE_SIGN_STYLE: Automatic
         SWIFT_VERSION: 5.0
+  LiveActivityExtension:
+    type: app-extension
+    platform: iOS
+    deploymentTarget: '18.0'
+    configFiles:
+      Debug: Configuration/Base.xcconfig
+      Release: Configuration/Base.xcconfig
+    sources:
+      - path: LiveActivityExtension
+      - path: BambuGateway/Models/PrintActivityAttributes.swift
+    settings:
+      base:
+        PRODUCT_NAME: LiveActivityExtension
+        PRODUCT_BUNDLE_IDENTIFIER: $(LIVE_ACTIVITY_BUNDLE_ID)
+        DEVELOPMENT_TEAM: $(DEVELOPMENT_TEAM)
+        INFOPLIST_FILE: LiveActivityExtension/Info.plist
+        GENERATE_INFOPLIST_FILE: NO
+        CODE_SIGN_STYLE: Automatic
+        SWIFT_VERSION: 5.0
 schemes:
   BambuGateway:
     build:
       targets:
         BambuGateway: all
         ShareExtension: [build]
+        LiveActivityExtension: [build]
     run:
       config: Debug
     analyze:

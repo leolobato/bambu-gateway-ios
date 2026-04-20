@@ -29,6 +29,20 @@
             buildForAnalyzing = "NO">
             <BuildableReference
                BuildableIdentifier = "primary"
+               BlueprintIdentifier = "31529554D8DA0DB5FB58CFBE"
+               BuildableName = "LiveActivityExtension.appex"
+               BlueprintName = "LiveActivityExtension"
+               ReferencedContainer = "container:BambuGateway.xcodeproj">
+            </BuildableReference>
+         </BuildActionEntry>
+         <BuildActionEntry
+            buildForTesting = "NO"
+            buildForRunning = "NO"
+            buildForProfiling = "NO"
+            buildForArchiving = "NO"
+            buildForAnalyzing = "NO">
+            <BuildableReference
+               BuildableIdentifier = "primary"
                BlueprintIdentifier = "C98CDF8A8045B91E83D80307"
                BuildableName = "ShareExtension.appex"
                BlueprintName = "ShareExtension"
