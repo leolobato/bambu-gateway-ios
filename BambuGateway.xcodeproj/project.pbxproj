@@ -10,12 +10,14 @@
 		0A2274DC8B4E7E9B301C33A2 /* PrintActivityAttributes.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E70DDBC904B734FBBB17271 /* PrintActivityAttributes.swift */; };
 		0E245E236604EDABE5D36FD2 /* GatewayClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE3B5CC1FCEEEE3F3845ADEC /* GatewayClient.swift */; };
 		160AB3CC8EC474155F80A170 /* ShareViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 68FD23DF97AF009395F22F1E /* ShareViewController.swift */; };
+		162927F10FBBE5F4B42564AA /* ToastCenter.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB2F9E774CDDFF1ABAEFCB11 /* ToastCenter.swift */; };
 		213CC43D8270AE62370EF492 /* DashboardColors.swift in Sources */ = {isa = PBXBuildFile; fileRef = A3234ED4CB1DEBAF20C20912 /* DashboardColors.swift */; };
 		2291CCBDE336DA4AED20DE24 /* PrintLiveActivity.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE9094B53DAFDF244C615D34 /* PrintLiveActivity.swift */; };
 		3170F3853AFAEC0D89898D09 /* AMSTrayCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = A90C3D6C3090D51A24960C1F /* AMSTrayCard.swift */; };
 		4C1A529AD33EE2A149CD9C0E /* PrinterTab.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2ACB1A998B04E9E9154760AE /* PrinterTab.swift */; };
 		5096C194622EACD881757599 /* PrintProgressCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0CACA553E0D70F489079E05 /* PrintProgressCard.swift */; };
 		518938796FA05AE905D80267 /* ThreeMFReader.swift in Sources */ = {isa = PBXBuildFile; fileRef = FFEEE185FB42B56E8BD094C5 /* ThreeMFReader.swift */; };
+		531A4B62990B0E7E59F76C06 /* ToastOverlay.swift in Sources */ = {isa = PBXBuildFile; fileRef = B52D3475F8383A6C96754E03 /* ToastOverlay.swift */; };
 		5862EC8951FC76F6FA97B697 /* PrintControlsRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 32780EC48A776B886BDB8B31 /* PrintControlsRow.swift */; };
 		5B1DAF338F92BE18208DB698 /* MakerWorldBrowserView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3B46FA0BBEC43DF398153A59 /* MakerWorldBrowserView.swift */; };
 		6326A5843953FCC43B8311EB /* MultipartFormData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 95B3B7F980C0E0EC50EEE372 /* MultipartFormData.swift */; };
@@ -100,7 +102,9 @@
 		9DB60428FD52299388786225 /* AppViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppViewModel.swift; sourceTree = "<group>"; };
 		A3234ED4CB1DEBAF20C20912 /* DashboardColors.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DashboardColors.swift; sourceTree = "<group>"; };
 		A90C3D6C3090D51A24960C1F /* AMSTrayCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AMSTrayCard.swift; sourceTree = "<group>"; };
+		B52D3475F8383A6C96754E03 /* ToastOverlay.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ToastOverlay.swift; sourceTree = "<group>"; };
 		BAE8CE9E59006DF49C051762 /* LiveActivityService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LiveActivityService.swift; sourceTree = "<group>"; };
+		BB2F9E774CDDFF1ABAEFCB11 /* ToastCenter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ToastCenter.swift; sourceTree = "<group>"; };
 		BB6EAF5F859F19DD2BA7568F /* Base.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Base.xcconfig; sourceTree = "<group>"; };
 		BC2E5A494F474B1D3D2EF4B7 /* PushService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PushService.swift; sourceTree = "<group>"; };
 		C0CACA553E0D70F489079E05 /* PrintProgressCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrintProgressCard.swift; sourceTree = "<group>"; };
@@ -240,6 +244,7 @@
 				2ACB1A998B04E9E9154760AE /* PrinterTab.swift */,
 				25AA0EB97886F4C8EB4AC476 /* PrintTab.swift */,
 				97E5B232DEE3A55BBBF52FD7 /* SettingsView.swift */,
+				B52D3475F8383A6C96754E03 /* ToastOverlay.swift */,
 				CBADEE1334EBDB125AD56B65 /* Dashboard */,
 			);
 			path = Views;
@@ -269,6 +274,7 @@
 				BAE8CE9E59006DF49C051762 /* LiveActivityService.swift */,
 				596B45CE6BCC0F808017F737 /* NotificationService.swift */,
 				BC2E5A494F474B1D3D2EF4B7 /* PushService.swift */,
+				BB2F9E774CDDFF1ABAEFCB11 /* ToastCenter.swift */,
 			);
 			path = Services;
 			sourceTree = "<group>";
@@ -445,6 +451,8 @@
 				9838CAA375A45D38455D0394 /* SpeedPickerSheet.swift in Sources */,
 				928BE6B468C5B40955A3B029 /* StatusRow.swift in Sources */,
 				518938796FA05AE905D80267 /* ThreeMFReader.swift in Sources */,
+				162927F10FBBE5F4B42564AA /* ToastCenter.swift in Sources */,
+				531A4B62990B0E7E59F76C06 /* ToastOverlay.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

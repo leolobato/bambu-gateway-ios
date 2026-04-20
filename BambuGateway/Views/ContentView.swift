@@ -26,5 +26,8 @@ struct ContentView: View {
                 }
             }
         }
+        .overlay(alignment: .top) {
+            ToastOverlay(center: viewModel.toastCenter)
+        }
     }
 }

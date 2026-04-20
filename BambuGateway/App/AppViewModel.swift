@@ -66,6 +66,7 @@ final class AppViewModel: ObservableObject {
     let pushService: PushService
     let liveActivityService: LiveActivityService
     let notificationService: NotificationService
+    let toastCenter: ToastCenter
 
     private var previousStates: [String: String] = [:]
 
@@ -100,10 +101,13 @@ final class AppViewModel: ObservableObject {
 
         let initialClient = GatewayClient(baseURLString: loaded.gatewayBaseURL)
         let push = PushService(client: initialClient)
+        let toast = ToastCenter()
         self.pushService = push
         self.liveActivityService = LiveActivityService(client: initialClient, pushService: push)
         self.notificationService = NotificationService()
+        self.toastCenter = toast
         AppDelegate.pushService = push
+        AppDelegate.toastCenter = toast
     }
 
     func bootstrapPushServices() async {
