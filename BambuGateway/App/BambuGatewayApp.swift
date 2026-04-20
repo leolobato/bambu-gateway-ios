@@ -3,6 +3,7 @@ import SwiftUI
 
 @main
 struct BambuGatewayApp: App {
+    @UIApplicationDelegateAdaptor(AppDelegate.self) private var appDelegate
     @StateObject private var viewModel = AppViewModel()
     @Environment(\.scenePhase) private var scenePhase
 
@@ -12,6 +13,7 @@ struct BambuGatewayApp: App {
         WindowGroup {
             ContentView(viewModel: viewModel)
                 .task {
+                    await viewModel.bootstrapPushServices()
                     await viewModel.refreshAll()
                 }
                 .onOpenURL { url in

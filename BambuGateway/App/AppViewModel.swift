@@ -63,6 +63,12 @@ final class AppViewModel: ObservableObject {
     @Published var uploadProgress: Double? = nil
     @Published var isCancellingUpload: Bool = false
 
+    let pushService: PushService
+    let liveActivityService: LiveActivityService
+    let notificationService: NotificationService
+
+    private var previousStates: [String: String] = [:]
+
     private var uploadPollingTask: Task<Void, Never>?
     private var activeUploadId: String?
     private let settingsStore: AppSettingsStore
@@ -91,6 +97,18 @@ final class AppViewModel: ObservableObject {
         self.persistedSettings = loaded
         self.gatewayBaseURL = loaded.gatewayBaseURL
         self.selectedPrinterId = loaded.selectedPrinterId
+
+        let initialClient = GatewayClient(baseURLString: loaded.gatewayBaseURL)
+        let push = PushService(client: initialClient)
+        self.pushService = push
+        self.liveActivityService = LiveActivityService(client: initialClient, pushService: push)
+        self.notificationService = NotificationService()
+        AppDelegate.pushService = push
+    }
+
+    func bootstrapPushServices() async {
+        await notificationService.requestAuthorizationIfNeeded()
+        await pushService.bootstrap()
     }
 
     var selectedPrinter: PrinterStatus? {
@@ -156,6 +174,7 @@ final class AppViewModel: ObservableObject {
 
         do {
             let fetchedPrinters = try await gatewayClient().fetchPrinters()
+            await handlePolledTransitions(newStatuses: fetchedPrinters)
             printers = fetchedPrinters
         } catch {
             // Silently ignore periodic refresh failures
@@ -173,6 +192,7 @@ final class AppViewModel: ObservableObject {
 
         do {
             let fetchedPrinters = try await gatewayClient().fetchPrinters()
+            await handlePolledTransitions(newStatuses: fetchedPrinters)
             printers = fetchedPrinters
             applyPrinterSelectionAfterRefresh()
         } catch {
@@ -481,6 +501,119 @@ final class AppViewModel: ObservableObject {
 
         if let uploadId = response.uploadId {
             startUploadPolling(uploadId: uploadId)
+        }
+
+        let printerId = response.printerId.isEmpty ? (startedContext?.printerId ?? "") : response.printerId
+        if !printerId.isEmpty {
+            let fileName = response.fileName.isEmpty ? (startedContext?.fileName ?? "Print") : response.fileName
+            let displayName = printerName(for: printerId)
+            Task { [weak self] in
+                await self?.liveActivityService.startActivity(
+                    printerId: printerId,
+                    printerName: displayName,
+                    fileName: fileName,
+                    thumbnail: nil,
+                    initialState: PrintActivityAttributes.ContentState(
+                        state: .preparing,
+                        stageName: "Starting print",
+                        progress: 0.0,
+                        remainingMinutes: 0,
+                        currentLayer: 0,
+                        totalLayers: 0,
+                        updatedAt: Date()
+                    )
+                )
+            }
+        }
+    }
+
+    private func printerName(for printerId: String) -> String {
+        if let match = printers.first(where: { $0.id == printerId }) {
+            return match.name
+        }
+        return printerId
+    }
+
+    private func handlePolledTransitions(newStatuses: [PrinterStatus]) async {
+        for status in newStatuses {
+            let stateKey = status.state.lowercased()
+            let prev = previousStates[status.id]
+            previousStates[status.id] = stateKey
+
+            guard let prev else { continue }
+            if prev == stateKey { continue }
+
+            let content = makeContentState(from: status)
+
+            switch stateKey {
+            case "printing":
+                if prev == "paused" {
+                    await liveActivityService.updateActivity(printerId: status.id, state: content)
+                }
+            case "paused":
+                await liveActivityService.updateActivity(printerId: status.id, state: content)
+                if !pushService.capabilitiesEnabled {
+                    await notificationService.fireLocal(
+                        title: "Print paused",
+                        body: "\(status.name) paused",
+                        identifier: "\(status.id)-paused"
+                    )
+                }
+            case "error":
+                await liveActivityService.endActivity(
+                    printerId: status.id,
+                    finalState: content,
+                    dismissalPolicy: .immediate
+                )
+                if !pushService.capabilitiesEnabled {
+                    await notificationService.fireLocal(
+                        title: "Print failed",
+                        body: "\(status.name) stopped with an error",
+                        identifier: "\(status.id)-error"
+                    )
+                }
+            case "finished":
+                await liveActivityService.endActivity(
+                    printerId: status.id,
+                    finalState: content,
+                    dismissalPolicy: .after(Date().addingTimeInterval(4 * 3600))
+                )
+            case "cancelled":
+                await liveActivityService.endActivity(
+                    printerId: status.id,
+                    finalState: content,
+                    dismissalPolicy: .immediate
+                )
+            default:
+                break
+            }
+        }
+    }
+
+    private func makeContentState(from status: PrinterStatus) -> PrintActivityAttributes.ContentState {
+        let progress = Double(status.job?.progress ?? 0) / 100.0
+        return PrintActivityAttributes.ContentState(
+            state: badge(for: status.state),
+            stageName: status.stageName,
+            progress: progress,
+            remainingMinutes: status.job?.remainingMinutes ?? 0,
+            currentLayer: status.job?.currentLayer ?? 0,
+            totalLayers: status.job?.totalLayers ?? 0,
+            updatedAt: Date()
+        )
+    }
+
+    private func badge(for state: String) -> PrinterStateBadge {
+        switch state.lowercased() {
+        case "idle": return .idle
+        case "preparing": return .preparing
+        case "printing", "running": return .printing
+        case "paused": return .paused
+        case "finished": return .finished
+        case "cancelled": return .cancelled
+        case "error": return .error
+        case "offline": return .offline
+        default: return .idle
         }
     }
 
