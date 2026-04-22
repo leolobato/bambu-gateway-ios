@@ -18,6 +18,10 @@ struct PrintProgressCard: View {
                 .scaleEffect(y: 1.5)
                 .padding(.horizontal, 24)
 
+            if let errorMessage = printer.errorMessage, !errorMessage.isEmpty {
+                errorRow(errorMessage)
+            }
+
             if !job.fileName.isEmpty {
                 Text(job.fileName)
                     .font(.subheadline)
@@ -73,6 +77,28 @@ struct PrintProgressCard: View {
             .background(stateColor.opacity(0.15))
             .foregroundStyle(stateColor)
             .clipShape(Capsule())
+    }
+
+    private func errorRow(_ message: String) -> some View {
+        HStack(alignment: .firstTextBaseline, spacing: 8) {
+            Image(systemName: "exclamationmark.triangle.fill")
+                .foregroundStyle(.orange)
+                .imageScale(.medium)
+            Text(message)
+                .font(.subheadline)
+                .foregroundStyle(.primary)
+                .fixedSize(horizontal: false, vertical: true)
+            Spacer(minLength: 0)
+        }
+        .padding(.vertical, 10)
+        .padding(.horizontal, 12)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background(Color.orange.opacity(0.12))
+        .clipShape(RoundedRectangle(cornerRadius: 10))
+        .padding(.horizontal, 16)
+        .padding(.top, 4)
+        .accessibilityElement(children: .combine)
+        .accessibilityLabel("Printer error: \(message)")
     }
 
     private static func formattedRemainingTime(_ minutes: Int) -> String {
