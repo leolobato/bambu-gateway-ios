@@ -33,12 +33,18 @@ struct PrintLiveActivity: Widget {
                     }
                 }
             } compactLeading: {
-                Image(systemName: iconName(for: context.state.state))
+                compactImage(
+                    state: context.state.state,
+                    thumbnailData: context.attributes.thumbnailData
+                )
             } compactTrailing: {
                 Text("\(Int(context.state.progress * 100))%")
                     .monospacedDigit()
             } minimal: {
-                Image(systemName: iconName(for: context.state.state))
+                compactImage(
+                    state: context.state.state,
+                    thumbnailData: context.attributes.thumbnailData
+                )
             }
         }
     }
@@ -112,6 +118,18 @@ struct PrintLiveActivity: Widget {
         let h = minutes / 60
         let m = minutes % 60
         return String(format: "%d:%02d", h, m)
+    }
+
+    @ViewBuilder
+    private func compactImage(state: PrinterStateBadge, thumbnailData: Data?) -> some View {
+        if let data = thumbnailData, let image = UIImage(data: data) {
+            Image(uiImage: image)
+                .resizable()
+                .scaledToFill()
+                .clipShape(Circle())
+        } else {
+            Image(systemName: iconName(for: state))
+        }
     }
 
     private func iconName(for state: PrinterStateBadge) -> String {
