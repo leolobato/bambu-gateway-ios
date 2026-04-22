@@ -6,6 +6,14 @@ struct PrinterTab: View {
     @State private var isShowingSettings = false
     @State private var isShowingSpeedPicker = false
 
+    @AppStorage("bambu_gateway_ios.dashboard.amsExpanded")
+    private var isAMSExpanded: Bool = true
+
+    @AppStorage("bambu_gateway_ios.dashboard.externalSpoolExpanded")
+    private var isExternalSpoolExpanded: Bool = true
+
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
+
     var body: some View {
         NavigationStack {
             ScrollView {
@@ -170,48 +178,48 @@ struct PrinterTab: View {
             ForEach(viewModel.amsUnits) { unit in
                 amsSectionHeader(unit: unit)
 
-                let unitTrays = viewModel.amsTrays.filter { $0.amsId == unit.id }
-                VStack(spacing: 6) {
-                    ForEach(unitTrays) { tray in
-                        AMSTrayCard(
-                            tray: tray,
-                            label: "Tray \(tray.trayId + 1)",
-                            selectedProfileName: resolvedProfileName(for: tray.slot)
-                        ) {
-                            FilamentPickerView(
-                                filaments: viewModel.amsAssignableFilaments,
-                                selection: Binding(
-                                    get: { viewModel.trayProfileSelection(for: tray.slot) },
-                                    set: { viewModel.setTrayProfileSelection(slot: tray.slot, settingId: $0) }
+                if isAMSExpanded {
+                    let unitTrays = viewModel.amsTrays.filter { $0.amsId == unit.id }
+                    VStack(spacing: 6) {
+                        ForEach(unitTrays) { tray in
+                            AMSTrayCard(
+                                tray: tray,
+                                label: "Tray \(tray.trayId + 1)",
+                                selectedProfileName: resolvedProfileName(for: tray.slot)
+                            ) {
+                                FilamentPickerView(
+                                    filaments: viewModel.amsAssignableFilaments,
+                                    selection: Binding(
+                                        get: { viewModel.trayProfileSelection(for: tray.slot) },
+                                        set: { viewModel.setTrayProfileSelection(slot: tray.slot, settingId: $0) }
+                                    )
                                 )
-                            )
+                            }
                         }
                     }
+                    .transition(.opacity.combined(with: .move(edge: .top)))
                 }
             }
         }
 
         if let vtTray = viewModel.vtTray {
-            HStack {
-                Text("External Spool")
-                    .font(.subheadline)
-                    .fontWeight(.semibold)
-                Spacer()
-            }
-            .padding(.top, 8)
+            externalSpoolSectionHeader
 
-            AMSTrayCard(
-                tray: vtTray,
-                label: "External",
-                selectedProfileName: resolvedProfileName(for: vtTray.slot)
-            ) {
-                FilamentPickerView(
-                    filaments: viewModel.amsAssignableFilaments,
-                    selection: Binding(
-                        get: { viewModel.trayProfileSelection(for: vtTray.slot) },
-                        set: { viewModel.setTrayProfileSelection(slot: vtTray.slot, settingId: $0) }
+            if isExternalSpoolExpanded {
+                AMSTrayCard(
+                    tray: vtTray,
+                    label: "External",
+                    selectedProfileName: resolvedProfileName(for: vtTray.slot)
+                ) {
+                    FilamentPickerView(
+                        filaments: viewModel.amsAssignableFilaments,
+                        selection: Binding(
+                            get: { viewModel.trayProfileSelection(for: vtTray.slot) },
+                            set: { viewModel.setTrayProfileSelection(slot: vtTray.slot, settingId: $0) }
+                        )
                     )
-                )
+                }
+                .transition(.opacity.combined(with: .move(edge: .top)))
             }
         }
     }
@@ -225,18 +233,71 @@ struct PrinterTab: View {
     }
 
     private func amsSectionHeader(unit: AMSUnit) -> some View {
-        HStack {
-            Text("AMS \(unit.id + 1)")
-                .font(.subheadline)
-                .fontWeight(.semibold)
-            Spacer()
-            if unit.hasHumiditySensor && unit.humidity >= 0 {
-                Label("\(unit.humidity)%", systemImage: "humidity")
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
+        Button {
+            toggle(binding: $isAMSExpanded)
+        } label: {
+            HStack(spacing: 8) {
+                Text("AMS \(unit.id + 1)")
+                    .font(.subheadline)
+                    .fontWeight(.semibold)
+                    .foregroundStyle(.primary)
+                Spacer()
+                if unit.hasHumiditySensor && unit.humidity >= 0 {
+                    Label("\(unit.humidity)%", systemImage: "humidity")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                }
+                disclosureChevron(isExpanded: isAMSExpanded)
+            }
+            .contentShape(.rect)
+            .frame(minHeight: 44)
+        }
+        .buttonStyle(.plain)
+        .padding(.top, 8)
+        .accessibilityAddTraits(.isButton)
+        .accessibilityLabel("AMS \(unit.id + 1)")
+        .accessibilityValue(isAMSExpanded ? "Expanded" : "Collapsed")
+        .accessibilityHint(isAMSExpanded ? "Double-tap to collapse" : "Double-tap to expand")
+    }
+
+    private var externalSpoolSectionHeader: some View {
+        Button {
+            toggle(binding: $isExternalSpoolExpanded)
+        } label: {
+            HStack(spacing: 8) {
+                Text("External Spool")
+                    .font(.subheadline)
+                    .fontWeight(.semibold)
+                    .foregroundStyle(.primary)
+                Spacer()
+                disclosureChevron(isExpanded: isExternalSpoolExpanded)
+            }
+            .contentShape(.rect)
+            .frame(minHeight: 44)
+        }
+        .buttonStyle(.plain)
+        .padding(.top, 8)
+        .accessibilityAddTraits(.isButton)
+        .accessibilityLabel("External Spool")
+        .accessibilityValue(isExternalSpoolExpanded ? "Expanded" : "Collapsed")
+        .accessibilityHint(isExternalSpoolExpanded ? "Double-tap to collapse" : "Double-tap to expand")
+    }
+
+    private func disclosureChevron(isExpanded: Bool) -> some View {
+        Image(systemName: "chevron.down")
+            .font(.caption.weight(.semibold))
+            .foregroundStyle(.secondary)
+            .rotationEffect(.degrees(isExpanded ? 0 : -90))
+    }
+
+    private func toggle(binding: Binding<Bool>) {
+        if reduceMotion {
+            binding.wrappedValue.toggle()
+        } else {
+            withAnimation(.spring(duration: 0.25, bounce: 0.1)) {
+                binding.wrappedValue.toggle()
             }
         }
-        .padding(.top, 8)
     }
 }
 
