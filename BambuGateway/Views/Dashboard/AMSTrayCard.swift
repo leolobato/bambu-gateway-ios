@@ -4,6 +4,7 @@ struct AMSTrayCard<Destination: View>: View {
     let tray: AMSTray
     let label: String
     var selectedProfileName: String? = nil
+    var isInUse: Bool = false
     let destination: () -> Destination
 
     private var isEmpty: Bool {
@@ -26,10 +27,16 @@ struct AMSTrayCard<Destination: View>: View {
                 }
 
                 VStack(alignment: .leading, spacing: 2) {
-                    Text(label)
-                        .font(.subheadline)
-                        .fontWeight(.semibold)
-                        .foregroundStyle(isEmpty ? .secondary : .primary)
+                    HStack(spacing: 6) {
+                        Text(label)
+                            .font(.subheadline)
+                            .fontWeight(.semibold)
+                            .foregroundStyle(isEmpty ? .secondary : .primary)
+
+                        if isInUse {
+                            inUseChip
+                        }
+                    }
 
                     if isEmpty {
                         Text("Empty")
@@ -60,11 +67,35 @@ struct AMSTrayCard<Destination: View>: View {
             }
             .padding(.horizontal, 14)
             .padding(.vertical, 10)
-            .background(Color.cardBackground)
+            .background {
+                ZStack {
+                    Color.cardBackground
+                    if isInUse {
+                        Color.accentBlue.opacity(0.08)
+                    }
+                }
+            }
             .clipShape(RoundedRectangle(cornerRadius: 12))
+            .overlay(
+                RoundedRectangle(cornerRadius: 12)
+                    .strokeBorder(
+                        isInUse ? Color.accentBlue : Color.clear,
+                        lineWidth: 1.5
+                    )
+            )
         }
         .disabled(isEmpty)
         .accessibilityLabel(accessibilityText)
+        .accessibilityAddTraits(isInUse ? .isSelected : [])
+    }
+
+    private var inUseChip: some View {
+        Text("In Use")
+            .font(.caption2.bold())
+            .foregroundStyle(.white)
+            .padding(.horizontal, 6)
+            .padding(.vertical, 2)
+            .background(Color.accentBlue, in: Capsule())
     }
 
     @ViewBuilder
@@ -82,11 +113,12 @@ struct AMSTrayCard<Destination: View>: View {
     }
 
     private var accessibilityText: String {
-        if isEmpty { return "\(label), empty" }
+        let prefix = isInUse ? "In Use, " : ""
+        if isEmpty { return "\(prefix)\(label), empty" }
         let type = tray.trayType.isEmpty ? "unknown type" : tray.trayType
         if !tray.filamentId.isEmpty {
-            return "\(label), \(type), \(tray.filamentId)"
+            return "\(prefix)\(label), \(type), \(tray.filamentId)"
         }
-        return "\(label), \(type)"
+        return "\(prefix)\(label), \(type)"
     }
 }

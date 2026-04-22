@@ -43,6 +43,7 @@ struct PrinterStatus: Decodable, Identifiable, Hashable {
     let state: String
     let stageName: String?
     let speedLevel: Int
+    let activeTray: Int?
     let temperatures: TemperatureInfo
     let job: PrintJob?
     let errorMessage: String?
@@ -56,13 +57,14 @@ struct PrinterStatus: Decodable, Identifiable, Hashable {
         state = try c.decode(String.self, forKey: .state)
         stageName = try c.decodeIfPresent(String.self, forKey: .stageName)
         speedLevel = try c.decodeIfPresent(Int.self, forKey: .speedLevel) ?? 2
+        activeTray = try c.decodeIfPresent(Int.self, forKey: .activeTray)
         temperatures = try c.decode(TemperatureInfo.self, forKey: .temperatures)
         job = try c.decodeIfPresent(PrintJob.self, forKey: .job)
         errorMessage = try c.decodeIfPresent(String.self, forKey: .errorMessage)
     }
 
     private enum CodingKeys: String, CodingKey {
-        case id, name, machineModel, online, state, stageName, speedLevel, temperatures, job, errorMessage
+        case id, name, machineModel, online, state, stageName, speedLevel, activeTray, temperatures, job, errorMessage
     }
 }
 

@@ -186,7 +186,8 @@ struct PrinterTab: View {
                             AMSTrayCard(
                                 tray: tray,
                                 label: "Tray \(tray.trayId + 1)",
-                                selectedProfileName: resolvedProfileName(for: tray.slot)
+                                selectedProfileName: resolvedProfileName(for: tray.slot),
+                                isInUse: activeTraySlot == tray.slot
                             ) {
                                 FilamentPickerView(
                                     filaments: viewModel.amsAssignableFilaments,
@@ -210,7 +211,8 @@ struct PrinterTab: View {
                 AMSTrayCard(
                     tray: vtTray,
                     label: "External",
-                    selectedProfileName: resolvedProfileName(for: vtTray.slot)
+                    selectedProfileName: resolvedProfileName(for: vtTray.slot),
+                    isInUse: activeTraySlot == vtTray.slot
                 ) {
                     FilamentPickerView(
                         filaments: viewModel.amsAssignableFilaments,
@@ -223,6 +225,13 @@ struct PrinterTab: View {
                 .transition(.opacity.combined(with: .move(edge: .top)))
             }
         }
+    }
+
+    private var activeTraySlot: Int? {
+        guard let printer = viewModel.selectedPrinter else { return nil }
+        let state = printer.state.lowercased()
+        guard state == "printing" || state == "paused" else { return nil }
+        return printer.activeTray
     }
 
     private func resolvedProfileName(for slot: Int) -> String? {
