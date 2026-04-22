@@ -140,6 +140,7 @@ struct PrinterTab: View {
                 StatusRow(
                     temperatures: printer.temperatures,
                     speedLevel: SpeedLevel(rawValue: printer.speedLevel) ?? .standard,
+                    isSpeedChangeInFlight: viewModel.isSpeedChangeInFlight,
                     isShowingSpeedPicker: $isShowingSpeedPicker
                 )
 

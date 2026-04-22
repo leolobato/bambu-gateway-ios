@@ -10,10 +10,8 @@ struct SpeedPickerSheet: View {
             List {
                 ForEach(SpeedLevel.allCases) { level in
                     Button {
-                        Task {
-                            await onSelect(level)
-                            dismiss()
-                        }
+                        Task { await onSelect(level) }
+                        dismiss()
                     } label: {
                         HStack {
                             VStack(alignment: .leading, spacing: 2) {

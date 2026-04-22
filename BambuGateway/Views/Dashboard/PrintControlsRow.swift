@@ -6,35 +6,70 @@ struct PrintControlsRow: View {
     let onResume: () async -> Void
     let onCancel: () async -> Void
 
+    @State private var inFlight: ControlAction?
+
+    private enum ControlAction {
+        case pause, resume, cancel
+    }
+
     var body: some View {
         HStack(spacing: 8) {
             if state.lowercased() == "printing" {
-                Button {
-                    Task { await onPause() }
-                } label: {
-                    Label("Pause", systemImage: "pause.fill")
-                        .frame(maxWidth: .infinity)
-                }
-                .buttonStyle(.bordered)
+                controlButton(
+                    action: .pause,
+                    title: "Pause",
+                    systemImage: "pause.fill"
+                ) { await onPause() }
             } else {
-                Button {
-                    Task { await onResume() }
-                } label: {
-                    Label("Resume", systemImage: "play.fill")
-                        .frame(maxWidth: .infinity)
-                }
-                .buttonStyle(.bordered)
+                controlButton(
+                    action: .resume,
+                    title: "Resume",
+                    systemImage: "play.fill"
+                ) { await onResume() }
             }
 
-            Button(role: .destructive) {
-                Task { await onCancel() }
-            } label: {
-                Label("Cancel", systemImage: "stop.fill")
-                    .frame(maxWidth: .infinity)
-            }
-            .buttonStyle(.bordered)
-            .tint(.red)
+            controlButton(
+                action: .cancel,
+                title: "Cancel",
+                systemImage: "stop.fill",
+                role: .destructive,
+                tint: .red
+            ) { await onCancel() }
         }
         .font(.subheadline)
+    }
+
+    @ViewBuilder
+    private func controlButton(
+        action: ControlAction,
+        title: String,
+        systemImage: String,
+        role: ButtonRole? = nil,
+        tint: Color? = nil,
+        handler: @escaping () async -> Void
+    ) -> some View {
+        let isThisInFlight = inFlight == action
+
+        Button(role: role) {
+            Task {
+                inFlight = action
+                await handler()
+                inFlight = nil
+            }
+        } label: {
+            HStack(spacing: 6) {
+                if isThisInFlight {
+                    ProgressView()
+                        .controlSize(.small)
+                } else {
+                    Image(systemName: systemImage)
+                }
+                Text(title)
+            }
+            .frame(maxWidth: .infinity)
+        }
+        .buttonStyle(.bordered)
+        .tint(tint)
+        .disabled(inFlight != nil)
     }
 }

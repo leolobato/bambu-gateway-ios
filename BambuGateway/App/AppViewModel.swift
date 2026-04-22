@@ -62,6 +62,7 @@ final class AppViewModel: ObservableObject {
     @Published var messageLevel: MessageLevel = .info
     @Published var uploadProgress: Double? = nil
     @Published var isCancellingUpload: Bool = false
+    @Published var isSpeedChangeInFlight: Bool = false
 
     let pushService: PushService
     let liveActivityService: LiveActivityService
@@ -418,6 +419,7 @@ final class AppViewModel: ObservableObject {
         guard let printerId = selectedPrinter?.id else { return }
         do {
             try await gatewayClient().pausePrint(printerId: printerId)
+            await refreshPrinters()
         } catch {
             setMessage(error.localizedDescription, .error)
         }
@@ -427,6 +429,7 @@ final class AppViewModel: ObservableObject {
         guard let printerId = selectedPrinter?.id else { return }
         do {
             try await gatewayClient().resumePrint(printerId: printerId)
+            await refreshPrinters()
         } catch {
             setMessage(error.localizedDescription, .error)
         }
@@ -436,6 +439,7 @@ final class AppViewModel: ObservableObject {
         guard let printerId = selectedPrinter?.id else { return }
         do {
             try await gatewayClient().cancelPrint(printerId: printerId)
+            await refreshPrinters()
         } catch {
             setMessage(error.localizedDescription, .error)
         }
@@ -443,8 +447,11 @@ final class AppViewModel: ObservableObject {
 
     func setSpeed(_ level: SpeedLevel) async {
         guard let printerId = selectedPrinter?.id else { return }
+        isSpeedChangeInFlight = true
+        defer { isSpeedChangeInFlight = false }
         do {
             try await gatewayClient().setSpeed(printerId: printerId, level: level)
+            await refreshPrinters()
         } catch {
             setMessage(error.localizedDescription, .error)
         }

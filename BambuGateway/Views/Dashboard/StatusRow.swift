@@ -3,6 +3,7 @@ import SwiftUI
 struct StatusRow: View {
     let temperatures: TemperatureInfo
     let speedLevel: SpeedLevel
+    let isSpeedChangeInFlight: Bool
     @Binding var isShowingSpeedPicker: Bool
 
     var body: some View {
@@ -57,9 +58,15 @@ struct StatusRow: View {
                     .foregroundStyle(.secondary)
                     .tracking(0.5)
 
-                Text(speedLevel.label)
-                    .font(.system(size: 14, weight: .bold))
-                    .foregroundStyle(Color.accentBlue)
+                if isSpeedChangeInFlight {
+                    ProgressView()
+                        .controlSize(.small)
+                        .frame(height: 17)
+                } else {
+                    Text(speedLevel.label)
+                        .font(.system(size: 14, weight: .bold))
+                        .foregroundStyle(Color.accentBlue)
+                }
             }
             .frame(maxWidth: .infinity)
             .padding(10)
@@ -72,7 +79,9 @@ struct StatusRow: View {
                     .padding(6)
             }
         }
+        .disabled(isSpeedChangeInFlight)
         .accessibilityLabel("Print speed: \(speedLevel.label)")
+        .accessibilityValue(isSpeedChangeInFlight ? "Changing" : speedLevel.label)
         .accessibilityHint("Double tap to change")
     }
 }
