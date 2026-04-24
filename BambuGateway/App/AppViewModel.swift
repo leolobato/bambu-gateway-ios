@@ -63,6 +63,12 @@ final class AppViewModel: ObservableObject {
     @Published var uploadProgress: Double? = nil
     @Published var isCancellingUpload: Bool = false
     @Published var isSpeedChangeInFlight: Bool = false
+    @Published var chamberLightPending: Bool = false
+    /// Set to the intended on/off state when a light toggle is in flight.
+    /// Cleared once the server's reported state catches up, or on failure.
+    /// `chamberLightOn` prefers this over the server value so the UI flips
+    /// immediately instead of waiting for the next MQTT pushall.
+    @Published var optimisticChamberLightOn: Bool?
 
     let pushService: PushService
     let liveActivityService: LiveActivityService
@@ -121,6 +127,17 @@ final class AppViewModel: ObservableObject {
             return explicit
         }
         return printers.first
+    }
+
+    /// `true` when the chamber light is on, `false` when off, `nil` when unknown.
+    /// An in-flight optimistic toggle takes precedence over the server value.
+    var chamberLightOn: Bool? {
+        optimisticChamberLightOn ?? selectedPrinter?.camera?.chamberLight?.on
+    }
+
+    /// `true` when the selected printer reports chamber-light as a supported feature.
+    var chamberLightSupported: Bool {
+        selectedPrinter?.camera?.chamberLight?.supported == true
     }
 
     var shouldAutoUseSinglePrinter: Bool {
@@ -453,6 +470,40 @@ final class AppViewModel: ObservableObject {
             try await gatewayClient().setSpeed(printerId: printerId, level: level)
             await refreshPrinters()
         } catch {
+            setMessage(error.localizedDescription, .error)
+        }
+    }
+
+    func setChamberLight(on: Bool) async {
+        guard let printer = selectedPrinter else { return }
+        // Flip the UI immediately. The MQTT `lights_report` can take a couple
+        // of seconds to round-trip; waiting for `refreshPrinters()` before
+        // updating the button makes the tap feel unresponsive.
+        optimisticChamberLightOn = on
+        chamberLightPending = true
+        do {
+            try await gatewayClient().setLight(printerId: printer.id, on: on)
+            chamberLightPending = false
+            // Poll the gateway a few times in the background — keep the
+            // optimistic value visible until the server reports the same
+            // thing, then drop it. Bounded so a dropped MQTT report can't
+            // pin the button forever.
+            Task { [weak self] in
+                for _ in 0 ..< 6 {
+                    try? await Task.sleep(nanoseconds: 500_000_000)
+                    await self?.refreshPrinters()
+                    if self?.selectedPrinter?.camera?.chamberLight?.on == on {
+                        self?.optimisticChamberLightOn = nil
+                        return
+                    }
+                }
+                // Server never confirmed — release the override anyway so a
+                // future (correct) report isn't shadowed.
+                self?.optimisticChamberLightOn = nil
+            }
+        } catch {
+            optimisticChamberLightOn = nil
+            chamberLightPending = false
             setMessage(error.localizedDescription, .error)
         }
     }

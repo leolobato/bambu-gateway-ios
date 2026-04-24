@@ -11,6 +11,12 @@ struct ContentView: View {
                 }
                 .tag(0)
 
+            CameraTab(viewModel: viewModel)
+                .tabItem {
+                    Label("Camera", systemImage: "video")
+                }
+                .tag(2)
+
             PrintTab(viewModel: viewModel)
                 .tabItem {
                     Label("Print", systemImage: "doc.badge.gearshape")

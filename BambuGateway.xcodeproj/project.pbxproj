@@ -7,13 +7,16 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		007AA72398C163EE43F732D2 /* VLCCameraFeed.swift in Sources */ = {isa = PBXBuildFile; fileRef = ADEBFF36646A2ECB61B04F33 /* VLCCameraFeed.swift */; };
 		0A2274DC8B4E7E9B301C33A2 /* PrintActivityAttributes.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E70DDBC904B734FBBB17271 /* PrintActivityAttributes.swift */; };
 		0E245E236604EDABE5D36FD2 /* GatewayClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE3B5CC1FCEEEE3F3845ADEC /* GatewayClient.swift */; };
 		160AB3CC8EC474155F80A170 /* ShareViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 68FD23DF97AF009395F22F1E /* ShareViewController.swift */; };
 		162927F10FBBE5F4B42564AA /* ToastCenter.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB2F9E774CDDFF1ABAEFCB11 /* ToastCenter.swift */; };
 		213CC43D8270AE62370EF492 /* DashboardColors.swift in Sources */ = {isa = PBXBuildFile; fileRef = A3234ED4CB1DEBAF20C20912 /* DashboardColors.swift */; };
 		2291CCBDE336DA4AED20DE24 /* PrintLiveActivity.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE9094B53DAFDF244C615D34 /* PrintLiveActivity.swift */; };
+		2B35F0A7CBA771FDD9C87DE0 /* CameraFeedView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 60EEE74AFB6EC29279BA25F4 /* CameraFeedView.swift */; };
 		3170F3853AFAEC0D89898D09 /* AMSTrayCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = A90C3D6C3090D51A24960C1F /* AMSTrayCard.swift */; };
+		4276A894BB7CE53680394377 /* AppSettingsStoreCameraTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 36C28A77CC578F19C3B443A8 /* AppSettingsStoreCameraTests.swift */; };
 		49397CEDE4D75E47854A886C /* PrinterOfflineCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1A82C8C3C49F519579B64E2 /* PrinterOfflineCard.swift */; };
 		4C1A529AD33EE2A149CD9C0E /* PrinterTab.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2ACB1A998B04E9E9154760AE /* PrinterTab.swift */; };
 		5096C194622EACD881757599 /* PrintProgressCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0CACA553E0D70F489079E05 /* PrintProgressCard.swift */; };
@@ -23,14 +26,23 @@
 		5B1DAF338F92BE18208DB698 /* MakerWorldBrowserView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3B46FA0BBEC43DF398153A59 /* MakerWorldBrowserView.swift */; };
 		6326A5843953FCC43B8311EB /* MultipartFormData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 95B3B7F980C0E0EC50EEE372 /* MultipartFormData.swift */; };
 		6D6F831E399F8EF5C49D1B81 /* GCodePreview in Frameworks */ = {isa = PBXBuildFile; productRef = 85BFD403F2AE24BB83C64D31 /* GCodePreview */; };
+		6F950FB8F2C074ABCF15B58F /* BambuTCPJPEGFeed.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2CD1B0E2E27437689C3D753A /* BambuTCPJPEGFeed.swift */; };
 		70CCAF8C0F42A532EBBB3A10 /* AppSettingsStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9C133CBD53A0F28997154461 /* AppSettingsStore.swift */; };
 		722C07A2FE9F8D32DA14CC11 /* PrintTab.swift in Sources */ = {isa = PBXBuildFile; fileRef = 25AA0EB97886F4C8EB4AC476 /* PrintTab.swift */; };
+		7BF05FE867DD814C8E22E0F6 /* CameraFeedController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 753276AADA566A39C55576DC /* CameraFeedController.swift */; };
 		7FBB60D7C763B1731A6A7368 /* PrinterStatusCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = C86D1F00D0E5D21411935A5E /* PrinterStatusCard.swift */; };
+		80CA2FC95EFD1FA78A919DB4 /* CameraFeed.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF802CF901C59D7640A13BBF /* CameraFeed.swift */; };
 		91FB314780FCE460E7C2F783 /* PushService.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC2E5A494F474B1D3D2EF4B7 /* PushService.swift */; };
 		928BE6B468C5B40955A3B029 /* StatusRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 244EB95AFE2F67045E60788A /* StatusRow.swift */; };
+		96620D20C294E0F910E6ADA9 /* BambuGatewayTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BEBF1713CA6AF40B8331BFA /* BambuGatewayTests.swift */; };
 		9838CAA375A45D38455D0394 /* SpeedPickerSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = 450020B566A6C67BC3D57DE2 /* SpeedPickerSheet.swift */; };
+		9D2578A0C71EFA277009170A /* PrinterStatusCameraDecodingTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0EEE85F6636C62884235109 /* PrinterStatusCameraDecodingTests.swift */; };
+		9FC430EBE5876AB11F4B47C0 /* BambuPrinterCameraFeed.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7F5F9FAB3657817D9E6CE4EF /* BambuPrinterCameraFeed.swift */; };
+		A7F2C0EA5DD4EFA272D034BC /* MobileVLCKit in Frameworks */ = {isa = PBXBuildFile; productRef = 4E1548E9D0BF21D3D57713BE /* MobileVLCKit */; };
+		AB2066B52591F2C3AADD9BC1 /* CameraTab.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8C9036F5C817DB069A0DD120 /* CameraTab.swift */; };
 		B112E90578486CB35D2277BA /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBEBCED8EAF681F59258D749 /* ContentView.swift */; };
 		B30AD4F02ACBB47DD4CAB1AF /* PrintActivityAttributes.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E70DDBC904B734FBBB17271 /* PrintActivityAttributes.swift */; };
+		B51A97CC26FA4B7FEBBF3C93 /* ChamberLightToggle.swift in Sources */ = {isa = PBXBuildFile; fileRef = B61A51F8709BB1DDABDC3650 /* ChamberLightToggle.swift */; };
 		B5431F4CFCEB61B700345680 /* LiveActivityExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = CAD2B6571B7210AD007472D2 /* LiveActivityExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		BACEC0C3302612B1C7A21088 /* ShareExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 8E99C2EC57D9D732AF5FC476 /* ShareExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		C12344BE79B9169E1A13F066 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 9A064996EB0DA8288274EC27 /* Assets.xcassets */; };
@@ -43,6 +55,7 @@
 		E47A2305B530F74D478F50A1 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0F1801F617DE01B7AC244E3E /* AppDelegate.swift */; };
 		F6321079052D62AF783281E5 /* GatewayModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 47F98F122F17587AC06D257D /* GatewayModels.swift */; };
 		F825FBCBD5B632A2E4E11F16 /* LiveActivityBundle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 863502189CB276B2AC75D17C /* LiveActivityBundle.swift */; };
+		FF0C43E3125D3E6BC03C045D /* FullscreenCameraView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAEA5D10A84F7C4C1D764BAF /* FullscreenCameraView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -52,6 +65,13 @@
 			proxyType = 1;
 			remoteGlobalIDString = C98CDF8A8045B91E83D80307;
 			remoteInfo = ShareExtension;
+		};
+		652356FD60DECD9A62F777B5 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 77B531BC7B6BA85A43566826 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 07C306B2D5C9BA8E92175590;
+			remoteInfo = BambuGateway;
 		};
 		741F9487ADD8E701B5D0C75B /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -84,15 +104,23 @@
 		244EB95AFE2F67045E60788A /* StatusRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatusRow.swift; sourceTree = "<group>"; };
 		25AA0EB97886F4C8EB4AC476 /* PrintTab.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrintTab.swift; sourceTree = "<group>"; };
 		2ACB1A998B04E9E9154760AE /* PrinterTab.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrinterTab.swift; sourceTree = "<group>"; };
+		2CD1B0E2E27437689C3D753A /* BambuTCPJPEGFeed.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BambuTCPJPEGFeed.swift; sourceTree = "<group>"; };
 		32780EC48A776B886BDB8B31 /* PrintControlsRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrintControlsRow.swift; sourceTree = "<group>"; };
+		36C28A77CC578F19C3B443A8 /* AppSettingsStoreCameraTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppSettingsStoreCameraTests.swift; sourceTree = "<group>"; };
 		3B46FA0BBEC43DF398153A59 /* MakerWorldBrowserView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MakerWorldBrowserView.swift; sourceTree = "<group>"; };
 		450020B566A6C67BC3D57DE2 /* SpeedPickerSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpeedPickerSheet.swift; sourceTree = "<group>"; };
 		47F98F122F17587AC06D257D /* GatewayModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GatewayModels.swift; sourceTree = "<group>"; };
 		596B45CE6BCC0F808017F737 /* NotificationService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationService.swift; sourceTree = "<group>"; };
+		5BEBF1713CA6AF40B8331BFA /* BambuGatewayTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BambuGatewayTests.swift; sourceTree = "<group>"; };
+		60EEE74AFB6EC29279BA25F4 /* CameraFeedView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraFeedView.swift; sourceTree = "<group>"; };
 		68FD23DF97AF009395F22F1E /* ShareViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShareViewController.swift; sourceTree = "<group>"; };
+		6C9FBB06FD1BF1F413BFE6C8 /* BambuGatewayTests.xctest */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.cfbundle; path = BambuGatewayTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		6DAA1E9A81B3A274FD5044DD /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
+		753276AADA566A39C55576DC /* CameraFeedController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraFeedController.swift; sourceTree = "<group>"; };
 		7E8DBA7CCF6FB1ACEDDE1120 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
+		7F5F9FAB3657817D9E6CE4EF /* BambuPrinterCameraFeed.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BambuPrinterCameraFeed.swift; sourceTree = "<group>"; };
 		863502189CB276B2AC75D17C /* LiveActivityBundle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LiveActivityBundle.swift; sourceTree = "<group>"; };
+		8C9036F5C817DB069A0DD120 /* CameraTab.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraTab.swift; sourceTree = "<group>"; };
 		8E70DDBC904B734FBBB17271 /* PrintActivityAttributes.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrintActivityAttributes.swift; sourceTree = "<group>"; };
 		8E99C2EC57D9D732AF5FC476 /* ShareExtension.appex */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = "wrapper.app-extension"; path = ShareExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		95B3B7F980C0E0EC50EEE372 /* MultipartFormData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MultipartFormData.swift; sourceTree = "<group>"; };
@@ -103,18 +131,23 @@
 		9DB60428FD52299388786225 /* AppViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppViewModel.swift; sourceTree = "<group>"; };
 		A3234ED4CB1DEBAF20C20912 /* DashboardColors.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DashboardColors.swift; sourceTree = "<group>"; };
 		A90C3D6C3090D51A24960C1F /* AMSTrayCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AMSTrayCard.swift; sourceTree = "<group>"; };
+		AAEA5D10A84F7C4C1D764BAF /* FullscreenCameraView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FullscreenCameraView.swift; sourceTree = "<group>"; };
+		ADEBFF36646A2ECB61B04F33 /* VLCCameraFeed.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VLCCameraFeed.swift; sourceTree = "<group>"; };
 		B1A82C8C3C49F519579B64E2 /* PrinterOfflineCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrinterOfflineCard.swift; sourceTree = "<group>"; };
 		B52D3475F8383A6C96754E03 /* ToastOverlay.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ToastOverlay.swift; sourceTree = "<group>"; };
+		B61A51F8709BB1DDABDC3650 /* ChamberLightToggle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChamberLightToggle.swift; sourceTree = "<group>"; };
 		BAE8CE9E59006DF49C051762 /* LiveActivityService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LiveActivityService.swift; sourceTree = "<group>"; };
 		BB2F9E774CDDFF1ABAEFCB11 /* ToastCenter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ToastCenter.swift; sourceTree = "<group>"; };
 		BB6EAF5F859F19DD2BA7568F /* Base.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Base.xcconfig; sourceTree = "<group>"; };
 		BC2E5A494F474B1D3D2EF4B7 /* PushService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PushService.swift; sourceTree = "<group>"; };
 		C0CACA553E0D70F489079E05 /* PrintProgressCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrintProgressCard.swift; sourceTree = "<group>"; };
+		C0EEE85F6636C62884235109 /* PrinterStatusCameraDecodingTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrinterStatusCameraDecodingTests.swift; sourceTree = "<group>"; };
 		C5AFFC06CAC383459918EF95 /* GCodePreviewModal.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GCodePreviewModal.swift; sourceTree = "<group>"; };
 		C86D1F00D0E5D21411935A5E /* PrinterStatusCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrinterStatusCard.swift; sourceTree = "<group>"; };
 		CAD2B6571B7210AD007472D2 /* LiveActivityExtension.appex */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = "wrapper.app-extension"; path = LiveActivityExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		CE3B5CC1FCEEEE3F3845ADEC /* GatewayClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GatewayClient.swift; sourceTree = "<group>"; };
 		CE9094B53DAFDF244C615D34 /* PrintLiveActivity.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrintLiveActivity.swift; sourceTree = "<group>"; };
+		CF802CF901C59D7640A13BBF /* CameraFeed.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraFeed.swift; sourceTree = "<group>"; };
 		DBEBCED8EAF681F59258D749 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		E9D461E5634BC80B7C37747F /* BambuGateway.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = BambuGateway.entitlements; sourceTree = "<group>"; };
 		FFEEE185FB42B56E8BD094C5 /* ThreeMFReader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ThreeMFReader.swift; sourceTree = "<group>"; };
@@ -126,12 +159,25 @@
 			buildActionMask = 2147483647;
 			files = (
 				6D6F831E399F8EF5C49D1B81 /* GCodePreview in Frameworks */,
+				A7F2C0EA5DD4EFA272D034BC /* MobileVLCKit in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		033717E448757A6938B3F57C /* Camera */ = {
+			isa = PBXGroup;
+			children = (
+				7F5F9FAB3657817D9E6CE4EF /* BambuPrinterCameraFeed.swift */,
+				2CD1B0E2E27437689C3D753A /* BambuTCPJPEGFeed.swift */,
+				CF802CF901C59D7640A13BBF /* CameraFeed.swift */,
+				753276AADA566A39C55576DC /* CameraFeedController.swift */,
+				ADEBFF36646A2ECB61B04F33 /* VLCCameraFeed.swift */,
+			);
+			path = Camera;
+			sourceTree = "<group>";
+		};
 		0AB25DCFFA9C18E411FF6066 /* LiveActivityExtension */ = {
 			isa = PBXGroup;
 			children = (
@@ -174,6 +220,7 @@
 			isa = PBXGroup;
 			children = (
 				1F95784351CF8ED3265FC5AF /* BambuGateway.app */,
+				6C9FBB06FD1BF1F413BFE6C8 /* BambuGatewayTests.xctest */,
 				CAD2B6571B7210AD007472D2 /* LiveActivityExtension.appex */,
 				8E99C2EC57D9D732AF5FC476 /* ShareExtension.appex */,
 			);
@@ -192,6 +239,7 @@
 			isa = PBXGroup;
 			children = (
 				FA9546B8119F5653FF13933F /* BambuGateway */,
+				E34573677577835B31EE039D /* BambuGatewayTests */,
 				7ED3FE26DF1B65569C58C57B /* Configuration */,
 				0AB25DCFFA9C18E411FF6066 /* LiveActivityExtension */,
 				E56CDDD34788FBF5F8CF0381 /* ShareExtension */,
@@ -223,6 +271,17 @@
 			path = ThreeMF;
 			sourceTree = "<group>";
 		};
+		BFCF654FB2646286A9DBE87D /* Camera */ = {
+			isa = PBXGroup;
+			children = (
+				60EEE74AFB6EC29279BA25F4 /* CameraFeedView.swift */,
+				8C9036F5C817DB069A0DD120 /* CameraTab.swift */,
+				B61A51F8709BB1DDABDC3650 /* ChamberLightToggle.swift */,
+				AAEA5D10A84F7C4C1D764BAF /* FullscreenCameraView.swift */,
+			);
+			path = Camera;
+			sourceTree = "<group>";
+		};
 		CBADEE1334EBDB125AD56B65 /* Dashboard */ = {
 			isa = PBXGroup;
 			children = (
@@ -248,9 +307,20 @@
 				25AA0EB97886F4C8EB4AC476 /* PrintTab.swift */,
 				97E5B232DEE3A55BBBF52FD7 /* SettingsView.swift */,
 				B52D3475F8383A6C96754E03 /* ToastOverlay.swift */,
+				BFCF654FB2646286A9DBE87D /* Camera */,
 				CBADEE1334EBDB125AD56B65 /* Dashboard */,
 			);
 			path = Views;
+			sourceTree = "<group>";
+		};
+		E34573677577835B31EE039D /* BambuGatewayTests */ = {
+			isa = PBXGroup;
+			children = (
+				36C28A77CC578F19C3B443A8 /* AppSettingsStoreCameraTests.swift */,
+				5BEBF1713CA6AF40B8331BFA /* BambuGatewayTests.swift */,
+				C0EEE85F6636C62884235109 /* PrinterStatusCameraDecodingTests.swift */,
+			);
+			path = BambuGatewayTests;
 			sourceTree = "<group>";
 		};
 		E56CDDD34788FBF5F8CF0381 /* ShareExtension */ = {
@@ -278,6 +348,7 @@
 				596B45CE6BCC0F808017F737 /* NotificationService.swift */,
 				BC2E5A494F474B1D3D2EF4B7 /* PushService.swift */,
 				BB2F9E774CDDFF1ABAEFCB11 /* ToastCenter.swift */,
+				033717E448757A6938B3F57C /* Camera */,
 			);
 			path = Services;
 			sourceTree = "<group>";
@@ -319,6 +390,7 @@
 			name = BambuGateway;
 			packageProductDependencies = (
 				85BFD403F2AE24BB83C64D31 /* GCodePreview */,
+				4E1548E9D0BF21D3D57713BE /* MobileVLCKit */,
 			);
 			productName = BambuGateway;
 			productReference = 1F95784351CF8ED3265FC5AF /* BambuGateway.app */;
@@ -340,6 +412,24 @@
 			productName = LiveActivityExtension;
 			productReference = CAD2B6571B7210AD007472D2 /* LiveActivityExtension.appex */;
 			productType = "com.apple.product-type.app-extension";
+		};
+		62519C98B575259E2F3BAD29 /* BambuGatewayTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 0E4982F16F5B4BD6286508D1 /* Build configuration list for PBXNativeTarget "BambuGatewayTests" */;
+			buildPhases = (
+				36904E469B0D94D6AF5D4FAF /* Sources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				7B2E7F04FEB1BD1B3C8C073E /* PBXTargetDependency */,
+			);
+			name = BambuGatewayTests;
+			packageProductDependencies = (
+			);
+			productName = BambuGatewayTests;
+			productReference = 6C9FBB06FD1BF1F413BFE6C8 /* BambuGatewayTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
 		};
 		C98CDF8A8045B91E83D80307 /* ShareExtension */ = {
 			isa = PBXNativeTarget;
@@ -375,6 +465,10 @@
 						DevelopmentTeam = "$(DEVELOPMENT_TEAM)";
 						ProvisioningStyle = Automatic;
 					};
+					62519C98B575259E2F3BAD29 = {
+						DevelopmentTeam = "$(DEVELOPMENT_TEAM)";
+						ProvisioningStyle = Automatic;
+					};
 					C98CDF8A8045B91E83D80307 = {
 						DevelopmentTeam = "$(DEVELOPMENT_TEAM)";
 						ProvisioningStyle = Automatic;
@@ -393,12 +487,14 @@
 			minimizedProjectReferenceProxies = 1;
 			packageReferences = (
 				DD933A013442A429FFF4FB80 /* XCRemoteSwiftPackageReference "GCodePreview" */,
+				A5C2CD4C597FA88745434145 /* XCRemoteSwiftPackageReference "MobileVLCKit-SPM" */,
 			);
 			preferredProjectObjectVersion = 77;
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
 				07C306B2D5C9BA8E92175590 /* BambuGateway */,
+				62519C98B575259E2F3BAD29 /* BambuGatewayTests */,
 				31529554D8DA0DB5FB58CFBE /* LiveActivityExtension */,
 				C98CDF8A8045B91E83D80307 /* ShareExtension */,
 			);
@@ -425,6 +521,16 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		36904E469B0D94D6AF5D4FAF /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				4276A894BB7CE53680394377 /* AppSettingsStoreCameraTests.swift in Sources */,
+				96620D20C294E0F910E6ADA9 /* BambuGatewayTests.swift in Sources */,
+				9D2578A0C71EFA277009170A /* PrinterStatusCameraDecodingTests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		8097724E4D7C44DC217B45C0 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -434,8 +540,16 @@
 				70CCAF8C0F42A532EBBB3A10 /* AppSettingsStore.swift in Sources */,
 				CB3388B447DBAD970B907E6B /* AppViewModel.swift in Sources */,
 				C9B3C4A8EF610EBC59EEDCB2 /* BambuGatewayApp.swift in Sources */,
+				9FC430EBE5876AB11F4B47C0 /* BambuPrinterCameraFeed.swift in Sources */,
+				6F950FB8F2C074ABCF15B58F /* BambuTCPJPEGFeed.swift in Sources */,
+				80CA2FC95EFD1FA78A919DB4 /* CameraFeed.swift in Sources */,
+				7BF05FE867DD814C8E22E0F6 /* CameraFeedController.swift in Sources */,
+				2B35F0A7CBA771FDD9C87DE0 /* CameraFeedView.swift in Sources */,
+				AB2066B52591F2C3AADD9BC1 /* CameraTab.swift in Sources */,
+				B51A97CC26FA4B7FEBBF3C93 /* ChamberLightToggle.swift in Sources */,
 				B112E90578486CB35D2277BA /* ContentView.swift in Sources */,
 				213CC43D8270AE62370EF492 /* DashboardColors.swift in Sources */,
+				FF0C43E3125D3E6BC03C045D /* FullscreenCameraView.swift in Sources */,
 				CA1468A89E6DEFF522781031 /* GCodePreviewModal.swift in Sources */,
 				0E245E236604EDABE5D36FD2 /* GatewayClient.swift in Sources */,
 				F6321079052D62AF783281E5 /* GatewayModels.swift in Sources */,
@@ -457,6 +571,7 @@
 				518938796FA05AE905D80267 /* ThreeMFReader.swift in Sources */,
 				162927F10FBBE5F4B42564AA /* ToastCenter.swift in Sources */,
 				531A4B62990B0E7E59F76C06 /* ToastOverlay.swift in Sources */,
+				007AA72398C163EE43F732D2 /* VLCCameraFeed.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -482,6 +597,11 @@
 			isa = PBXTargetDependency;
 			target = C98CDF8A8045B91E83D80307 /* ShareExtension */;
 			targetProxy = 132FC0E9E209FACCA1222825 /* PBXContainerItemProxy */;
+		};
+		7B2E7F04FEB1BD1B3C8C073E /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 07C306B2D5C9BA8E92175590 /* BambuGateway */;
+			targetProxy = 652356FD60DECD9A62F777B5 /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
@@ -642,6 +762,50 @@
 			};
 			name = Debug;
 		};
+		821A8ED0CEDD7F7AD259453E /* Debug */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = BB6EAF5F859F19DD2BA7568F /* Base.xcconfig */;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				DEVELOPMENT_TEAM = "$(DEVELOPMENT_TEAM)";
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = "$(APP_BUNDLE_ID).tests";
+				PRODUCT_NAME = BambuGatewayTests;
+				SDKROOT = iphoneos;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/BambuGateway.app/BambuGateway";
+			};
+			name = Debug;
+		};
+		BA1E948E87D39A9B9BB9FDE0 /* Release */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = BB6EAF5F859F19DD2BA7568F /* Base.xcconfig */;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				DEVELOPMENT_TEAM = "$(DEVELOPMENT_TEAM)";
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = "$(APP_BUNDLE_ID).tests";
+				PRODUCT_NAME = BambuGatewayTests;
+				SDKROOT = iphoneos;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/BambuGateway.app/BambuGateway";
+			};
+			name = Release;
+		};
 		C96D97FEF30E118EB512BB7B /* Release */ = {
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = BB6EAF5F859F19DD2BA7568F /* Base.xcconfig */;
@@ -764,6 +928,15 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
+		0E4982F16F5B4BD6286508D1 /* Build configuration list for PBXNativeTarget "BambuGatewayTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				821A8ED0CEDD7F7AD259453E /* Debug */,
+				BA1E948E87D39A9B9BB9FDE0 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
 		28FE0E962E93135EDAD5DF0B /* Build configuration list for PBXProject "BambuGateway" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
@@ -803,6 +976,14 @@
 /* End XCConfigurationList section */
 
 /* Begin XCRemoteSwiftPackageReference section */
+		A5C2CD4C597FA88745434145 /* XCRemoteSwiftPackageReference "MobileVLCKit-SPM" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/MobileVLCKit-SPM/MobileVLCKit-SPM";
+			requirement = {
+				kind = exactVersion;
+				version = 3.7.3;
+			};
+		};
 		DD933A013442A429FFF4FB80 /* XCRemoteSwiftPackageReference "GCodePreview" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/leolobato/GCodePreview";
@@ -814,6 +995,11 @@
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
+		4E1548E9D0BF21D3D57713BE /* MobileVLCKit */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = A5C2CD4C597FA88745434145 /* XCRemoteSwiftPackageReference "MobileVLCKit-SPM" */;
+			productName = MobileVLCKit;
+		};
 		85BFD403F2AE24BB83C64D31 /* GCodePreview */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = DD933A013442A429FFF4FB80 /* XCRemoteSwiftPackageReference "GCodePreview" */;

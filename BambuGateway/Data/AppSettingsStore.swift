@@ -6,6 +6,7 @@ struct PerPrinterSelection: Codable {
     var plateType: String
     var trayProfileBySlot: [Int: String]
     var filamentTrayByIndex: [Int: Int]
+    var externalCameraURL: String?
 
     enum CodingKeys: String, CodingKey {
         case machineProfileId
@@ -13,6 +14,7 @@ struct PerPrinterSelection: Codable {
         case plateType
         case trayProfileBySlot
         case filamentTrayByIndex
+        case externalCameraURL
     }
 
     init(
@@ -20,13 +22,15 @@ struct PerPrinterSelection: Codable {
         processProfileId: String,
         plateType: String,
         trayProfileBySlot: [Int: String],
-        filamentTrayByIndex: [Int: Int]
+        filamentTrayByIndex: [Int: Int],
+        externalCameraURL: String? = nil
     ) {
         self.machineProfileId = machineProfileId
         self.processProfileId = processProfileId
         self.plateType = plateType
         self.trayProfileBySlot = trayProfileBySlot
         self.filamentTrayByIndex = filamentTrayByIndex
+        self.externalCameraURL = externalCameraURL
     }
 
     init(from decoder: Decoder) throws {
@@ -36,6 +40,7 @@ struct PerPrinterSelection: Codable {
         plateType = try container.decodeIfPresent(String.self, forKey: .plateType) ?? ""
         trayProfileBySlot = try container.decodeIfPresent([Int: String].self, forKey: .trayProfileBySlot) ?? [:]
         filamentTrayByIndex = try container.decodeIfPresent([Int: Int].self, forKey: .filamentTrayByIndex) ?? [:]
+        externalCameraURL = try container.decodeIfPresent(String.self, forKey: .externalCameraURL)
     }
 
     static let empty = PerPrinterSelection(
@@ -43,7 +48,8 @@ struct PerPrinterSelection: Codable {
         processProfileId: "",
         plateType: "",
         trayProfileBySlot: [:],
-        filamentTrayByIndex: [:]
+        filamentTrayByIndex: [:],
+        externalCameraURL: nil
     )
 }
 

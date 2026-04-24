@@ -255,6 +255,20 @@ struct GatewayClient {
         )
     }
 
+    func setLight(printerId: String, node: String = "chamber_light", on: Bool) async throws {
+        struct Payload: Encodable {
+            let node: String
+            let on: Bool
+        }
+        let body = try JSONEncoder().encode(Payload(node: node, on: on))
+        _ = try await request(
+            path: "/api/printers/\(printerId)/light",
+            method: "POST",
+            body: body,
+            contentType: "application/json"
+        )
+    }
+
     @discardableResult
     func pausePrint(printerId: String) async throws -> CommandResponse {
         let (data, _) = try await request(path: "/api/printers/\(printerId)/pause", method: "POST")

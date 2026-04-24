@@ -47,6 +47,7 @@ struct PrinterStatus: Decodable, Identifiable, Hashable {
     let temperatures: TemperatureInfo
     let job: PrintJob?
     let errorMessage: String?
+    let camera: CameraInfo?
 
     init(from decoder: Decoder) throws {
         let c = try decoder.container(keyedBy: CodingKeys.self)
@@ -61,10 +62,11 @@ struct PrinterStatus: Decodable, Identifiable, Hashable {
         temperatures = try c.decode(TemperatureInfo.self, forKey: .temperatures)
         job = try c.decodeIfPresent(PrintJob.self, forKey: .job)
         errorMessage = try c.decodeIfPresent(String.self, forKey: .errorMessage)
+        camera = try c.decodeIfPresent(CameraInfo.self, forKey: .camera)
     }
 
     private enum CodingKeys: String, CodingKey {
-        case id, name, machineModel, online, state, stageName, speedLevel, activeTray, temperatures, job, errorMessage
+        case id, name, machineModel, online, state, stageName, speedLevel, activeTray, temperatures, job, errorMessage, camera
     }
 }
 
@@ -345,5 +347,52 @@ struct ActivityRegisterPayload: Codable {
     enum CodingKeys: String, CodingKey {
         case printerId = "printer_id"
         case activityUpdateToken = "activity_update_token"
+    }
+}
+
+// MARK: - Camera
+
+enum CameraTransport: String, Decodable, Hashable {
+    case rtsps
+    case tcpJPEG = "tcp_jpeg"
+    case unknown
+
+    init(from decoder: Decoder) throws {
+        let raw = try decoder.singleValueContainer().decode(String.self)
+        self = CameraTransport(rawValue: raw) ?? .unknown
+    }
+}
+
+struct ChamberLightInfo: Decodable, Hashable {
+    let supported: Bool
+    let on: Bool?
+
+    init(from decoder: Decoder) throws {
+        let c = try decoder.container(keyedBy: CodingKeys.self)
+        supported = try c.decodeIfPresent(Bool.self, forKey: .supported) ?? false
+        on = try c.decodeIfPresent(Bool.self, forKey: .on)
+    }
+
+    private enum CodingKeys: String, CodingKey {
+        case supported, on
+    }
+}
+
+struct CameraInfo: Decodable, Hashable {
+    let ip: String
+    let accessCode: String
+    let transport: CameraTransport
+    let chamberLight: ChamberLightInfo?
+
+    init(from decoder: Decoder) throws {
+        let c = try decoder.container(keyedBy: CodingKeys.self)
+        ip = try c.decode(String.self, forKey: .ip)
+        accessCode = try c.decode(String.self, forKey: .accessCode)
+        transport = try c.decodeIfPresent(CameraTransport.self, forKey: .transport) ?? .unknown
+        chamberLight = try c.decodeIfPresent(ChamberLightInfo.self, forKey: .chamberLight)
+    }
+
+    private enum CodingKeys: String, CodingKey {
+        case ip, accessCode, transport, chamberLight
     }
 }
