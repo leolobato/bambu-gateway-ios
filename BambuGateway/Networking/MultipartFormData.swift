@@ -28,6 +28,9 @@ struct MultipartFormData {
 }
 
 extension MultipartFormData {
+    /// Writes the body to a uniquely-named file in the temporary directory and returns its URL.
+    /// Background `URLSession` upload tasks require a file URL as the body source.
+    /// The caller owns the returned file and is responsible for removing it once the upload completes.
     func writeBody(toTemporaryFileNamed name: String) throws -> URL {
         let url = FileManager.default.temporaryDirectory
             .appendingPathComponent(name + "-" + UUID().uuidString)
