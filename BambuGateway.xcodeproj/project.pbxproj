@@ -10,6 +10,7 @@
 		007AA72398C163EE43F732D2 /* VLCCameraFeed.swift in Sources */ = {isa = PBXBuildFile; fileRef = ADEBFF36646A2ECB61B04F33 /* VLCCameraFeed.swift */; };
 		0A2274DC8B4E7E9B301C33A2 /* PrintActivityAttributes.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E70DDBC904B734FBBB17271 /* PrintActivityAttributes.swift */; };
 		0E245E236604EDABE5D36FD2 /* GatewayClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE3B5CC1FCEEEE3F3845ADEC /* GatewayClient.swift */; };
+		1608695E345525305EF5A5C4 /* MultipartFormDataTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7EB13728279F3D3F30A9151 /* MultipartFormDataTests.swift */; };
 		160AB3CC8EC474155F80A170 /* ShareViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 68FD23DF97AF009395F22F1E /* ShareViewController.swift */; };
 		162927F10FBBE5F4B42564AA /* ToastCenter.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB2F9E774CDDFF1ABAEFCB11 /* ToastCenter.swift */; };
 		213CC43D8270AE62370EF492 /* DashboardColors.swift in Sources */ = {isa = PBXBuildFile; fileRef = A3234ED4CB1DEBAF20C20912 /* DashboardColors.swift */; };
@@ -140,6 +141,7 @@
 		9D5542807513C5701CF0BC3D /* BambuGatewayApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BambuGatewayApp.swift; sourceTree = "<group>"; };
 		9DB60428FD52299388786225 /* AppViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppViewModel.swift; sourceTree = "<group>"; };
 		A3234ED4CB1DEBAF20C20912 /* DashboardColors.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DashboardColors.swift; sourceTree = "<group>"; };
+		A7EB13728279F3D3F30A9151 /* MultipartFormDataTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MultipartFormDataTests.swift; sourceTree = "<group>"; };
 		A90C3D6C3090D51A24960C1F /* AMSTrayCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AMSTrayCard.swift; sourceTree = "<group>"; };
 		AAEA5D10A84F7C4C1D764BAF /* FullscreenCameraView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FullscreenCameraView.swift; sourceTree = "<group>"; };
 		ADEBFF36646A2ECB61B04F33 /* VLCCameraFeed.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VLCCameraFeed.swift; sourceTree = "<group>"; };
@@ -334,6 +336,7 @@
 			children = (
 				36C28A77CC578F19C3B443A8 /* AppSettingsStoreCameraTests.swift */,
 				5BEBF1713CA6AF40B8331BFA /* BambuGatewayTests.swift */,
+				A7EB13728279F3D3F30A9151 /* MultipartFormDataTests.swift */,
 				C0EEE85F6636C62884235109 /* PrinterStatusCameraDecodingTests.swift */,
 				CFF25855CE5E2F502E04B737 /* PrintEstimateDecodingTests.swift */,
 				7FFB4F3826F66CCF3B3483F4 /* PrintEstimationFormattingTests.swift */,
@@ -545,6 +548,7 @@
 			files = (
 				4276A894BB7CE53680394377 /* AppSettingsStoreCameraTests.swift in Sources */,
 				96620D20C294E0F910E6ADA9 /* BambuGatewayTests.swift in Sources */,
+				1608695E345525305EF5A5C4 /* MultipartFormDataTests.swift in Sources */,
 				67618F9E9456EA482EB1ADB0 /* PrintEstimateDecodingTests.swift in Sources */,
 				5B72FB38118F24AE0B84611B /* PrintEstimationFormattingTests.swift in Sources */,
 				9D2578A0C71EFA277009170A /* PrinterStatusCameraDecodingTests.swift in Sources */,

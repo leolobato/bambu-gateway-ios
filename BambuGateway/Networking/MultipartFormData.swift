@@ -26,3 +26,13 @@ struct MultipartFormData {
         body.append(Data(string.utf8))
     }
 }
+
+extension MultipartFormData {
+    func writeBody(toTemporaryFileNamed name: String) throws -> URL {
+        let url = FileManager.default.temporaryDirectory
+            .appendingPathComponent(name + "-" + UUID().uuidString)
+            .appendingPathExtension("multipart")
+        try body.write(to: url, options: .atomic)
+        return url
+    }
+}
