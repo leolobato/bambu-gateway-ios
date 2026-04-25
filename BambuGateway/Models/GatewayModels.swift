@@ -315,6 +315,7 @@ struct PreviewResult {
     let threeMFData: Data
     let previewId: String
     let fileName: String
+    let estimate: PrintEstimate?
 }
 
 struct GatewayCapabilities: Codable {

@@ -137,8 +137,10 @@ struct GatewayClient {
         }
 
         let fileName = parseContentDispositionFilename(httpResponse) ?? submission.file.fileName
+        let estimateHeader = httpResponse.value(forHTTPHeaderField: "X-Print-Estimate")
+        let estimate = PrintEstimate.decodeFromHeader(estimateHeader)
 
-        return PreviewResult(threeMFData: data, previewId: previewId, fileName: fileName)
+        return PreviewResult(threeMFData: data, previewId: previewId, fileName: fileName, estimate: estimate)
     }
 
     func printFromPreview(previewId: String, printerId: String) async throws -> PrintResponse {

@@ -85,3 +85,29 @@ final class PrintResponseEstimateTests: XCTestCase {
         XCTAssertNil(response.estimate)
     }
 }
+
+final class PrintEstimateHeaderDecodingTests: XCTestCase {
+    func test_decodesBase64JSONHeader() throws {
+        let json = """
+        {"total_seconds": 120, "model_filament_grams": 1.5}
+        """
+        let base64 = Data(json.utf8).base64EncodedString()
+        let estimate = try XCTUnwrap(PrintEstimate.decodeFromHeader(base64))
+        XCTAssertEqual(estimate.totalSeconds, 120)
+        XCTAssertEqual(estimate.modelFilamentGrams, 1.5)
+    }
+
+    func test_returnsNilForInvalidBase64() {
+        XCTAssertNil(PrintEstimate.decodeFromHeader("not-base64!@#"))
+    }
+
+    func test_returnsNilForInvalidJSON() {
+        let base64 = Data("not json".utf8).base64EncodedString()
+        XCTAssertNil(PrintEstimate.decodeFromHeader(base64))
+    }
+
+    func test_returnsNilForEmptyHeader() {
+        XCTAssertNil(PrintEstimate.decodeFromHeader(nil))
+        XCTAssertNil(PrintEstimate.decodeFromHeader(""))
+    }
+}
