@@ -104,6 +104,10 @@ struct GatewayClient {
     }
 
     func fetchPrintPreview(_ submission: PrintSubmission) async throws -> PreviewResult {
+        guard let transferService else {
+            throw GatewayClientError.serverError("Background transfer service is not available.")
+        }
+
         var form = MultipartFormData()
         form.addFile(name: "file", fileName: submission.file.fileName, mimeType: "application/octet-stream", data: submission.file.data)
 
@@ -125,19 +129,22 @@ struct GatewayClient {
         if !submission.filamentOverrides.isEmpty {
             try addFilamentProfilesField(to: &form, overrides: submission.filamentOverrides)
         }
-
         form.finalize()
 
-        let (data, response) = try await request(
-            path: "/api/print-preview",
-            method: "POST",
-            body: form.body,
-            contentType: "multipart/form-data; boundary=\(form.boundary)",
-            timeout: 600
-        )
+        let bodyURL = try form.writeBody(toTemporaryFileNamed: "print-preview")
+        defer { try? FileManager.default.removeItem(at: bodyURL) }
 
-        guard let httpResponse = response as? HTTPURLResponse,
-              let previewId = httpResponse.value(forHTTPHeaderField: "X-Preview-Id"),
+        var request = URLRequest(url: try resolveURL(path: "/api/print-preview"))
+        request.httpMethod = "POST"
+        request.setValue("multipart/form-data; boundary=\(form.boundary)", forHTTPHeaderField: "Content-Type")
+
+        let (data, httpResponse) = try await transferService.upload(request: request, fromFile: bodyURL)
+
+        guard (200 ... 299).contains(httpResponse.statusCode) else {
+            throw mapHTTPError(httpResponse, data: data)
+        }
+
+        guard let previewId = httpResponse.value(forHTTPHeaderField: "X-Preview-Id"),
               !previewId.isEmpty else {
             throw GatewayClientError.serverError("Server did not return a preview ID.")
         }
