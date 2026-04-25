@@ -33,10 +33,16 @@ struct PrintSubmission {
 struct GatewayClient {
     let baseURLString: String
     let session: URLSession
+    let transferService: BackgroundTransferService?
 
-    init(baseURLString: String, session: URLSession = .shared) {
+    init(
+        baseURLString: String,
+        session: URLSession = .shared,
+        transferService: BackgroundTransferService? = nil
+    ) {
         self.baseURLString = baseURLString
         self.session = session
+        self.transferService = transferService
     }
 
     func fetchPrinters() async throws -> [PrinterStatus] {

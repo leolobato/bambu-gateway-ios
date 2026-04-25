@@ -81,6 +81,7 @@ final class AppViewModel: ObservableObject {
     let liveActivityService: LiveActivityService
     let notificationService: NotificationService
     let toastCenter: ToastCenter
+    let transferService: BackgroundTransferService
 
     private var previousStates: [String: String] = [:]
 
@@ -116,12 +117,15 @@ final class AppViewModel: ObservableObject {
         let initialClient = GatewayClient(baseURLString: loaded.gatewayBaseURL)
         let push = PushService(client: initialClient)
         let toast = ToastCenter()
+        let transfer = BackgroundTransferService()
         self.pushService = push
         self.liveActivityService = LiveActivityService(client: initialClient, pushService: push)
         self.notificationService = NotificationService()
         self.toastCenter = toast
+        self.transferService = transfer
         AppDelegate.pushService = push
         AppDelegate.toastCenter = toast
+        AppDelegate.transferService = transfer
     }
 
     func bootstrapPushServices() async {
@@ -1267,7 +1271,7 @@ final class AppViewModel: ObservableObject {
     }
 
     private func gatewayClient() -> GatewayClient {
-        GatewayClient(baseURLString: gatewayBaseURL)
+        GatewayClient(baseURLString: gatewayBaseURL, transferService: transferService)
     }
 
     private func loadFile(url: URL) throws -> Imported3MFFile {
