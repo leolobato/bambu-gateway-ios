@@ -1,0 +1,97 @@
+import Foundation
+
+@MainActor
+final class BackgroundTransferService: NSObject {
+    static let sessionIdentifier = "com.bambugateway.transfer"
+
+    private struct InFlight {
+        var response: HTTPURLResponse?
+        var body: Data
+        let continuation: CheckedContinuation<(Data, HTTPURLResponse), Error>
+    }
+
+    private var inFlight: [Int: InFlight] = [:]
+    private var pendingCompletionHandler: (() -> Void)?
+
+    private lazy var session: URLSession = {
+        let config = URLSessionConfiguration.background(withIdentifier: Self.sessionIdentifier)
+        config.isDiscretionary = false
+        config.sessionSendsLaunchEvents = true
+        config.timeoutIntervalForRequest = 600
+        config.timeoutIntervalForResource = 60 * 60
+        return URLSession(configuration: config, delegate: self, delegateQueue: .main)
+    }()
+
+    func upload(request: URLRequest, fromFile fileURL: URL) async throws -> (Data, HTTPURLResponse) {
+        try await withCheckedThrowingContinuation { continuation in
+            let task = session.uploadTask(with: request, fromFile: fileURL)
+            inFlight[task.taskIdentifier] = InFlight(response: nil, body: Data(), continuation: continuation)
+            task.resume()
+        }
+    }
+
+    func cancelAll() {
+        session.getAllTasks { tasks in
+            for task in tasks { task.cancel() }
+        }
+    }
+
+    func adoptCompletionHandler(_ handler: @escaping () -> Void) {
+        pendingCompletionHandler = handler
+        _ = session  // force lazy session init so the delegate is wired
+    }
+}
+
+extension BackgroundTransferService: URLSessionDataDelegate, URLSessionTaskDelegate {
+    nonisolated func urlSession(
+        _ session: URLSession,
+        dataTask: URLSessionDataTask,
+        didReceive response: URLResponse,
+        completionHandler: @escaping (URLSession.ResponseDisposition) -> Void
+    ) {
+        let identifier = dataTask.taskIdentifier
+        let httpResponse = response as? HTTPURLResponse
+        Task { @MainActor in
+            self.inFlight[identifier]?.response = httpResponse
+            completionHandler(.allow)
+        }
+    }
+
+    nonisolated func urlSession(
+        _ session: URLSession,
+        dataTask: URLSessionDataTask,
+        didReceive data: Data
+    ) {
+        let identifier = dataTask.taskIdentifier
+        Task { @MainActor in
+            self.inFlight[identifier]?.body.append(data)
+        }
+    }
+
+    nonisolated func urlSession(
+        _ session: URLSession,
+        task: URLSessionTask,
+        didCompleteWithError error: Error?
+    ) {
+        let identifier = task.taskIdentifier
+        Task { @MainActor in
+            guard let entry = self.inFlight.removeValue(forKey: identifier) else { return }
+            if let error {
+                entry.continuation.resume(throwing: error)
+                return
+            }
+            guard let response = entry.response else {
+                entry.continuation.resume(throwing: GatewayClientError.invalidResponse)
+                return
+            }
+            entry.continuation.resume(returning: (entry.body, response))
+        }
+    }
+
+    nonisolated func urlSessionDidFinishEvents(forBackgroundURLSession session: URLSession) {
+        Task { @MainActor in
+            self.pendingCompletionHandler?()
+            self.pendingCompletionHandler = nil
+        }
+    }
+}
