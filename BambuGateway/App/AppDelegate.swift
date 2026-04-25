@@ -37,7 +37,15 @@ final class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCent
         completionHandler: @escaping () -> Void
     ) {
         Task { @MainActor in
-            Self.transferService?.adoptCompletionHandler(completionHandler)
+            // If the service hasn't been constructed yet (very early launch),
+            // call the handler so iOS doesn't penalise future background time.
+            // The session's queued events stay attached to the identifier and
+            // will be redelivered once the service reattaches.
+            if let service = Self.transferService {
+                service.adoptCompletionHandler(completionHandler)
+            } else {
+                completionHandler()
+            }
         }
     }
 
