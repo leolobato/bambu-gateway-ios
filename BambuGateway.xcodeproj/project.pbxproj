@@ -17,6 +17,7 @@
 		2B35F0A7CBA771FDD9C87DE0 /* CameraFeedView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 60EEE74AFB6EC29279BA25F4 /* CameraFeedView.swift */; };
 		3170F3853AFAEC0D89898D09 /* AMSTrayCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = A90C3D6C3090D51A24960C1F /* AMSTrayCard.swift */; };
 		4276A894BB7CE53680394377 /* AppSettingsStoreCameraTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 36C28A77CC578F19C3B443A8 /* AppSettingsStoreCameraTests.swift */; };
+		44B56515793C2BB83F5F6D4A /* PrintEstimateFormatters.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B9A2C955FDC5D3DCDDE04AE /* PrintEstimateFormatters.swift */; };
 		49397CEDE4D75E47854A886C /* PrinterOfflineCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1A82C8C3C49F519579B64E2 /* PrinterOfflineCard.swift */; };
 		4C1A529AD33EE2A149CD9C0E /* PrinterTab.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2ACB1A998B04E9E9154760AE /* PrinterTab.swift */; };
 		5096C194622EACD881757599 /* PrintProgressCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0CACA553E0D70F489079E05 /* PrintProgressCard.swift */; };
@@ -24,7 +25,9 @@
 		531A4B62990B0E7E59F76C06 /* ToastOverlay.swift in Sources */ = {isa = PBXBuildFile; fileRef = B52D3475F8383A6C96754E03 /* ToastOverlay.swift */; };
 		5862EC8951FC76F6FA97B697 /* PrintControlsRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 32780EC48A776B886BDB8B31 /* PrintControlsRow.swift */; };
 		5B1DAF338F92BE18208DB698 /* MakerWorldBrowserView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3B46FA0BBEC43DF398153A59 /* MakerWorldBrowserView.swift */; };
+		5B72FB38118F24AE0B84611B /* PrintEstimationFormattingTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7FFB4F3826F66CCF3B3483F4 /* PrintEstimationFormattingTests.swift */; };
 		6326A5843953FCC43B8311EB /* MultipartFormData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 95B3B7F980C0E0EC50EEE372 /* MultipartFormData.swift */; };
+		67618F9E9456EA482EB1ADB0 /* PrintEstimateDecodingTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = CFF25855CE5E2F502E04B737 /* PrintEstimateDecodingTests.swift */; };
 		6D6F831E399F8EF5C49D1B81 /* GCodePreview in Frameworks */ = {isa = PBXBuildFile; productRef = 85BFD403F2AE24BB83C64D31 /* GCodePreview */; };
 		6F950FB8F2C074ABCF15B58F /* BambuTCPJPEGFeed.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2CD1B0E2E27437689C3D753A /* BambuTCPJPEGFeed.swift */; };
 		70CCAF8C0F42A532EBBB3A10 /* AppSettingsStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9C133CBD53A0F28997154461 /* AppSettingsStore.swift */; };
@@ -40,6 +43,7 @@
 		9FC430EBE5876AB11F4B47C0 /* BambuPrinterCameraFeed.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7F5F9FAB3657817D9E6CE4EF /* BambuPrinterCameraFeed.swift */; };
 		A7F2C0EA5DD4EFA272D034BC /* MobileVLCKit in Frameworks */ = {isa = PBXBuildFile; productRef = 4E1548E9D0BF21D3D57713BE /* MobileVLCKit */; };
 		AB2066B52591F2C3AADD9BC1 /* CameraTab.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8C9036F5C817DB069A0DD120 /* CameraTab.swift */; };
+		ABA318F3B31BE90C35C19873 /* PrintEstimate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 93846A9BFBDF5AA0EF917D85 /* PrintEstimate.swift */; };
 		B112E90578486CB35D2277BA /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBEBCED8EAF681F59258D749 /* ContentView.swift */; };
 		B30AD4F02ACBB47DD4CAB1AF /* PrintActivityAttributes.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E70DDBC904B734FBBB17271 /* PrintActivityAttributes.swift */; };
 		B51A97CC26FA4B7FEBBF3C93 /* ChamberLightToggle.swift in Sources */ = {isa = PBXBuildFile; fileRef = B61A51F8709BB1DDABDC3650 /* ChamberLightToggle.swift */; };
@@ -47,11 +51,13 @@
 		BACEC0C3302612B1C7A21088 /* ShareExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 8E99C2EC57D9D732AF5FC476 /* ShareExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		C12344BE79B9169E1A13F066 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 9A064996EB0DA8288274EC27 /* Assets.xcassets */; };
 		C44AE3E1C219190C0B100AD0 /* LiveActivityService.swift in Sources */ = {isa = PBXBuildFile; fileRef = BAE8CE9E59006DF49C051762 /* LiveActivityService.swift */; };
+		C880911BE8A314F7BB1CCA8A /* PrintEstimationCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = BD79F6C355656BD9DEEBFF85 /* PrintEstimationCard.swift */; };
 		C9B3C4A8EF610EBC59EEDCB2 /* BambuGatewayApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9D5542807513C5701CF0BC3D /* BambuGatewayApp.swift */; };
 		CA1468A89E6DEFF522781031 /* GCodePreviewModal.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5AFFC06CAC383459918EF95 /* GCodePreviewModal.swift */; };
 		CAD4B96276AAC8B63ADE3B20 /* NotificationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 596B45CE6BCC0F808017F737 /* NotificationService.swift */; };
 		CB3388B447DBAD970B907E6B /* AppViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9DB60428FD52299388786225 /* AppViewModel.swift */; };
 		DAA6A261BF169E58D43A32F6 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 97E5B232DEE3A55BBBF52FD7 /* SettingsView.swift */; };
+		DB447D27A007346EA8C32B6D /* PrintSuccessModal.swift in Sources */ = {isa = PBXBuildFile; fileRef = 000CC4A4B6BBD8DE7A68CF34 /* PrintSuccessModal.swift */; };
 		E47A2305B530F74D478F50A1 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0F1801F617DE01B7AC244E3E /* AppDelegate.swift */; };
 		F6321079052D62AF783281E5 /* GatewayModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 47F98F122F17587AC06D257D /* GatewayModels.swift */; };
 		F825FBCBD5B632A2E4E11F16 /* LiveActivityBundle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 863502189CB276B2AC75D17C /* LiveActivityBundle.swift */; };
@@ -98,12 +104,14 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		000CC4A4B6BBD8DE7A68CF34 /* PrintSuccessModal.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrintSuccessModal.swift; sourceTree = "<group>"; };
 		04CB9E2D394BC045B08ADAC9 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		0F1801F617DE01B7AC244E3E /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		1F95784351CF8ED3265FC5AF /* BambuGateway.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = BambuGateway.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		244EB95AFE2F67045E60788A /* StatusRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatusRow.swift; sourceTree = "<group>"; };
 		25AA0EB97886F4C8EB4AC476 /* PrintTab.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrintTab.swift; sourceTree = "<group>"; };
 		2ACB1A998B04E9E9154760AE /* PrinterTab.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrinterTab.swift; sourceTree = "<group>"; };
+		2B9A2C955FDC5D3DCDDE04AE /* PrintEstimateFormatters.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrintEstimateFormatters.swift; sourceTree = "<group>"; };
 		2CD1B0E2E27437689C3D753A /* BambuTCPJPEGFeed.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BambuTCPJPEGFeed.swift; sourceTree = "<group>"; };
 		32780EC48A776B886BDB8B31 /* PrintControlsRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrintControlsRow.swift; sourceTree = "<group>"; };
 		36C28A77CC578F19C3B443A8 /* AppSettingsStoreCameraTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppSettingsStoreCameraTests.swift; sourceTree = "<group>"; };
@@ -119,10 +127,12 @@
 		753276AADA566A39C55576DC /* CameraFeedController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraFeedController.swift; sourceTree = "<group>"; };
 		7E8DBA7CCF6FB1ACEDDE1120 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		7F5F9FAB3657817D9E6CE4EF /* BambuPrinterCameraFeed.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BambuPrinterCameraFeed.swift; sourceTree = "<group>"; };
+		7FFB4F3826F66CCF3B3483F4 /* PrintEstimationFormattingTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrintEstimationFormattingTests.swift; sourceTree = "<group>"; };
 		863502189CB276B2AC75D17C /* LiveActivityBundle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LiveActivityBundle.swift; sourceTree = "<group>"; };
 		8C9036F5C817DB069A0DD120 /* CameraTab.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraTab.swift; sourceTree = "<group>"; };
 		8E70DDBC904B734FBBB17271 /* PrintActivityAttributes.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrintActivityAttributes.swift; sourceTree = "<group>"; };
 		8E99C2EC57D9D732AF5FC476 /* ShareExtension.appex */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = "wrapper.app-extension"; path = ShareExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
+		93846A9BFBDF5AA0EF917D85 /* PrintEstimate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrintEstimate.swift; sourceTree = "<group>"; };
 		95B3B7F980C0E0EC50EEE372 /* MultipartFormData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MultipartFormData.swift; sourceTree = "<group>"; };
 		97E5B232DEE3A55BBBF52FD7 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
 		9A064996EB0DA8288274EC27 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
@@ -140,6 +150,7 @@
 		BB2F9E774CDDFF1ABAEFCB11 /* ToastCenter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ToastCenter.swift; sourceTree = "<group>"; };
 		BB6EAF5F859F19DD2BA7568F /* Base.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Base.xcconfig; sourceTree = "<group>"; };
 		BC2E5A494F474B1D3D2EF4B7 /* PushService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PushService.swift; sourceTree = "<group>"; };
+		BD79F6C355656BD9DEEBFF85 /* PrintEstimationCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrintEstimationCard.swift; sourceTree = "<group>"; };
 		C0CACA553E0D70F489079E05 /* PrintProgressCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrintProgressCard.swift; sourceTree = "<group>"; };
 		C0EEE85F6636C62884235109 /* PrinterStatusCameraDecodingTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrinterStatusCameraDecodingTests.swift; sourceTree = "<group>"; };
 		C5AFFC06CAC383459918EF95 /* GCodePreviewModal.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GCodePreviewModal.swift; sourceTree = "<group>"; };
@@ -148,6 +159,7 @@
 		CE3B5CC1FCEEEE3F3845ADEC /* GatewayClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GatewayClient.swift; sourceTree = "<group>"; };
 		CE9094B53DAFDF244C615D34 /* PrintLiveActivity.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrintLiveActivity.swift; sourceTree = "<group>"; };
 		CF802CF901C59D7640A13BBF /* CameraFeed.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraFeed.swift; sourceTree = "<group>"; };
+		CFF25855CE5E2F502E04B737 /* PrintEstimateDecodingTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrintEstimateDecodingTests.swift; sourceTree = "<group>"; };
 		DBEBCED8EAF681F59258D749 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		E9D461E5634BC80B7C37747F /* BambuGateway.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = BambuGateway.entitlements; sourceTree = "<group>"; };
 		FFEEE185FB42B56E8BD094C5 /* ThreeMFReader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ThreeMFReader.swift; sourceTree = "<group>"; };
@@ -202,6 +214,7 @@
 			children = (
 				47F98F122F17587AC06D257D /* GatewayModels.swift */,
 				8E70DDBC904B734FBBB17271 /* PrintActivityAttributes.swift */,
+				93846A9BFBDF5AA0EF917D85 /* PrintEstimate.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -304,6 +317,9 @@
 				C5AFFC06CAC383459918EF95 /* GCodePreviewModal.swift */,
 				3B46FA0BBEC43DF398153A59 /* MakerWorldBrowserView.swift */,
 				2ACB1A998B04E9E9154760AE /* PrinterTab.swift */,
+				2B9A2C955FDC5D3DCDDE04AE /* PrintEstimateFormatters.swift */,
+				BD79F6C355656BD9DEEBFF85 /* PrintEstimationCard.swift */,
+				000CC4A4B6BBD8DE7A68CF34 /* PrintSuccessModal.swift */,
 				25AA0EB97886F4C8EB4AC476 /* PrintTab.swift */,
 				97E5B232DEE3A55BBBF52FD7 /* SettingsView.swift */,
 				B52D3475F8383A6C96754E03 /* ToastOverlay.swift */,
@@ -319,6 +335,8 @@
 				36C28A77CC578F19C3B443A8 /* AppSettingsStoreCameraTests.swift */,
 				5BEBF1713CA6AF40B8331BFA /* BambuGatewayTests.swift */,
 				C0EEE85F6636C62884235109 /* PrinterStatusCameraDecodingTests.swift */,
+				CFF25855CE5E2F502E04B737 /* PrintEstimateDecodingTests.swift */,
+				7FFB4F3826F66CCF3B3483F4 /* PrintEstimationFormattingTests.swift */,
 			);
 			path = BambuGatewayTests;
 			sourceTree = "<group>";
@@ -527,6 +545,8 @@
 			files = (
 				4276A894BB7CE53680394377 /* AppSettingsStoreCameraTests.swift in Sources */,
 				96620D20C294E0F910E6ADA9 /* BambuGatewayTests.swift in Sources */,
+				67618F9E9456EA482EB1ADB0 /* PrintEstimateDecodingTests.swift in Sources */,
+				5B72FB38118F24AE0B84611B /* PrintEstimationFormattingTests.swift in Sources */,
 				9D2578A0C71EFA277009170A /* PrinterStatusCameraDecodingTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -559,7 +579,11 @@
 				CAD4B96276AAC8B63ADE3B20 /* NotificationService.swift in Sources */,
 				0A2274DC8B4E7E9B301C33A2 /* PrintActivityAttributes.swift in Sources */,
 				5862EC8951FC76F6FA97B697 /* PrintControlsRow.swift in Sources */,
+				ABA318F3B31BE90C35C19873 /* PrintEstimate.swift in Sources */,
+				44B56515793C2BB83F5F6D4A /* PrintEstimateFormatters.swift in Sources */,
+				C880911BE8A314F7BB1CCA8A /* PrintEstimationCard.swift in Sources */,
 				5096C194622EACD881757599 /* PrintProgressCard.swift in Sources */,
+				DB447D27A007346EA8C32B6D /* PrintSuccessModal.swift in Sources */,
 				722C07A2FE9F8D32DA14CC11 /* PrintTab.swift in Sources */,
 				49397CEDE4D75E47854A886C /* PrinterOfflineCard.swift in Sources */,
 				7FBB60D7C763B1731A6A7368 /* PrinterStatusCard.swift in Sources */,

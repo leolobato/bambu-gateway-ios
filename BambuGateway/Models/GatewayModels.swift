@@ -249,6 +249,7 @@ struct PrintResponse: Decodable {
     let wasSliced: Bool
     let settingsTransfer: SettingsTransferInfo?
     let uploadId: String?
+    let estimate: PrintEstimate?
 }
 
 struct UploadProgressResponse: Decodable {
@@ -314,6 +315,7 @@ struct PreviewResult {
     let threeMFData: Data
     let previewId: String
     let fileName: String
+    let estimate: PrintEstimate?
 }
 
 struct GatewayCapabilities: Codable {

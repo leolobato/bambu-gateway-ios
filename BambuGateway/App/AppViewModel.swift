@@ -58,6 +58,13 @@ final class AppViewModel: ObservableObject {
     @Published var isShowingPreview: Bool = false
     @Published var previewScene: SCNScene?
     @Published var currentPreviewId: String?
+    @Published var previewEstimate: PrintEstimate?
+    @Published var lastPrintEstimate: PrintEstimate?
+    @Published var lastPrintPrinterName: String?
+    /// Drives the one-shot success sheet shown after a direct print.
+    /// Set together with `lastPrintEstimate` and `lastPrintPrinterName` in `submitPrint`;
+    /// cleared together by `dismissPrintSuccessModal()`.
+    @Published var showPrintSuccessModal: Bool = false
     @Published var message: String = ""
     @Published var messageLevel: MessageLevel = .info
     @Published var uploadProgress: Double? = nil
@@ -341,6 +348,10 @@ final class AppViewModel: ObservableObject {
         do {
             let response = try await gatewayClient().submitPrint(submission)
             handlePrintResponse(response, startedContext: printContext)
+            lastPrintEstimate = response.estimate
+            let resolvedPrinterId = response.printerId.isEmpty ? printContext.printerId : response.printerId
+            lastPrintPrinterName = printerName(for: resolvedPrinterId)
+            showPrintSuccessModal = true
         } catch {
             setMessage(error.localizedDescription, .error)
         }
@@ -394,6 +405,7 @@ final class AppViewModel: ObservableObject {
 
                 previewScene = scene
                 currentPreviewId = previewResult.previewId
+                previewEstimate = previewResult.estimate
                 isShowingPreview = true
                 setMessage("", .info)
             }
@@ -430,6 +442,12 @@ final class AppViewModel: ObservableObject {
 
     func cancelPreview() {
         dismissPreview()
+    }
+
+    func dismissPrintSuccessModal() {
+        showPrintSuccessModal = false
+        lastPrintEstimate = nil
+        lastPrintPrinterName = nil
     }
 
     func pausePrint() async {
@@ -512,6 +530,7 @@ final class AppViewModel: ObservableObject {
         isShowingPreview = false
         previewScene = nil
         currentPreviewId = nil
+        previewEstimate = nil
     }
 
     private func buildSubmission() -> PrintSubmission? {

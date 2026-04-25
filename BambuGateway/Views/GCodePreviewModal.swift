@@ -6,17 +6,28 @@ struct GCodePreviewModal: View {
 
     var body: some View {
         NavigationStack {
-            ZStack {
-                Color(uiColor: .systemBackground)
-                    .ignoresSafeArea()
+            VStack(spacing: 0) {
+                PrintEstimationCard(
+                    estimate: viewModel.previewEstimate,
+                    isLoading: viewModel.isLoadingPreview && viewModel.previewEstimate == nil
+                )
+                .padding(.horizontal, 16)
+                .padding(.top, 12)
+                .padding(.bottom, 8)
 
-                if let scene = viewModel.previewScene {
-                    GCodePreviewView(scene: scene)
-                        .ignoresSafeArea(edges: .bottom)
-                } else {
-                    ProgressView("Preparing preview...")
+                ZStack {
+                    Color(uiColor: .systemBackground)
+
+                    if let scene = viewModel.previewScene {
+                        GCodePreviewView(scene: scene)
+                    } else {
+                        ProgressView("Preparing preview...")
+                    }
                 }
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
             }
+            .background(Color(uiColor: .systemBackground))
+            .ignoresSafeArea(edges: .bottom)
             .navigationTitle("G-code Preview")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
