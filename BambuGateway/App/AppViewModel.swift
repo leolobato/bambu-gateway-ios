@@ -356,6 +356,8 @@ final class AppViewModel: ObservableObject {
             let resolvedPrinterId = response.printerId.isEmpty ? printContext.printerId : response.printerId
             lastPrintPrinterName = printerName(for: resolvedPrinterId)
             showPrintSuccessModal = true
+        } catch let error as URLError where error.code == .cancelled {
+            // user-initiated cancel — silent
         } catch {
             setMessage(error.localizedDescription, .error)
         }
@@ -413,6 +415,8 @@ final class AppViewModel: ObservableObject {
                 isShowingPreview = true
                 setMessage("", .info)
             }
+        } catch let error as URLError where error.code == .cancelled {
+            // user-initiated cancel — silent
         } catch {
             setMessage(error.localizedDescription, .error)
         }
@@ -445,6 +449,7 @@ final class AppViewModel: ObservableObject {
     }
 
     func cancelPreview() {
+        transferService.cancelAll()
         dismissPreview()
     }
 
