@@ -51,6 +51,7 @@
 		BACEC0C3302612B1C7A21088 /* ShareExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 8E99C2EC57D9D732AF5FC476 /* ShareExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		C12344BE79B9169E1A13F066 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 9A064996EB0DA8288274EC27 /* Assets.xcassets */; };
 		C44AE3E1C219190C0B100AD0 /* LiveActivityService.swift in Sources */ = {isa = PBXBuildFile; fileRef = BAE8CE9E59006DF49C051762 /* LiveActivityService.swift */; };
+		C880911BE8A314F7BB1CCA8A /* PrintEstimationCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = BD79F6C355656BD9DEEBFF85 /* PrintEstimationCard.swift */; };
 		C9B3C4A8EF610EBC59EEDCB2 /* BambuGatewayApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9D5542807513C5701CF0BC3D /* BambuGatewayApp.swift */; };
 		CA1468A89E6DEFF522781031 /* GCodePreviewModal.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5AFFC06CAC383459918EF95 /* GCodePreviewModal.swift */; };
 		CAD4B96276AAC8B63ADE3B20 /* NotificationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 596B45CE6BCC0F808017F737 /* NotificationService.swift */; };
@@ -147,6 +148,7 @@
 		BB2F9E774CDDFF1ABAEFCB11 /* ToastCenter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ToastCenter.swift; sourceTree = "<group>"; };
 		BB6EAF5F859F19DD2BA7568F /* Base.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Base.xcconfig; sourceTree = "<group>"; };
 		BC2E5A494F474B1D3D2EF4B7 /* PushService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PushService.swift; sourceTree = "<group>"; };
+		BD79F6C355656BD9DEEBFF85 /* PrintEstimationCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrintEstimationCard.swift; sourceTree = "<group>"; };
 		C0CACA553E0D70F489079E05 /* PrintProgressCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrintProgressCard.swift; sourceTree = "<group>"; };
 		C0EEE85F6636C62884235109 /* PrinterStatusCameraDecodingTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrinterStatusCameraDecodingTests.swift; sourceTree = "<group>"; };
 		C5AFFC06CAC383459918EF95 /* GCodePreviewModal.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GCodePreviewModal.swift; sourceTree = "<group>"; };
@@ -314,6 +316,7 @@
 				3B46FA0BBEC43DF398153A59 /* MakerWorldBrowserView.swift */,
 				2ACB1A998B04E9E9154760AE /* PrinterTab.swift */,
 				2B9A2C955FDC5D3DCDDE04AE /* PrintEstimateFormatters.swift */,
+				BD79F6C355656BD9DEEBFF85 /* PrintEstimationCard.swift */,
 				25AA0EB97886F4C8EB4AC476 /* PrintTab.swift */,
 				97E5B232DEE3A55BBBF52FD7 /* SettingsView.swift */,
 				B52D3475F8383A6C96754E03 /* ToastOverlay.swift */,
@@ -575,6 +578,7 @@
 				5862EC8951FC76F6FA97B697 /* PrintControlsRow.swift in Sources */,
 				ABA318F3B31BE90C35C19873 /* PrintEstimate.swift in Sources */,
 				44B56515793C2BB83F5F6D4A /* PrintEstimateFormatters.swift in Sources */,
+				C880911BE8A314F7BB1CCA8A /* PrintEstimationCard.swift in Sources */,
 				5096C194622EACD881757599 /* PrintProgressCard.swift in Sources */,
 				722C07A2FE9F8D32DA14CC11 /* PrintTab.swift in Sources */,
 				49397CEDE4D75E47854A886C /* PrinterOfflineCard.swift in Sources */,
