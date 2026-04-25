@@ -88,6 +88,14 @@ private struct FilamentRow: View {
     let grams: Double?
 
     var body: some View {
+        ViewThatFits(in: .horizontal) {
+            horizontalLayout
+            verticalLayout
+        }
+        .accessibilityElement(children: .combine)
+    }
+
+    private var horizontalLayout: some View {
         HStack(spacing: 8) {
             Image(systemName: icon)
                 .font(.footnote)
@@ -96,17 +104,60 @@ private struct FilamentRow: View {
             Text(label)
                 .font(.subheadline)
                 .foregroundStyle(.secondary)
+                .lineLimit(1)
             Spacer(minLength: 8)
-            Text(PrintEstimateFormatters.formatLength(millimeters: millimeters) ?? "—")
-                .font(.subheadline.monospacedDigit())
-                .foregroundStyle(millimeters == nil ? .tertiary : .primary)
+            lengthText
                 .frame(minWidth: 80, alignment: .trailing)
-            Text(PrintEstimateFormatters.formatMass(grams: grams) ?? "—")
-                .font(.subheadline.monospacedDigit())
-                .foregroundStyle(grams == nil ? .tertiary : .primary)
+            massText
                 .frame(minWidth: 80, alignment: .trailing)
         }
-        .accessibilityElement(children: .combine)
+    }
+
+    private var verticalLayout: some View {
+        VStack(alignment: .leading, spacing: 4) {
+            HStack(spacing: 8) {
+                Image(systemName: icon)
+                    .font(.footnote)
+                    .foregroundStyle(.secondary)
+                    .frame(width: 16)
+                Text(label)
+                    .font(.subheadline)
+                    .foregroundStyle(.secondary)
+            }
+            HStack(spacing: 12) {
+                lengthText
+                massText
+            }
+            .padding(.leading, 24)
+        }
+    }
+
+    @ViewBuilder
+    private var lengthText: some View {
+        if let formatted = PrintEstimateFormatters.formatLength(millimeters: millimeters) {
+            Text(formatted)
+                .font(.subheadline.monospacedDigit())
+                .foregroundStyle(.primary)
+        } else {
+            Text("—")
+                .font(.subheadline.monospacedDigit())
+                .foregroundStyle(.tertiary)
+                .accessibilityHidden(true)
+        }
+    }
+
+    @ViewBuilder
+    private var massText: some View {
+        if let formatted = PrintEstimateFormatters.formatMass(grams: grams) {
+            Text(formatted)
+                .font(.subheadline.monospacedDigit())
+                .foregroundStyle(.primary)
+        } else {
+            Text("—")
+                .font(.subheadline.monospacedDigit())
+                .foregroundStyle(.tertiary)
+                .accessibilityHidden(true)
+        }
     }
 }
 
@@ -126,11 +177,20 @@ private struct TimeRow: View {
                 .font(emphasized ? .subheadline.weight(.semibold) : .subheadline)
                 .foregroundStyle(emphasized ? .primary : .secondary)
             Spacer(minLength: 8)
-            Text(PrintEstimateFormatters.formatDuration(seconds: seconds) ?? "—")
-                .font(emphasized
-                      ? .subheadline.weight(.semibold).monospacedDigit()
-                      : .subheadline.monospacedDigit())
-                .foregroundStyle(seconds == nil ? .tertiary : .primary)
+            if let formatted = PrintEstimateFormatters.formatDuration(seconds: seconds) {
+                Text(formatted)
+                    .font(emphasized
+                          ? .subheadline.weight(.semibold).monospacedDigit()
+                          : .subheadline.monospacedDigit())
+                    .foregroundStyle(.primary)
+            } else {
+                Text("—")
+                    .font(emphasized
+                          ? .subheadline.weight(.semibold).monospacedDigit()
+                          : .subheadline.monospacedDigit())
+                    .foregroundStyle(.tertiary)
+                    .accessibilityHidden(true)
+            }
         }
         .accessibilityElement(children: .combine)
     }
@@ -183,4 +243,18 @@ private extension PrintEstimate {
     PrintEstimationCard(estimate: nil)
         .padding()
         .background(Color.red.opacity(0.1))
+}
+
+#Preview("AX large text") {
+    PrintEstimationCard(estimate: .init(
+        totalFilamentMillimeters: 9280,
+        totalFilamentGrams: 29.46,
+        modelFilamentMillimeters: 9120,
+        modelFilamentGrams: 28.96,
+        prepareSeconds: 356,
+        modelPrintSeconds: 9000,
+        totalSeconds: 9356
+    ))
+    .padding()
+    .environment(\.dynamicTypeSize, .accessibility3)
 }
