@@ -443,6 +443,8 @@ final class AppViewModel: ObservableObject {
                 dismissPreview()
                 handlePrintResponse(response, startedContext: startedContext ?? printContext(for: submission))
             }
+        } catch let error as URLError where error.code == .cancelled {
+            // user-initiated cancel — silent
         } catch {
             setMessage(error.localizedDescription, .error)
         }

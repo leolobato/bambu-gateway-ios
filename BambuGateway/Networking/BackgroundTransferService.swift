@@ -1,5 +1,9 @@
 import Foundation
 
+/// Owns the single background `URLSession` for long-running gateway uploads.
+/// Constructed exactly once per process, in `AppViewModel.init`. Constructing
+/// a second instance would conflict on `sessionIdentifier`, since iOS allows
+/// only one live session per identifier.
 @MainActor
 final class BackgroundTransferService: NSObject {
     static let sessionIdentifier = "com.bambugateway.transfer"

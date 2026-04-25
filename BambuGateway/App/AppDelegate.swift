@@ -39,8 +39,9 @@ final class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCent
         Task { @MainActor in
             // If the service hasn't been constructed yet (very early launch),
             // call the handler so iOS doesn't penalise future background time.
-            // The session's queued events stay attached to the identifier and
-            // will be redelivered once the service reattaches.
+            // Per the discard semantic in the spec, this case is silent — the
+            // outstanding tasks remain attached to the session identifier and
+            // are surfaced via the normal delegate methods on the next launch.
             if let service = Self.transferService {
                 service.adoptCompletionHandler(completionHandler)
             } else {
