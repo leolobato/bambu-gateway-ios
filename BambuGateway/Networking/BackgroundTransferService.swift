@@ -51,10 +51,14 @@ extension BackgroundTransferService: URLSessionDataDelegate, URLSessionTaskDeleg
     ) {
         let identifier = dataTask.taskIdentifier
         let httpResponse = response as? HTTPURLResponse
-        Task { @MainActor in
+        // The session is configured with `delegateQueue: .main`, so all delegate
+        // callbacks already run on the main thread. `assumeIsolated` lets us
+        // mutate main-actor state synchronously, preserving the order the
+        // system delivers callbacks in.
+        MainActor.assumeIsolated {
             self.inFlight[identifier]?.response = httpResponse
-            completionHandler(.allow)
         }
+        completionHandler(.allow)
     }
 
     nonisolated func urlSession(
@@ -63,7 +67,7 @@ extension BackgroundTransferService: URLSessionDataDelegate, URLSessionTaskDeleg
         didReceive data: Data
     ) {
         let identifier = dataTask.taskIdentifier
-        Task { @MainActor in
+        MainActor.assumeIsolated {
             self.inFlight[identifier]?.body.append(data)
         }
     }
@@ -74,7 +78,9 @@ extension BackgroundTransferService: URLSessionDataDelegate, URLSessionTaskDeleg
         didCompleteWithError error: Error?
     ) {
         let identifier = task.taskIdentifier
-        Task { @MainActor in
+        MainActor.assumeIsolated {
+            // Orphan from a previous app launch — the system reattached the
+            // task but no continuation exists. Per spec: discard silently.
             guard let entry = self.inFlight.removeValue(forKey: identifier) else { return }
             if let error {
                 entry.continuation.resume(throwing: error)
@@ -89,7 +95,7 @@ extension BackgroundTransferService: URLSessionDataDelegate, URLSessionTaskDeleg
     }
 
     nonisolated func urlSessionDidFinishEvents(forBackgroundURLSession session: URLSession) {
-        Task { @MainActor in
+        MainActor.assumeIsolated {
             self.pendingCompletionHandler?()
             self.pendingCompletionHandler = nil
         }
