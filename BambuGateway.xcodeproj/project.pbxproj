@@ -57,6 +57,7 @@
 		CAD4B96276AAC8B63ADE3B20 /* NotificationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 596B45CE6BCC0F808017F737 /* NotificationService.swift */; };
 		CB3388B447DBAD970B907E6B /* AppViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9DB60428FD52299388786225 /* AppViewModel.swift */; };
 		DAA6A261BF169E58D43A32F6 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 97E5B232DEE3A55BBBF52FD7 /* SettingsView.swift */; };
+		DB447D27A007346EA8C32B6D /* PrintSuccessModal.swift in Sources */ = {isa = PBXBuildFile; fileRef = 000CC4A4B6BBD8DE7A68CF34 /* PrintSuccessModal.swift */; };
 		E47A2305B530F74D478F50A1 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0F1801F617DE01B7AC244E3E /* AppDelegate.swift */; };
 		F6321079052D62AF783281E5 /* GatewayModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 47F98F122F17587AC06D257D /* GatewayModels.swift */; };
 		F825FBCBD5B632A2E4E11F16 /* LiveActivityBundle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 863502189CB276B2AC75D17C /* LiveActivityBundle.swift */; };
@@ -103,6 +104,7 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		000CC4A4B6BBD8DE7A68CF34 /* PrintSuccessModal.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrintSuccessModal.swift; sourceTree = "<group>"; };
 		04CB9E2D394BC045B08ADAC9 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		0F1801F617DE01B7AC244E3E /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		1F95784351CF8ED3265FC5AF /* BambuGateway.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = BambuGateway.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -317,6 +319,7 @@
 				2ACB1A998B04E9E9154760AE /* PrinterTab.swift */,
 				2B9A2C955FDC5D3DCDDE04AE /* PrintEstimateFormatters.swift */,
 				BD79F6C355656BD9DEEBFF85 /* PrintEstimationCard.swift */,
+				000CC4A4B6BBD8DE7A68CF34 /* PrintSuccessModal.swift */,
 				25AA0EB97886F4C8EB4AC476 /* PrintTab.swift */,
 				97E5B232DEE3A55BBBF52FD7 /* SettingsView.swift */,
 				B52D3475F8383A6C96754E03 /* ToastOverlay.swift */,
@@ -580,6 +583,7 @@
 				44B56515793C2BB83F5F6D4A /* PrintEstimateFormatters.swift in Sources */,
 				C880911BE8A314F7BB1CCA8A /* PrintEstimationCard.swift in Sources */,
 				5096C194622EACD881757599 /* PrintProgressCard.swift in Sources */,
+				DB447D27A007346EA8C32B6D /* PrintSuccessModal.swift in Sources */,
 				722C07A2FE9F8D32DA14CC11 /* PrintTab.swift in Sources */,
 				49397CEDE4D75E47854A886C /* PrinterOfflineCard.swift in Sources */,
 				7FBB60D7C763B1731A6A7368 /* PrinterStatusCard.swift in Sources */,

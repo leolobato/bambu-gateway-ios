@@ -64,6 +64,13 @@ struct PrintTab: View {
         .fullScreenCover(isPresented: $viewModel.isShowingPreview) {
             GCodePreviewModal(viewModel: viewModel)
         }
+        .sheet(isPresented: $viewModel.showPrintSuccessModal) {
+            PrintSuccessModal(
+                printerName: viewModel.lastPrintPrinterName,
+                estimate: viewModel.lastPrintEstimate,
+                onDone: { viewModel.dismissPrintSuccessModal() }
+            )
+        }
     }
 
     // MARK: - File area
