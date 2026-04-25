@@ -17,6 +17,7 @@
 		2B35F0A7CBA771FDD9C87DE0 /* CameraFeedView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 60EEE74AFB6EC29279BA25F4 /* CameraFeedView.swift */; };
 		3170F3853AFAEC0D89898D09 /* AMSTrayCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = A90C3D6C3090D51A24960C1F /* AMSTrayCard.swift */; };
 		4276A894BB7CE53680394377 /* AppSettingsStoreCameraTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 36C28A77CC578F19C3B443A8 /* AppSettingsStoreCameraTests.swift */; };
+		44B56515793C2BB83F5F6D4A /* PrintEstimateFormatters.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B9A2C955FDC5D3DCDDE04AE /* PrintEstimateFormatters.swift */; };
 		49397CEDE4D75E47854A886C /* PrinterOfflineCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1A82C8C3C49F519579B64E2 /* PrinterOfflineCard.swift */; };
 		4C1A529AD33EE2A149CD9C0E /* PrinterTab.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2ACB1A998B04E9E9154760AE /* PrinterTab.swift */; };
 		5096C194622EACD881757599 /* PrintProgressCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0CACA553E0D70F489079E05 /* PrintProgressCard.swift */; };
@@ -24,6 +25,7 @@
 		531A4B62990B0E7E59F76C06 /* ToastOverlay.swift in Sources */ = {isa = PBXBuildFile; fileRef = B52D3475F8383A6C96754E03 /* ToastOverlay.swift */; };
 		5862EC8951FC76F6FA97B697 /* PrintControlsRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 32780EC48A776B886BDB8B31 /* PrintControlsRow.swift */; };
 		5B1DAF338F92BE18208DB698 /* MakerWorldBrowserView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3B46FA0BBEC43DF398153A59 /* MakerWorldBrowserView.swift */; };
+		5B72FB38118F24AE0B84611B /* PrintEstimationFormattingTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7FFB4F3826F66CCF3B3483F4 /* PrintEstimationFormattingTests.swift */; };
 		6326A5843953FCC43B8311EB /* MultipartFormData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 95B3B7F980C0E0EC50EEE372 /* MultipartFormData.swift */; };
 		67618F9E9456EA482EB1ADB0 /* PrintEstimateDecodingTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = CFF25855CE5E2F502E04B737 /* PrintEstimateDecodingTests.swift */; };
 		6D6F831E399F8EF5C49D1B81 /* GCodePreview in Frameworks */ = {isa = PBXBuildFile; productRef = 85BFD403F2AE24BB83C64D31 /* GCodePreview */; };
@@ -106,6 +108,7 @@
 		244EB95AFE2F67045E60788A /* StatusRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatusRow.swift; sourceTree = "<group>"; };
 		25AA0EB97886F4C8EB4AC476 /* PrintTab.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrintTab.swift; sourceTree = "<group>"; };
 		2ACB1A998B04E9E9154760AE /* PrinterTab.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrinterTab.swift; sourceTree = "<group>"; };
+		2B9A2C955FDC5D3DCDDE04AE /* PrintEstimateFormatters.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrintEstimateFormatters.swift; sourceTree = "<group>"; };
 		2CD1B0E2E27437689C3D753A /* BambuTCPJPEGFeed.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BambuTCPJPEGFeed.swift; sourceTree = "<group>"; };
 		32780EC48A776B886BDB8B31 /* PrintControlsRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrintControlsRow.swift; sourceTree = "<group>"; };
 		36C28A77CC578F19C3B443A8 /* AppSettingsStoreCameraTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppSettingsStoreCameraTests.swift; sourceTree = "<group>"; };
@@ -121,6 +124,7 @@
 		753276AADA566A39C55576DC /* CameraFeedController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraFeedController.swift; sourceTree = "<group>"; };
 		7E8DBA7CCF6FB1ACEDDE1120 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		7F5F9FAB3657817D9E6CE4EF /* BambuPrinterCameraFeed.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BambuPrinterCameraFeed.swift; sourceTree = "<group>"; };
+		7FFB4F3826F66CCF3B3483F4 /* PrintEstimationFormattingTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrintEstimationFormattingTests.swift; sourceTree = "<group>"; };
 		863502189CB276B2AC75D17C /* LiveActivityBundle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LiveActivityBundle.swift; sourceTree = "<group>"; };
 		8C9036F5C817DB069A0DD120 /* CameraTab.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraTab.swift; sourceTree = "<group>"; };
 		8E70DDBC904B734FBBB17271 /* PrintActivityAttributes.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrintActivityAttributes.swift; sourceTree = "<group>"; };
@@ -309,6 +313,7 @@
 				C5AFFC06CAC383459918EF95 /* GCodePreviewModal.swift */,
 				3B46FA0BBEC43DF398153A59 /* MakerWorldBrowserView.swift */,
 				2ACB1A998B04E9E9154760AE /* PrinterTab.swift */,
+				2B9A2C955FDC5D3DCDDE04AE /* PrintEstimateFormatters.swift */,
 				25AA0EB97886F4C8EB4AC476 /* PrintTab.swift */,
 				97E5B232DEE3A55BBBF52FD7 /* SettingsView.swift */,
 				B52D3475F8383A6C96754E03 /* ToastOverlay.swift */,
@@ -325,6 +330,7 @@
 				5BEBF1713CA6AF40B8331BFA /* BambuGatewayTests.swift */,
 				C0EEE85F6636C62884235109 /* PrinterStatusCameraDecodingTests.swift */,
 				CFF25855CE5E2F502E04B737 /* PrintEstimateDecodingTests.swift */,
+				7FFB4F3826F66CCF3B3483F4 /* PrintEstimationFormattingTests.swift */,
 			);
 			path = BambuGatewayTests;
 			sourceTree = "<group>";
@@ -534,6 +540,7 @@
 				4276A894BB7CE53680394377 /* AppSettingsStoreCameraTests.swift in Sources */,
 				96620D20C294E0F910E6ADA9 /* BambuGatewayTests.swift in Sources */,
 				67618F9E9456EA482EB1ADB0 /* PrintEstimateDecodingTests.swift in Sources */,
+				5B72FB38118F24AE0B84611B /* PrintEstimationFormattingTests.swift in Sources */,
 				9D2578A0C71EFA277009170A /* PrinterStatusCameraDecodingTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -567,6 +574,7 @@
 				0A2274DC8B4E7E9B301C33A2 /* PrintActivityAttributes.swift in Sources */,
 				5862EC8951FC76F6FA97B697 /* PrintControlsRow.swift in Sources */,
 				ABA318F3B31BE90C35C19873 /* PrintEstimate.swift in Sources */,
+				44B56515793C2BB83F5F6D4A /* PrintEstimateFormatters.swift in Sources */,
 				5096C194622EACD881757599 /* PrintProgressCard.swift in Sources */,
 				722C07A2FE9F8D32DA14CC11 /* PrintTab.swift in Sources */,
 				49397CEDE4D75E47854A886C /* PrinterOfflineCard.swift in Sources */,
