@@ -5,6 +5,7 @@ import UserNotifications
 final class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDelegate {
     static var pushService: PushService?
     static var toastCenter: ToastCenter?
+    static var transferService: BackgroundTransferService?
 
     func application(
         _ application: UIApplication,
@@ -28,6 +29,16 @@ final class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCent
         didFailToRegisterForRemoteNotificationsWithError error: Error
     ) {
         // Ignore — push just won't work this session
+    }
+
+    func application(
+        _ application: UIApplication,
+        handleEventsForBackgroundURLSession identifier: String,
+        completionHandler: @escaping () -> Void
+    ) {
+        Task { @MainActor in
+            Self.transferService?.adoptCompletionHandler(completionHandler)
+        }
     }
 
     // Forward foreground notifications into our in-app toast so users see
