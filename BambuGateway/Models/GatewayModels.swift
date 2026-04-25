@@ -249,6 +249,7 @@ struct PrintResponse: Decodable {
     let wasSliced: Bool
     let settingsTransfer: SettingsTransferInfo?
     let uploadId: String?
+    let estimate: PrintEstimate?
 }
 
 struct UploadProgressResponse: Decodable {

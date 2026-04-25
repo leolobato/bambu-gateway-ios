@@ -49,3 +49,39 @@ final class PrintEstimateDecodingTests: XCTestCase {
         XCTAssertFalse(estimate.isEmpty)
     }
 }
+
+final class PrintResponseEstimateTests: XCTestCase {
+    private func decode(_ json: String) throws -> PrintResponse {
+        let decoder = JSONDecoder()
+        decoder.keyDecodingStrategy = .convertFromSnakeCase
+        return try decoder.decode(PrintResponse.self, from: Data(json.utf8))
+    }
+
+    func test_decodesPrintResponseWithEstimate() throws {
+        let json = """
+        {
+          "status": "ok",
+          "file_name": "demo.3mf",
+          "printer_id": "P01",
+          "was_sliced": true,
+          "estimate": { "total_seconds": 9356, "total_filament_grams": 29.46 }
+        }
+        """
+        let response = try decode(json)
+        XCTAssertEqual(response.estimate?.totalSeconds, 9356)
+        XCTAssertEqual(response.estimate?.totalFilamentGrams, 29.46)
+    }
+
+    func test_decodesPrintResponseWithoutEstimate() throws {
+        let json = """
+        {
+          "status": "ok",
+          "file_name": "demo.3mf",
+          "printer_id": "P01",
+          "was_sliced": false
+        }
+        """
+        let response = try decode(json)
+        XCTAssertNil(response.estimate)
+    }
+}
