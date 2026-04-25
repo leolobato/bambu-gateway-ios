@@ -234,7 +234,7 @@ final class AppViewModel: ObservableObject {
         }
 
         await loadSetupData()
-        if selectedFile != nil {
+        if selectedFile != nil && parsedInfo == nil {
             await parseSelectedFile()
         }
     }
