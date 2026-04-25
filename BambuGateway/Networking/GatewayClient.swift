@@ -300,6 +300,27 @@ struct GatewayClient {
         return try decode(T.self, from: data)
     }
 
+    private func resolveURL(path: String, queryItems: [URLQueryItem] = []) throws -> URL {
+        guard var components = URLComponents(string: baseURLString.trimmingCharacters(in: .whitespacesAndNewlines)),
+              let host = components.host,
+              !host.isEmpty else {
+            throw GatewayClientError.invalidURL
+        }
+        components.path = path
+        components.queryItems = queryItems.isEmpty ? nil : queryItems
+        guard let url = components.url else {
+            throw GatewayClientError.invalidURL
+        }
+        return url
+    }
+
+    private func mapHTTPError(_ response: HTTPURLResponse, data: Data) -> GatewayClientError {
+        if let detail = try? JSONDecoder().decode(ErrorDetailResponse.self, from: data).detail {
+            return .serverError(detail)
+        }
+        return .serverError("Request failed with HTTP \(response.statusCode).")
+    }
+
     private func request(
         path: String,
         method: String,
@@ -308,18 +329,7 @@ struct GatewayClient {
         contentType: String? = nil,
         timeout: TimeInterval = 60
     ) async throws -> (Data, URLResponse) {
-        guard var components = URLComponents(string: baseURLString.trimmingCharacters(in: .whitespacesAndNewlines)),
-              let host = components.host,
-              !host.isEmpty else {
-            throw GatewayClientError.invalidURL
-        }
-
-        components.path = path
-        components.queryItems = queryItems.isEmpty ? nil : queryItems
-
-        guard let url = components.url else {
-            throw GatewayClientError.invalidURL
-        }
+        let url = try resolveURL(path: path, queryItems: queryItems)
 
         var request = URLRequest(url: url)
         request.httpMethod = method
@@ -337,10 +347,7 @@ struct GatewayClient {
         }
 
         guard (200 ... 299).contains(http.statusCode) else {
-            if let detail = try? JSONDecoder().decode(ErrorDetailResponse.self, from: data).detail {
-                throw GatewayClientError.serverError(detail)
-            }
-            throw GatewayClientError.serverError("Request failed with HTTP \(http.statusCode).")
+            throw mapHTTPError(http, data: data)
         }
 
         return (data, response)
