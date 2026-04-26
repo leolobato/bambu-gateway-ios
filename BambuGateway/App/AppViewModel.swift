@@ -70,6 +70,9 @@ final class AppViewModel: ObservableObject {
     @Published var previewEstimate: PrintEstimate?
     /// 0–100 while a slice job is running for this client; nil otherwise.
     @Published var slicingProgress: Int?
+    /// Human-readable phase from the gateway (e.g. "Optimizing toolpath").
+    /// Nil when no slice job is in flight or the gateway hasn't reported one yet.
+    @Published var slicingPhase: String?
     @Published var lastPrintEstimate: PrintEstimate?
     @Published var lastPrintPrinterName: String?
     /// Drives the one-shot success sheet shown after a direct print.
@@ -496,7 +499,11 @@ final class AppViewModel: ObservableObject {
     /// `kind` is persisted alongside the job id so a kill-and-relaunch can resume.
     private func runSliceJob(_ submission: PrintSubmission, kind: String) async throws -> String {
         slicingProgress = 0
-        defer { slicingProgress = nil }
+        slicingPhase = nil
+        defer {
+            slicingProgress = nil
+            slicingPhase = nil
+        }
 
         let client = gatewayClient()
         let jobId = try await client.createSliceJob(submission)
@@ -520,6 +527,7 @@ final class AppViewModel: ObservableObject {
             try Task.checkCancellation()
             let job = try await client.fetchSliceJob(jobId: jobId)
             slicingProgress = job.progress
+            slicingPhase = job.phase
             if job.isTerminal {
                 switch job.status {
                 case "ready":
@@ -703,11 +711,13 @@ final class AppViewModel: ObservableObject {
             isSubmitting = true
         }
         slicingProgress = initial.progress
+        slicingPhase = initial.phase
 
         defer {
             isLoadingPreview = false
             isSubmitting = false
             slicingProgress = nil
+            slicingPhase = nil
         }
 
         do {

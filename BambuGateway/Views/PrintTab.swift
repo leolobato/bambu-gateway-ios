@@ -619,9 +619,28 @@ struct PrintTab: View {
                 }
                 .buttonStyle(FilledButtonStyle(tint: Color.accentBlue))
                 .disabled(!canSubmit)
+
+                if let phase = currentSlicingPhase {
+                    Text(phase)
+                        .font(.footnote)
+                        .foregroundColor(.secondary)
+                        .lineLimit(1)
+                        .truncationMode(.tail)
+                        .frame(maxWidth: .infinity, alignment: .center)
+                        .transition(.opacity)
+                }
             }
             .padding(.top, 4)
+            .animation(.easeInOut(duration: 0.2), value: currentSlicingPhase)
         }
+    }
+
+    /// Slicing phase string when a slice job is currently in flight for the
+    /// active Preview or Print submission. Hidden once the job settles.
+    private var currentSlicingPhase: String? {
+        guard viewModel.isLoadingPreview || viewModel.isSubmitting else { return nil }
+        guard let phase = viewModel.slicingPhase, !phase.isEmpty else { return nil }
+        return phase
     }
 
     private func submitButtonLabel(
