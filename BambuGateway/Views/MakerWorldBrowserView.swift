@@ -69,6 +69,9 @@ struct MakerWorldBrowserView: View {
                 }
             }
         }
+        .onChange(of: initialURL) { _, newURL in
+            browser.navigate(to: newURL)
+        }
         .alert("Download unavailable", isPresented: Binding(
             get: { browser.errorMessage != nil },
             set: { if !$0 { browser.errorMessage = nil } }

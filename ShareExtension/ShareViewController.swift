@@ -59,6 +59,22 @@ class ShareViewController: UIViewController {
             return
         }
 
+        // `extensionContext?.open(_:)` silently fails from share extensions on
+        // recent iOS — the sheet dismisses but the host app never launches.
+        // Walk the responder chain to UIApplication and open the URL directly.
+        var responder: UIResponder? = self
+        while let current = responder {
+            if let application = current as? UIApplication {
+                let selector = NSSelectorFromString("openURL:")
+                if application.responds(to: selector) {
+                    _ = application.perform(selector, with: appURL)
+                    done()
+                    return
+                }
+            }
+            responder = current.next
+        }
+
         extensionContext?.open(appURL) { [weak self] _ in
             self?.done()
         }
