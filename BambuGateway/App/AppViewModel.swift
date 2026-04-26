@@ -57,8 +57,10 @@ final class AppViewModel: ObservableObject {
     @Published var isLoadingPreview: Bool = false
     @Published var isShowingPreview: Bool = false
     @Published var previewScene: SCNScene?
-    @Published var currentPreviewId: String?
+    @Published var currentJobId: String?
     @Published var previewEstimate: PrintEstimate?
+    /// 0–100 while a slice job is running for this client; nil otherwise.
+    @Published var slicingProgress: Int?
     @Published var lastPrintEstimate: PrintEstimate?
     @Published var lastPrintPrinterName: String?
     /// Drives the one-shot success sheet shown after a direct print.
@@ -345,12 +347,25 @@ final class AppViewModel: ObservableObject {
     func submitPrint() async {
         guard let submission = buildSubmission() else { return }
         let printContext = printContext(for: submission)
+        let needsSlicing = !(parsedInfo?.hasGcode ?? true)
 
         isSubmitting = true
         defer { isSubmitting = false }
 
         do {
-            let response = try await gatewayClient().submitPrint(submission)
+            let response: PrintResponse
+            if needsSlicing {
+                // Slice with progress, then trigger print from the resulting job.
+                let jobId = try await runSliceJob(submission)
+                currentJobId = jobId
+                response = try await gatewayClient().printFromJob(
+                    jobId: jobId,
+                    printerId: submission.printerId
+                )
+                currentJobId = nil
+            } else {
+                response = try await gatewayClient().submitPrint(submission)
+            }
             handlePrintResponse(response, startedContext: printContext)
             lastPrintEstimate = response.estimate
             let resolvedPrinterId = response.printerId.isEmpty ? printContext.printerId : response.printerId
@@ -389,13 +404,17 @@ final class AppViewModel: ObservableObject {
                 }.value
 
                 previewScene = scene
-                currentPreviewId = nil
+                currentJobId = nil
                 isShowingPreview = true
                 setMessage("", .info)
             } else {
-                // Needs slicing — call the preview API
+                // Needs slicing — submit a slice job and poll for progress.
                 guard let submission = buildSubmission() else { return }
-                let previewResult = try await gatewayClient().fetchPrintPreview(submission)
+                let jobId = try await runSliceJob(submission)
+                let previewResult = try await gatewayClient().fetchSliceJobOutput(
+                    jobId: jobId,
+                    fallbackFileName: submission.file.fileName
+                )
 
                 let threeMFData = previewResult.threeMFData
                 let scene = try await Task.detached {
@@ -410,7 +429,7 @@ final class AppViewModel: ObservableObject {
                 }.value
 
                 previewScene = scene
-                currentPreviewId = previewResult.previewId
+                currentJobId = jobId
                 previewEstimate = previewResult.estimate
                 isShowingPreview = true
                 setMessage("", .info)
@@ -428,10 +447,10 @@ final class AppViewModel: ObservableObject {
         defer { isSubmitting = false }
 
         do {
-            if let previewId = currentPreviewId {
-                // Was sliced via API — use the stored preview
-                let response = try await gatewayClient().printFromPreview(
-                    previewId: previewId,
+            if let jobId = currentJobId {
+                // Was sliced via the slice-job flow — use the job id
+                let response = try await gatewayClient().printFromJob(
+                    jobId: jobId,
                     printerId: resolvedPrinterId()
                 )
                 dismissPreview()
@@ -452,7 +471,49 @@ final class AppViewModel: ObservableObject {
 
     func cancelPreview() {
         transferService.cancelAll()
+        // Best-effort: tell the gateway to cancel any in-flight job we kicked off.
+        if let jobId = currentJobId {
+            Task { [client = gatewayClient()] in
+                try? await client.cancelSliceJob(jobId: jobId)
+            }
+        }
         dismissPreview()
+    }
+
+    /// Submit a slice job and poll until terminal, surfacing progress to the UI.
+    /// Returns the job id on success; throws on failure/cancellation.
+    private func runSliceJob(_ submission: PrintSubmission) async throws -> String {
+        slicingProgress = 0
+        defer { slicingProgress = nil }
+
+        let client = gatewayClient()
+        let jobId = try await client.createSliceJob(submission)
+
+        while true {
+            try Task.checkCancellation()
+            let job = try await client.fetchSliceJob(jobId: jobId)
+            slicingProgress = job.progress
+            if job.isTerminal {
+                switch job.status {
+                case "ready":
+                    return jobId
+                case "failed":
+                    throw GatewayClientError.serverError(
+                        job.error ?? "Slicing failed"
+                    )
+                case "cancelled":
+                    throw URLError(.cancelled)
+                case "printing":
+                    // Shouldn't happen with auto_print=false, but treat as success.
+                    return jobId
+                default:
+                    throw GatewayClientError.serverError(
+                        "Unexpected slice job state: \(job.status)"
+                    )
+                }
+            }
+            try await Task.sleep(nanoseconds: 1_000_000_000)
+        }
     }
 
     func dismissPrintSuccessModal() {
@@ -540,7 +601,7 @@ final class AppViewModel: ObservableObject {
     private func dismissPreview() {
         isShowingPreview = false
         previewScene = nil
-        currentPreviewId = nil
+        currentJobId = nil
         previewEstimate = nil
     }
 

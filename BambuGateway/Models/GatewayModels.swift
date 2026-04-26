@@ -318,6 +318,33 @@ struct PreviewResult {
     let estimate: PrintEstimate?
 }
 
+struct SliceJobStatusResponse: Codable {
+    let jobId: String
+    let status: String
+    let progress: Int
+    let phase: String?
+    let filename: String
+    let printerId: String?
+    let autoPrint: Bool
+    let error: String?
+
+    enum CodingKeys: String, CodingKey {
+        case jobId = "job_id"
+        case status, progress, phase, filename, error
+        case printerId = "printer_id"
+        case autoPrint = "auto_print"
+    }
+
+    var isTerminal: Bool {
+        switch status {
+        case "ready", "printing", "failed", "cancelled":
+            return true
+        default:
+            return false
+        }
+    }
+}
+
 struct GatewayCapabilities: Codable {
     // Decoded via GatewayClient's `convertFromSnakeCase` strategy — do not add
     // explicit `CodingKeys` here. An explicit mapping would shadow the global

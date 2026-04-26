@@ -599,7 +599,8 @@ struct PrintTab: View {
                     submitButtonLabel(
                         title: "Preview",
                         systemImage: "eye.fill",
-                        isBusy: viewModel.isLoadingPreview
+                        isBusy: viewModel.isLoadingPreview,
+                        slicingProgress: viewModel.isLoadingPreview ? viewModel.slicingProgress : nil
                     )
                 }
                 .buttonStyle(TonalButtonStyle(tint: Color.accentBlue))
@@ -612,6 +613,7 @@ struct PrintTab: View {
                         title: "Print",
                         systemImage: "printer.fill",
                         isBusy: viewModel.isSubmitting,
+                        slicingProgress: viewModel.isSubmitting ? viewModel.slicingProgress : nil,
                         spinnerOnLight: true
                     )
                 }
@@ -626,6 +628,7 @@ struct PrintTab: View {
         title: String,
         systemImage: String,
         isBusy: Bool,
+        slicingProgress: Int? = nil,
         spinnerOnLight: Bool = false
     ) -> some View {
         HStack(spacing: 8) {
@@ -635,8 +638,13 @@ struct PrintTab: View {
             } else {
                 Image(systemName: systemImage)
             }
-            Text(title)
-                .fontWeight(.semibold)
+            if let percent = slicingProgress {
+                Text("Slicing \(percent)%")
+                    .fontWeight(.semibold)
+            } else {
+                Text(title)
+                    .fontWeight(.semibold)
+            }
         }
     }
 

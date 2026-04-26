@@ -175,6 +175,107 @@ struct GatewayClient {
         return try decode(PrintResponse.self, from: data)
     }
 
+    /// Submit a slice job (auto_print=false). Returns the job id.
+    func createSliceJob(_ submission: PrintSubmission) async throws -> String {
+        guard let transferService else {
+            throw GatewayClientError.serverError("Background transfer service is not available.")
+        }
+
+        var form = MultipartFormData()
+        form.addFile(name: "file", fileName: submission.file.fileName, mimeType: "application/octet-stream", data: submission.file.data)
+
+        if !submission.printerId.isEmpty {
+            form.addField(name: "printer_id", value: submission.printerId)
+        }
+        if !submission.machineProfile.isEmpty {
+            form.addField(name: "machine_profile", value: submission.machineProfile)
+        }
+        if !submission.processProfile.isEmpty {
+            form.addField(name: "process_profile", value: submission.processProfile)
+        }
+        if let plateId = submission.plateId {
+            form.addField(name: "plate_id", value: String(plateId))
+        }
+        if !submission.plateType.isEmpty {
+            form.addField(name: "plate_type", value: submission.plateType)
+        }
+        if !submission.filamentOverrides.isEmpty {
+            try addFilamentProfilesField(to: &form, overrides: submission.filamentOverrides)
+        }
+        // auto_print stays false; the iOS app drives the print explicitly later.
+        form.addField(name: "auto_print", value: "false")
+        form.finalize()
+
+        let bodyURL = try form.writeBody(toTemporaryFileNamed: "slice-job-create")
+        defer { try? FileManager.default.removeItem(at: bodyURL) }
+
+        var request = URLRequest(url: try resolveURL(path: "/api/slice-jobs"))
+        request.httpMethod = "POST"
+        request.setValue("multipart/form-data; boundary=\(form.boundary)", forHTTPHeaderField: "Content-Type")
+
+        let (data, httpResponse) = try await transferService.upload(request: request, fromFile: bodyURL)
+
+        guard (200 ... 299).contains(httpResponse.statusCode) else {
+            throw mapHTTPError(httpResponse, data: data)
+        }
+
+        let response = try decode(SliceJobStatusResponse.self, from: data)
+        return response.jobId
+    }
+
+    func fetchSliceJob(jobId: String) async throws -> SliceJobStatusResponse {
+        try await get(path: "/api/slice-jobs/\(jobId)")
+    }
+
+    func cancelSliceJob(jobId: String) async throws {
+        _ = try await request(
+            path: "/api/slice-jobs/\(jobId)/cancel",
+            method: "POST"
+        )
+    }
+
+    /// Download the sliced 3MF for a job that has reached `ready`/`printing`.
+    func fetchSliceJobOutput(jobId: String, fallbackFileName: String) async throws -> PreviewResult {
+        let (data, response) = try await request(
+            path: "/api/slice-jobs/\(jobId)/output",
+            method: "GET",
+            timeout: 120
+        )
+        guard let httpResponse = response as? HTTPURLResponse else {
+            throw GatewayClientError.invalidResponse
+        }
+        let fileName = parseContentDispositionFilename(httpResponse) ?? fallbackFileName
+        let estimate = PrintEstimate.decodeFromHeader(
+            httpResponse.value(forHTTPHeaderField: "X-Print-Estimate")
+        )
+        return PreviewResult(
+            threeMFData: data,
+            previewId: jobId,
+            fileName: fileName,
+            estimate: estimate
+        )
+    }
+
+    /// Trigger a print from a `ready` slice job.
+    func printFromJob(jobId: String, printerId: String) async throws -> PrintResponse {
+        var form = MultipartFormData()
+        form.addField(name: "job_id", value: jobId)
+        if !printerId.isEmpty {
+            form.addField(name: "printer_id", value: printerId)
+        }
+        form.finalize()
+
+        let (data, _) = try await request(
+            path: "/api/print",
+            method: "POST",
+            body: form.body,
+            contentType: "multipart/form-data; boundary=\(form.boundary)",
+            timeout: 600
+        )
+
+        return try decode(PrintResponse.self, from: data)
+    }
+
     func submitPrint(_ submission: PrintSubmission) async throws -> PrintResponse {
         guard let transferService else {
             throw GatewayClientError.serverError("Background transfer service is not available.")
