@@ -319,6 +319,9 @@ struct PreviewResult {
 }
 
 struct SliceJobStatusResponse: Codable {
+    // Decoded via GatewayClient's `convertFromSnakeCase` strategy — do not add
+    // explicit `CodingKeys` here. An explicit mapping would shadow the global
+    // strategy and fail to decode `job_id`, `printer_id`, and `auto_print`.
     let jobId: String
     let status: String
     let progress: Int
@@ -327,13 +330,6 @@ struct SliceJobStatusResponse: Codable {
     let printerId: String?
     let autoPrint: Bool
     let error: String?
-
-    enum CodingKeys: String, CodingKey {
-        case jobId = "job_id"
-        case status, progress, phase, filename, error
-        case printerId = "printer_id"
-        case autoPrint = "auto_print"
-    }
 
     var isTerminal: Bool {
         switch status {
