@@ -16,6 +16,7 @@ struct BambuGatewayApp: App {
                 .task {
                     await viewModel.bootstrapPushServices()
                     await viewModel.refreshAll()
+                    await viewModel.resumePersistedSliceJob()
                 }
                 .onOpenURL { url in
                     if url.scheme == "bambugateway",

@@ -16,6 +16,15 @@ final class AppViewModel: ObservableObject {
         let filamentOverrides: [Int: FilamentOverrideSelection]
     }
 
+    /// Persisted across app launches so a slice job in flight can be resumed
+    /// after the app is killed. `kind` says what to do once the job is ready.
+    private struct PendingSliceJob: Codable {
+        let jobId: String
+        let kind: String  // "preview" or "print"
+    }
+
+    private static let pendingSliceJobKey = "BambuGateway.pendingSliceJob"
+
     enum MessageLevel {
         case info
         case success
@@ -356,13 +365,14 @@ final class AppViewModel: ObservableObject {
             let response: PrintResponse
             if needsSlicing {
                 // Slice with progress, then trigger print from the resulting job.
-                let jobId = try await runSliceJob(submission)
+                let jobId = try await runSliceJob(submission, kind: "print")
                 currentJobId = jobId
                 response = try await gatewayClient().printFromJob(
                     jobId: jobId,
                     printerId: submission.printerId
                 )
                 currentJobId = nil
+                clearPendingSliceJob()
             } else {
                 response = try await gatewayClient().submitPrint(submission)
             }
@@ -410,7 +420,7 @@ final class AppViewModel: ObservableObject {
             } else {
                 // Needs slicing — submit a slice job and poll for progress.
                 guard let submission = buildSubmission() else { return }
-                let jobId = try await runSliceJob(submission)
+                let jobId = try await runSliceJob(submission, kind: "preview")
                 let previewResult = try await gatewayClient().fetchSliceJobOutput(
                     jobId: jobId,
                     fallbackFileName: submission.file.fileName
@@ -432,6 +442,7 @@ final class AppViewModel: ObservableObject {
                 currentJobId = jobId
                 previewEstimate = previewResult.estimate
                 isShowingPreview = true
+                clearPendingSliceJob()
                 setMessage("", .info)
             }
         } catch let error as URLError where error.code == .cancelled {
@@ -482,13 +493,29 @@ final class AppViewModel: ObservableObject {
 
     /// Submit a slice job and poll until terminal, surfacing progress to the UI.
     /// Returns the job id on success; throws on failure/cancellation.
-    private func runSliceJob(_ submission: PrintSubmission) async throws -> String {
+    /// `kind` is persisted alongside the job id so a kill-and-relaunch can resume.
+    private func runSliceJob(_ submission: PrintSubmission, kind: String) async throws -> String {
         slicingProgress = 0
         defer { slicingProgress = nil }
 
         let client = gatewayClient()
         let jobId = try await client.createSliceJob(submission)
+        savePendingSliceJob(jobId: jobId, kind: kind)
 
+        do {
+            return try await pollUntilReady(jobId: jobId, client: client)
+        } catch {
+            clearPendingSliceJob()
+            throw error
+        }
+    }
+
+    /// Poll a job until it leaves the queued/slicing/uploading states.
+    /// Returns the job id on `ready`/`printing`; throws on `failed` or `cancelled`.
+    private func pollUntilReady(
+        jobId: String,
+        client: GatewayClient
+    ) async throws -> String {
         while true {
             try Task.checkCancellation()
             let job = try await client.fetchSliceJob(jobId: jobId)
@@ -498,15 +525,18 @@ final class AppViewModel: ObservableObject {
                 case "ready":
                     return jobId
                 case "failed":
+                    clearPendingSliceJob()
                     throw GatewayClientError.serverError(
                         job.error ?? "Slicing failed"
                     )
                 case "cancelled":
+                    clearPendingSliceJob()
                     throw URLError(.cancelled)
                 case "printing":
                     // Shouldn't happen with auto_print=false, but treat as success.
                     return jobId
                 default:
+                    clearPendingSliceJob()
                     throw GatewayClientError.serverError(
                         "Unexpected slice job state: \(job.status)"
                     )
@@ -603,6 +633,138 @@ final class AppViewModel: ObservableObject {
         previewScene = nil
         currentJobId = nil
         previewEstimate = nil
+        clearPendingSliceJob()
+    }
+
+    // MARK: - Pending slice job persistence
+
+    private func savePendingSliceJob(jobId: String, kind: String) {
+        let memento = PendingSliceJob(jobId: jobId, kind: kind)
+        if let data = try? JSONEncoder().encode(memento) {
+            UserDefaults.standard.set(data, forKey: Self.pendingSliceJobKey)
+        }
+    }
+
+    private func clearPendingSliceJob() {
+        UserDefaults.standard.removeObject(forKey: Self.pendingSliceJobKey)
+    }
+
+    private func loadPendingSliceJob() -> PendingSliceJob? {
+        guard let data = UserDefaults.standard.data(forKey: Self.pendingSliceJobKey),
+              let memento = try? JSONDecoder().decode(PendingSliceJob.self, from: data)
+        else {
+            return nil
+        }
+        return memento
+    }
+
+    /// Resume a slice job persisted from a prior session, if any.
+    /// Called from app launch. Polls the gateway for the saved job; once it
+    /// reaches `ready`, surfaces the appropriate UI (preview modal or print).
+    func resumePersistedSliceJob() async {
+        guard let memento = loadPendingSliceJob() else { return }
+        let client = gatewayClient()
+
+        // First fetch — if the job no longer exists on the gateway, drop the memento.
+        let initial: SliceJobStatusResponse
+        do {
+            initial = try await client.fetchSliceJob(jobId: memento.jobId)
+        } catch {
+            clearPendingSliceJob()
+            return
+        }
+
+        // If already terminal and not `ready`, just clear and surface any error.
+        if initial.isTerminal {
+            switch initial.status {
+            case "failed":
+                setMessage(initial.error ?? "Slicing failed", .error)
+                clearPendingSliceJob()
+                return
+            case "cancelled":
+                clearPendingSliceJob()
+                return
+            case "printing":
+                clearPendingSliceJob()
+                return
+            case "ready":
+                break  // fall through to consume
+            default:
+                clearPendingSliceJob()
+                return
+            }
+        }
+
+        // Show progress UI while we wait for terminal.
+        switch memento.kind {
+        case "preview":
+            isLoadingPreview = true
+        default:
+            isSubmitting = true
+        }
+        slicingProgress = initial.progress
+
+        defer {
+            isLoadingPreview = false
+            isSubmitting = false
+            slicingProgress = nil
+        }
+
+        do {
+            let jobId: String
+            if initial.status == "ready" {
+                jobId = memento.jobId
+            } else {
+                jobId = try await pollUntilReady(jobId: memento.jobId, client: client)
+            }
+            try await consumeReadyJob(jobId: jobId, kind: memento.kind, client: client)
+        } catch let error as URLError where error.code == .cancelled {
+            clearPendingSliceJob()
+        } catch {
+            setMessage(error.localizedDescription, .error)
+        }
+    }
+
+    /// Once a job is `ready`, either render its preview or trigger the print,
+    /// based on the original intent stored alongside the job id.
+    private func consumeReadyJob(
+        jobId: String, kind: String, client: GatewayClient
+    ) async throws {
+        switch kind {
+        case "preview":
+            let result = try await client.fetchSliceJobOutput(
+                jobId: jobId,
+                fallbackFileName: "preview.3mf"
+            )
+            let threeMFData = result.threeMFData
+            let scene = try await Task.detached {
+                let reader = ThreeMFReader()
+                let extracted = try reader.extractGCode(
+                    from: threeMFData,
+                    preferredPlateId: nil
+                )
+                let parser = GCodeParser()
+                let model = try parser.parse(extracted.content)
+                return PrintSceneBuilder().buildScene(from: model)
+            }.value
+            previewScene = scene
+            currentJobId = jobId
+            previewEstimate = result.estimate
+            isShowingPreview = true
+            clearPendingSliceJob()
+        default:
+            // print kind — fetch the job to learn the printer it was bound to,
+            // then trigger the print.
+            let job = try await client.fetchSliceJob(jobId: jobId)
+            let printerId = (job.printerId?.isEmpty == false ? job.printerId! : resolvedPrinterId())
+            let response = try await client.printFromJob(jobId: jobId, printerId: printerId)
+            handlePrintResponse(response, startedContext: nil)
+            lastPrintEstimate = response.estimate
+            let resolvedId = response.printerId.isEmpty ? printerId : response.printerId
+            lastPrintPrinterName = printerName(for: resolvedId)
+            showPrintSuccessModal = true
+            clearPendingSliceJob()
+        }
     }
 
     private func buildSubmission() -> PrintSubmission? {
