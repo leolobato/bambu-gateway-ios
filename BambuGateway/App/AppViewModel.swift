@@ -93,6 +93,11 @@ final class AppViewModel: ObservableObject {
     @Published var uploadProgress: Double? = nil
     @Published var isCancellingUpload: Bool = false
     @Published var isSpeedChangeInFlight: Bool = false
+    /// Set to the intended speed level when a speed change is in flight, so
+    /// the button reflects the tap immediately instead of waiting for the
+    /// next gateway refresh. Cleared once the server's reported value catches
+    /// up, or on failure.
+    @Published var optimisticSpeedLevel: SpeedLevel?
     @Published var chamberLightPending: Bool = false
     /// Set to the intended on/off state when a light toggle is in flight.
     /// Cleared once the server's reported state catches up, or on failure.
@@ -610,12 +615,32 @@ final class AppViewModel: ObservableObject {
 
     func setSpeed(_ level: SpeedLevel) async {
         guard let printerId = selectedPrinter?.id else { return }
+        // Flip the UI immediately. The MQTT speed report from the printer can
+        // take a couple of seconds to round-trip; waiting for a refresh before
+        // updating the button makes the tap feel unresponsive.
+        optimisticSpeedLevel = level
         isSpeedChangeInFlight = true
-        defer { isSpeedChangeInFlight = false }
         do {
             try await gatewayClient().setSpeed(printerId: printerId, level: level)
-            await refreshPrinters()
+            isSpeedChangeInFlight = false
+            // Poll the gateway a few times in the background — keep the
+            // optimistic value visible until the server reports the same
+            // level, then drop it. Bounded so a dropped MQTT report can't
+            // pin the button forever.
+            Task { [weak self] in
+                for _ in 0 ..< 6 {
+                    try? await Task.sleep(nanoseconds: 500_000_000)
+                    await self?.refreshPrinters()
+                    if self?.selectedPrinter?.speedLevel == level.rawValue {
+                        self?.optimisticSpeedLevel = nil
+                        return
+                    }
+                }
+                self?.optimisticSpeedLevel = nil
+            }
         } catch {
+            optimisticSpeedLevel = nil
+            isSpeedChangeInFlight = false
             setMessage(error.localizedDescription, .error)
         }
     }

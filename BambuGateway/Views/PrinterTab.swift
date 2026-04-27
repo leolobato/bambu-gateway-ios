@@ -57,7 +57,9 @@ struct PrinterTab: View {
         }
         .sheet(isPresented: $isShowingSpeedPicker) {
             if let printer = viewModel.selectedPrinter {
-                let currentLevel = SpeedLevel(rawValue: printer.speedLevel) ?? .standard
+                let currentLevel = viewModel.optimisticSpeedLevel
+                    ?? SpeedLevel(rawValue: printer.speedLevel)
+                    ?? .standard
                 SpeedPickerSheet(currentLevel: currentLevel) { level in
                     await viewModel.setSpeed(level)
                 }
@@ -176,7 +178,9 @@ struct PrinterTab: View {
             if isLive || printer.job != nil {
                 StatusRow(
                     temperatures: printer.temperatures,
-                    speedLevel: SpeedLevel(rawValue: printer.speedLevel) ?? .standard,
+                    speedLevel: viewModel.optimisticSpeedLevel
+                        ?? SpeedLevel(rawValue: printer.speedLevel)
+                        ?? .standard,
                     isSpeedChangeInFlight: viewModel.isSpeedChangeInFlight,
                     isShowingSpeedPicker: $isShowingSpeedPicker
                 )
