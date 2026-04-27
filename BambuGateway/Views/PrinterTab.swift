@@ -111,7 +111,7 @@ struct PrinterTab: View {
     private var emptyPrintersCard: some View {
         let unreachable = viewModel.printersLoadState == .unreachable
         VStack(spacing: 10) {
-            Image(systemName: unreachable ? "wifi.exclamationmark" : "printer")
+            Image(systemName: unreachable ? "wifi.exclamationmark" : "cube")
                 .font(.system(size: 32))
                 .foregroundStyle(.secondary)
             Text(unreachable ? "Can't reach the gateway" : "No printers available")
@@ -123,14 +123,8 @@ struct PrinterTab: View {
                 .foregroundStyle(.secondary)
                 .multilineTextAlignment(.center)
                 .fixedSize(horizontal: false, vertical: true)
-            Button {
+            Button("Try again") {
                 Task { await viewModel.refreshAll() }
-            } label: {
-                if viewModel.isLoading {
-                    ProgressView()
-                } else {
-                    Text("Try again")
-                }
             }
             .buttonStyle(.bordered)
             .disabled(viewModel.isLoading || viewModel.isSubmitting)
