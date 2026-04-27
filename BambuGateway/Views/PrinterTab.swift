@@ -169,14 +169,20 @@ struct PrinterTab: View {
     private var printingControls: some View {
         if let printer = viewModel.selectedPrinter, printer.online {
             let state = printer.state.lowercased()
-            if state == "printing" || state == "paused" {
+            let isLive = state == "printing" || state == "paused"
+            // Keep the temperature/speed row visible while a job record is
+            // present (printing, paused, finished, cancelled), so the user can
+            // still check bed temperature after a print completes.
+            if isLive || printer.job != nil {
                 StatusRow(
                     temperatures: printer.temperatures,
                     speedLevel: SpeedLevel(rawValue: printer.speedLevel) ?? .standard,
                     isSpeedChangeInFlight: viewModel.isSpeedChangeInFlight,
                     isShowingSpeedPicker: $isShowingSpeedPicker
                 )
+            }
 
+            if isLive {
                 PrintControlsRow(
                     state: printer.state,
                     onPause: { await viewModel.pausePrint() },
