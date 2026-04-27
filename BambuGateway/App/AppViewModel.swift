@@ -918,11 +918,19 @@ final class AppViewModel: ObservableObject {
             let isActive = Self.activeStateKeys.contains(stateKey)
 
             if isActive && !liveActivityService.hasActivity(for: status.id) {
+                let runningFileName = status.job?.fileName ?? ""
+                let parsedFileName = selectedFile?.fileName ?? ""
+                // Only attach the locally-parsed thumbnail when its file name matches
+                // the job actually running on the printer. Otherwise the LA would show
+                // a stale thumbnail for a job started elsewhere (webui, MakerWorld, etc.).
+                let thumbnail: Data? = (!runningFileName.isEmpty && runningFileName == parsedFileName)
+                    ? liveActivityThumbnail()
+                    : nil
                 await liveActivityService.startActivity(
                     printerId: status.id,
                     printerName: status.name,
-                    fileName: status.job?.fileName ?? "",
-                    thumbnail: liveActivityThumbnail(),
+                    fileName: runningFileName,
+                    thumbnail: thumbnail,
                     showPrinterName: printers.count > 1,
                     initialState: content
                 )
