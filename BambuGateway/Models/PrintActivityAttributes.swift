@@ -21,6 +21,37 @@ struct PrintActivityAttributes: ActivityAttributes {
     let printerName: String
     let fileName: String
     let thumbnailData: Data?
+    /// True when the user has more than one printer configured. The Live
+    /// Activity surfaces the printer name in the status line only when this
+    /// is set, since with a single printer the name is just noise.
+    let showPrinterName: Bool
+
+    init(
+        printerId: String,
+        printerName: String,
+        fileName: String,
+        thumbnailData: Data?,
+        showPrinterName: Bool = false
+    ) {
+        self.printerId = printerId
+        self.printerName = printerName
+        self.fileName = fileName
+        self.thumbnailData = thumbnailData
+        self.showPrinterName = showPrinterName
+    }
+
+    init(from decoder: Decoder) throws {
+        let c = try decoder.container(keyedBy: CodingKeys.self)
+        printerId = try c.decode(String.self, forKey: .printerId)
+        printerName = try c.decode(String.self, forKey: .printerName)
+        fileName = try c.decode(String.self, forKey: .fileName)
+        thumbnailData = try c.decodeIfPresent(Data.self, forKey: .thumbnailData)
+        showPrinterName = try c.decodeIfPresent(Bool.self, forKey: .showPrinterName) ?? false
+    }
+
+    private enum CodingKeys: String, CodingKey {
+        case printerId, printerName, fileName, thumbnailData, showPrinterName
+    }
 
     struct ContentState: Codable, Hashable {
         var state: PrinterStateBadge

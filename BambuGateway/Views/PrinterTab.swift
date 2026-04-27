@@ -75,10 +75,7 @@ struct PrinterTab: View {
     @ViewBuilder
     private var printerSection: some View {
         if viewModel.printers.isEmpty {
-            Text("No printers available")
-                .foregroundStyle(.secondary)
-                .frame(maxWidth: .infinity)
-                .padding(.vertical, 20)
+            emptyPrintersCard
         } else if !viewModel.shouldAutoUseSinglePrinter {
             HStack {
                 Text("Printer")
@@ -106,6 +103,42 @@ struct PrinterTab: View {
             .background(Color.cardBackground)
             .clipShape(RoundedRectangle(cornerRadius: 10))
         }
+    }
+
+    @ViewBuilder
+    private var emptyPrintersCard: some View {
+        let unreachable = viewModel.printersLoadState == .unreachable
+        VStack(spacing: 10) {
+            Image(systemName: unreachable ? "wifi.exclamationmark" : "printer")
+                .font(.system(size: 32))
+                .foregroundStyle(.secondary)
+            Text(unreachable ? "Can't reach the gateway" : "No printers available")
+                .font(.headline)
+            Text(unreachable
+                 ? "Check that the gateway server is running and reachable on your network."
+                 : "The gateway responded but isn't tracking any printers yet.")
+                .font(.caption)
+                .foregroundStyle(.secondary)
+                .multilineTextAlignment(.center)
+                .fixedSize(horizontal: false, vertical: true)
+            Button {
+                Task { await viewModel.refreshAll() }
+            } label: {
+                if viewModel.isLoading {
+                    ProgressView()
+                } else {
+                    Text("Try again")
+                }
+            }
+            .buttonStyle(.bordered)
+            .disabled(viewModel.isLoading || viewModel.isSubmitting)
+            .padding(.top, 2)
+        }
+        .frame(maxWidth: .infinity)
+        .padding(.vertical, 20)
+        .padding(.horizontal, 16)
+        .background(Color.cardBackground)
+        .clipShape(RoundedRectangle(cornerRadius: 10))
     }
 
     // MARK: - Hero Section

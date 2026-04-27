@@ -31,6 +31,7 @@ final class LiveActivityService {
         printerName: String,
         fileName: String,
         thumbnail: Data?,
+        showPrinterName: Bool,
         initialState: PrintActivityAttributes.ContentState
     ) async {
         let enabled = ActivityAuthorizationInfo().areActivitiesEnabled
@@ -52,7 +53,8 @@ final class LiveActivityService {
             printerId: printerId,
             printerName: printerName,
             fileName: fileName,
-            thumbnailData: thumbnail
+            thumbnailData: thumbnail,
+            showPrinterName: showPrinterName
         )
         do {
             let activity = try Activity.request(

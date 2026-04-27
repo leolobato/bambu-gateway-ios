@@ -13,23 +13,24 @@ struct PrintLiveActivity: Widget {
         } dynamicIsland: { context in
             DynamicIsland {
                 DynamicIslandExpandedRegion(.leading) {
-                    thumbnail(data: context.attributes.thumbnailData, size: 36)
+                    thumbnail(data: context.attributes.thumbnailData, size: 56)
                 }
                 DynamicIslandExpandedRegion(.trailing) {
                     Text("\(Int(context.state.progress * 100))%")
-                        .font(.headline.monospacedDigit())
+                        .font(.title2.monospacedDigit())
                 }
                 DynamicIslandExpandedRegion(.center) {
-                    Text(context.attributes.printerName)
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
+                    Text(jobTitle(context: context))
+                        .font(.subheadline.weight(.semibold))
+                        .lineLimit(1)
+                        .truncationMode(.tail)
                 }
                 DynamicIslandExpandedRegion(.bottom) {
                     VStack(alignment: .leading, spacing: 4) {
                         ProgressView(value: context.state.progress)
                         Text(statusLine(context: context))
                             .font(.caption2)
-                            .foregroundStyle(.secondary)
+                            .foregroundStyle(.white.opacity(0.7))
                     }
                 }
             } compactLeading: {
@@ -50,68 +51,92 @@ struct PrintLiveActivity: Widget {
     }
 
     private func lockScreenView(context: ActivityViewContext<PrintActivityAttributes>) -> some View {
-        HStack(alignment: .top, spacing: 12) {
-            thumbnail(data: context.attributes.thumbnailData, size: 56)
+        HStack(alignment: .center, spacing: 14) {
+            thumbnail(data: context.attributes.thumbnailData, size: 84)
             VStack(alignment: .leading, spacing: 6) {
-                HStack {
-                    Text(context.attributes.printerName)
+                HStack(alignment: .firstTextBaseline) {
+                    Text(jobTitle(context: context))
                         .font(.headline)
-                    Spacer()
+                        .lineLimit(2)
+                        .truncationMode(.tail)
+                        .multilineTextAlignment(.leading)
+                        .fixedSize(horizontal: false, vertical: true)
+                    Spacer(minLength: 8)
                     Text("\(Int(context.state.progress * 100))%")
                         .font(.headline.monospacedDigit())
-                }
-                if !context.attributes.fileName.isEmpty {
-                    Text(context.attributes.fileName)
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
-                        .lineLimit(1)
                 }
                 ProgressView(value: context.state.progress)
                     .tint(.white)
                 Text(statusLine(context: context))
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
+                    .font(.caption.monospacedDigit())
+                    .foregroundStyle(.white.opacity(0.7))
+                    .lineLimit(1)
             }
         }
     }
 
+    private func jobTitle(context: ActivityViewContext<PrintActivityAttributes>) -> String {
+        let name = context.attributes.fileName
+        guard !name.isEmpty else { return context.attributes.printerName }
+        let trimmed = (name as NSString).deletingPathExtension
+        return trimmed.isEmpty ? name : trimmed
+    }
+
     @ViewBuilder
     private func thumbnail(data: Data?, size: CGFloat) -> some View {
+        let radius = max(8, size * 0.14)
         if let data, let image = UIImage(data: data) {
             Image(uiImage: image)
                 .resizable()
                 .aspectRatio(contentMode: .fill)
                 .frame(width: size, height: size)
-                .clipShape(RoundedRectangle(cornerRadius: 8))
+                .clipShape(RoundedRectangle(cornerRadius: radius))
+                .overlay(
+                    RoundedRectangle(cornerRadius: radius)
+                        .strokeBorder(Color.white.opacity(0.12), lineWidth: 0.5)
+                )
         } else {
-            RoundedRectangle(cornerRadius: 8)
+            RoundedRectangle(cornerRadius: radius)
                 .fill(Color.white.opacity(0.1))
                 .frame(width: size, height: size)
-                .overlay(Image(systemName: "cube.fill").foregroundStyle(.white.opacity(0.6)))
+                .overlay(
+                    Image(systemName: "cube.fill")
+                        .font(.system(size: size * 0.4))
+                        .foregroundStyle(.white.opacity(0.6))
+                )
         }
     }
 
     private func statusLine(context: ActivityViewContext<PrintActivityAttributes>) -> String {
         let state = context.state
-        if let stage = state.stageName, !stage.isEmpty, state.state == .preparing {
-            return stage
-        }
+        let core: String
         switch state.state {
-        case .paused: return "Paused"
-        case .offline: return "Printer offline"
-        case .error: return "Error"
-        case .finished: return "Complete"
-        case .cancelled: return "Cancelled"
+        case .paused: core = "Paused"
+        case .offline: core = "Printer offline"
+        case .error: core = "Error"
+        case .finished: core = "Complete"
+        case .cancelled: core = "Cancelled"
         default:
-            var parts: [String] = []
-            if state.totalLayers > 0 {
-                parts.append("Layer \(state.currentLayer)/\(state.totalLayers)")
+            if let stage = state.stageName, !stage.isEmpty {
+                if state.remainingMinutes > 0 {
+                    core = "\(stage) · \(formattedRemaining(state.remainingMinutes)) left"
+                } else {
+                    core = stage
+                }
+            } else if state.remainingMinutes > 0 {
+                core = "\(formattedRemaining(state.remainingMinutes)) left"
+            } else {
+                core = ""
             }
-            if state.remainingMinutes > 0 {
-                parts.append("\(formattedRemaining(state.remainingMinutes)) left")
-            }
-            return parts.joined(separator: " · ")
         }
+
+        if context.attributes.showPrinterName {
+            let name = context.attributes.printerName
+            if !name.isEmpty {
+                return core.isEmpty ? name : "\(name) · \(core)"
+            }
+        }
+        return core
     }
 
     private func formattedRemaining(_ minutes: Int) -> String {

@@ -1,7 +1,9 @@
 import Foundation
 import GCodePreview
+import OSLog
 import SceneKit
 import SwiftUI
+import UIKit
 
 @MainActor
 final class AppViewModel: ObservableObject {
@@ -32,8 +34,15 @@ final class AppViewModel: ObservableObject {
         case error
     }
 
+    enum PrintersLoadState {
+        case idle
+        case loaded
+        case unreachable
+    }
+
     @Published var gatewayBaseURL: String
     @Published var printers: [PrinterStatus] = []
+    @Published var printersLoadState: PrintersLoadState = .idle
     @Published var selectedPrinterId: String
 
     @Published var amsTrays: [AMSTray] = []
@@ -223,8 +232,13 @@ final class AppViewModel: ObservableObject {
             let fetchedPrinters = try await gatewayClient().fetchPrinters()
             await handlePolledTransitions(newStatuses: fetchedPrinters)
             printers = fetchedPrinters
+            printersLoadState = .loaded
         } catch {
-            // Silently ignore periodic refresh failures
+            // Silently ignore periodic refresh failures, but surface unreachable
+            // state so the empty UI can show the right message on first load.
+            if printers.isEmpty {
+                printersLoadState = .unreachable
+            }
         }
     }
 
@@ -241,8 +255,12 @@ final class AppViewModel: ObservableObject {
             let fetchedPrinters = try await gatewayClient().fetchPrinters()
             await handlePolledTransitions(newStatuses: fetchedPrinters)
             printers = fetchedPrinters
+            printersLoadState = .loaded
             applyPrinterSelectionAfterRefresh()
         } catch {
+            if printers.isEmpty {
+                printersLoadState = .unreachable
+            }
             setMessage(error.localizedDescription, .error)
             return
         }
@@ -832,12 +850,15 @@ final class AppViewModel: ObservableObject {
         if !printerId.isEmpty {
             let fileName = response.fileName.isEmpty ? (startedContext?.fileName ?? "Print") : response.fileName
             let displayName = printerName(for: printerId)
+            let thumbnail = liveActivityThumbnail()
+            let showPrinterName = printers.count > 1
             Task { [weak self] in
                 await self?.liveActivityService.startActivity(
                     printerId: printerId,
                     printerName: displayName,
                     fileName: fileName,
-                    thumbnail: nil,
+                    thumbnail: thumbnail,
+                    showPrinterName: showPrinterName,
                     initialState: PrintActivityAttributes.ContentState(
                         state: .preparing,
                         stageName: "Starting print",
@@ -876,7 +897,8 @@ final class AppViewModel: ObservableObject {
                     printerId: status.id,
                     printerName: status.name,
                     fileName: status.job?.fileName ?? "",
-                    thumbnail: nil,
+                    thumbnail: liveActivityThumbnail(),
+                    showPrinterName: printers.count > 1,
                     initialState: content
                 )
             }
@@ -927,6 +949,85 @@ final class AppViewModel: ObservableObject {
                 break
             }
         }
+    }
+
+    private static let liveActivityLog = Logger(subsystem: "com.bambugateway.ios", category: "LiveActivityThumbnail")
+
+    /// Live Activities cap total payload (static attributes + content state)
+    /// at ~4 KB. We aggressively shrink so the encoded JPEG fits comfortably
+    /// under that ceiling along with the rest of the attributes.
+    private static let liveActivityThumbnailBudget = 2_500
+
+    private func liveActivityThumbnail() -> Data? {
+        guard let info = parsedInfo else {
+            Self.liveActivityLog.info("liveActivityThumbnail: no parsedInfo")
+            return nil
+        }
+        let plate: PlateInfo?
+        if info.plates.count > 1 {
+            plate = info.plates.first(where: { $0.id == selectedPlateId }) ?? info.plates.first
+        } else {
+            plate = info.plates.first
+        }
+        guard let raw = plate?.thumbnail, !raw.isEmpty else {
+            Self.liveActivityLog.info("liveActivityThumbnail: plate has no thumbnail")
+            return nil
+        }
+        let payload: String
+        if let comma = raw.firstIndex(of: ",") {
+            payload = String(raw[raw.index(after: comma)...])
+        } else {
+            payload = raw
+        }
+        guard let data = Data(base64Encoded: payload) else {
+            Self.liveActivityLog.error("liveActivityThumbnail: base64 decode failed")
+            return nil
+        }
+
+        // Use the original bytes if they already fit — re-encoding only loses
+        // quality. 3MF plate thumbnails are usually small PNGs.
+        if data.count <= Self.liveActivityThumbnailBudget {
+            Self.liveActivityLog.info("liveActivityThumbnail: using original bytes=\(data.count)")
+            return data
+        }
+
+        guard let image = UIImage(data: data) else {
+            Self.liveActivityLog.error("liveActivityThumbnail: UIImage decode failed (\(data.count) bytes)")
+            return nil
+        }
+        Self.liveActivityLog.info("liveActivityThumbnail: original too large (\(data.count) bytes, \(Int(image.size.width))x\(Int(image.size.height))), shrinking")
+
+        let attempts: [(maxDim: CGFloat, quality: CGFloat)] = [
+            (160, 0.6),
+            (128, 0.55),
+            (96, 0.5),
+            (72, 0.45)
+        ]
+        for attempt in attempts {
+            if let jpeg = encodeJPEG(image, maxDimension: attempt.maxDim, quality: attempt.quality),
+               jpeg.count <= Self.liveActivityThumbnailBudget {
+                Self.liveActivityLog.info("liveActivityThumbnail: shrunk maxDim=\(Int(attempt.maxDim)) quality=\(attempt.quality, privacy: .public) bytes=\(jpeg.count)")
+                return jpeg
+            }
+        }
+        Self.liveActivityLog.error("liveActivityThumbnail: could not fit under budget, dropping")
+        return nil
+    }
+
+    private func encodeJPEG(_ image: UIImage, maxDimension: CGFloat, quality: CGFloat) -> Data? {
+        let largest = max(image.size.width, image.size.height)
+        let scale = largest > maxDimension ? maxDimension / largest : 1
+        let target = CGSize(width: image.size.width * scale, height: image.size.height * scale)
+        let format = UIGraphicsImageRendererFormat.default()
+        format.scale = 1
+        format.opaque = true
+        let renderer = UIGraphicsImageRenderer(size: target, format: format)
+        let resized = renderer.image { ctx in
+            UIColor.black.setFill()
+            ctx.fill(CGRect(origin: .zero, size: target))
+            image.draw(in: CGRect(origin: .zero, size: target))
+        }
+        return resized.jpegData(compressionQuality: quality)
     }
 
     private func makeContentState(from status: PrinterStatus) -> PrintActivityAttributes.ContentState {
