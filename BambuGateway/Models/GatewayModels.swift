@@ -353,6 +353,43 @@ struct SliceJobListResponse: Codable {
     let jobs: [SliceJob]
 }
 
+/// View-side projection of `SliceJob.status`. Collapses the `printing`
+/// raw status into `.ready` so the Print tab's slice-jobs list never
+/// duplicates live print state — the Dashboard tab owns that.
+enum SliceJobDisplayStatus: Equatable {
+    case queued
+    case slicing
+    case uploading
+    case ready
+    case failed
+    case cancelled
+
+    init(rawStatus: String) {
+        switch rawStatus {
+        case "queued": self = .queued
+        case "slicing": self = .slicing
+        case "uploading": self = .uploading
+        case "printing", "ready": self = .ready
+        case "failed": self = .failed
+        case "cancelled": self = .cancelled
+        default: self = .queued
+        }
+    }
+
+    var isInFlight: Bool {
+        switch self {
+        case .queued, .slicing, .uploading: return true
+        case .ready, .failed, .cancelled: return false
+        }
+    }
+}
+
+extension SliceJob {
+    var displayStatus: SliceJobDisplayStatus {
+        SliceJobDisplayStatus(rawStatus: status)
+    }
+}
+
 struct GatewayCapabilities: Codable {
     // Decoded via GatewayClient's `convertFromSnakeCase` strategy — do not add
     // explicit `CodingKeys` here. An explicit mapping would shadow the global
