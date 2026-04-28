@@ -72,10 +72,7 @@ struct PrintTab: View {
                 onDone: { viewModel.dismissPrintSuccessModal() }
             )
         }
-        .sheet(item: Binding(
-            get: { selectedSliceJobId.map { SliceJobIdentifier(id: $0) } },
-            set: { selectedSliceJobId = $0?.id }
-        )) { identifier in
+        .sheet(item: $selectedSliceJobId.asIdentifiable) { identifier in
             SliceJobDetailSheet(viewModel: viewModel, jobId: identifier.id)
         }
     }
@@ -859,6 +856,18 @@ private extension UTType {
 
 private struct SliceJobIdentifier: Identifiable, Hashable {
     let id: String
+}
+
+private extension Binding where Value == String? {
+    /// Bridges `String?` state to `.sheet(item:)`, which needs the wrapped
+    /// value to be `Identifiable`. Extracted to a helper so the surrounding
+    /// `body` keeps a small, fast-to-type-check expression.
+    var asIdentifiable: Binding<SliceJobIdentifier?> {
+        Binding<SliceJobIdentifier?>(
+            get: { wrappedValue.map { SliceJobIdentifier(id: $0) } },
+            set: { wrappedValue = $0?.id }
+        )
+    }
 }
 
 extension UIColor {
