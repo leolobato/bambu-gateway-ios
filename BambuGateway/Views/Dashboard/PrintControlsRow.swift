@@ -7,6 +7,7 @@ struct PrintControlsRow: View {
     let onCancel: () async -> Void
 
     @State private var inFlight: ControlAction?
+    @State private var isConfirmingCancel: Bool = false
 
     private enum ControlAction {
         case pause, resume, cancel
@@ -19,13 +20,25 @@ struct PrintControlsRow: View {
                     action: .pause,
                     title: "Pause",
                     systemImage: "pause.fill"
-                ) { await onPause() }
+                ) {
+                    Task {
+                        inFlight = .pause
+                        await onPause()
+                        inFlight = nil
+                    }
+                }
             } else {
                 controlButton(
                     action: .resume,
                     title: "Resume",
                     systemImage: "play.fill"
-                ) { await onResume() }
+                ) {
+                    Task {
+                        inFlight = .resume
+                        await onResume()
+                        inFlight = nil
+                    }
+                }
             }
 
             controlButton(
@@ -34,9 +47,27 @@ struct PrintControlsRow: View {
                 systemImage: "stop.fill",
                 role: .destructive,
                 tint: .red
-            ) { await onCancel() }
+            ) {
+                isConfirmingCancel = true
+            }
         }
         .font(.subheadline)
+        .confirmationDialog(
+            "Cancel this print?",
+            isPresented: $isConfirmingCancel,
+            titleVisibility: .visible
+        ) {
+            Button("Cancel print", role: .destructive) {
+                Task {
+                    inFlight = .cancel
+                    await onCancel()
+                    inFlight = nil
+                }
+            }
+            Button("Keep printing", role: .cancel) {}
+        } message: {
+            Text("This will stop the print on the printer.")
+        }
     }
 
     @ViewBuilder
@@ -46,17 +77,11 @@ struct PrintControlsRow: View {
         systemImage: String,
         role: ButtonRole? = nil,
         tint: Color? = nil,
-        handler: @escaping () async -> Void
+        onTap: @escaping () -> Void
     ) -> some View {
         let isThisInFlight = inFlight == action
 
-        Button(role: role) {
-            Task {
-                inFlight = action
-                await handler()
-                inFlight = nil
-            }
-        } label: {
+        Button(role: role, action: onTap) {
             HStack(spacing: 6) {
                 if isThisInFlight {
                     ProgressView()
