@@ -84,6 +84,12 @@ final class AppViewModel: ObservableObject {
     @Published var slicingPhase: String?
     @Published var lastPrintEstimate: PrintEstimate?
     @Published var lastPrintPrinterName: String?
+    @Published private(set) var sliceJobs: [SliceJob] = []
+    @Published private(set) var isLoadingSliceJobs: Bool = false
+    /// Job ids whose row-level mutation (cancel / delete / print) is in flight.
+    @Published private(set) var sliceJobMutationsInFlight: Set<String> = []
+    @Published private(set) var clearFailedInFlight: Bool = false
+    @Published private(set) var clearCompletedInFlight: Bool = false
     /// Drives the one-shot success sheet shown after a direct print.
     /// Set together with `lastPrintEstimate` and `lastPrintPrinterName` in `submitPrint`;
     /// cleared together by `dismissPrintSuccessModal()`.
@@ -1132,6 +1138,118 @@ final class AppViewModel: ObservableObject {
         uploadProgress = nil
         activeUploadId = nil
         isCancellingUpload = false
+    }
+
+    // MARK: - Slice jobs
+
+    /// Long-running polling loop driven by SwiftUI's `.task` modifier.
+    /// Returns when the surrounding Task is cancelled (i.e. the section view
+    /// disappears or the gateway is unconfigured).
+    func runSliceJobsPolling() async {
+        guard isGatewayConfigured else { return }
+        await refreshSliceJobs(isInitialLoad: true)
+        while !Task.isCancelled {
+            let hasInFlight = sliceJobs.contains { !$0.isTerminal }
+            let delaySeconds: UInt64 = hasInFlight ? 2 : 30
+            do {
+                try await Task.sleep(nanoseconds: delaySeconds * 1_000_000_000)
+            } catch {
+                return
+            }
+            guard !Task.isCancelled else { return }
+            await refreshSliceJobs(isInitialLoad: false)
+        }
+    }
+
+    func refreshSliceJobs(isInitialLoad: Bool = false) async {
+        guard isGatewayConfigured else {
+            sliceJobs = []
+            isLoadingSliceJobs = false
+            return
+        }
+        if isInitialLoad && sliceJobs.isEmpty {
+            isLoadingSliceJobs = true
+        }
+        defer { isLoadingSliceJobs = false }
+        do {
+            let jobs = try await gatewayClient().listSliceJobs()
+            sliceJobs = jobs.sorted { $0.createdAt > $1.createdAt }
+        } catch {
+            // Transient errors are silent; the next tick retries. Surface
+            // nothing through `message` — the section view is auxiliary.
+        }
+    }
+
+    func cancelSliceJob(jobId: String) async {
+        guard !sliceJobMutationsInFlight.contains(jobId) else { return }
+        sliceJobMutationsInFlight.insert(jobId)
+        defer { sliceJobMutationsInFlight.remove(jobId) }
+        do {
+            try await gatewayClient().cancelSliceJob(jobId: jobId)
+            await refreshSliceJobs()
+        } catch {
+            setMessage("Couldn't cancel job: \(error.localizedDescription)", .error)
+        }
+    }
+
+    func deleteSliceJob(jobId: String) async {
+        guard !sliceJobMutationsInFlight.contains(jobId) else { return }
+        sliceJobMutationsInFlight.insert(jobId)
+        defer { sliceJobMutationsInFlight.remove(jobId) }
+        do {
+            try await gatewayClient().deleteSliceJob(jobId: jobId)
+            sliceJobs.removeAll { $0.jobId == jobId }
+        } catch {
+            setMessage("Couldn't delete job: \(error.localizedDescription)", .error)
+        }
+    }
+
+    func clearSliceJobs(failedOnly: Bool) async {
+        if failedOnly {
+            guard !clearFailedInFlight else { return }
+            clearFailedInFlight = true
+        } else {
+            guard !clearCompletedInFlight else { return }
+            clearCompletedInFlight = true
+        }
+        defer {
+            if failedOnly {
+                clearFailedInFlight = false
+            } else {
+                clearCompletedInFlight = false
+            }
+        }
+        do {
+            _ = try await gatewayClient().clearSliceJobs(
+                statuses: failedOnly ? ["failed"] : nil
+            )
+            await refreshSliceJobs()
+        } catch {
+            setMessage("Couldn't clear jobs: \(error.localizedDescription)", .error)
+        }
+    }
+
+    /// Submit a print for a slice job that already has output. Always
+    /// targets the dashboard's currently selected printer; no-ops otherwise.
+    func printSliceJob(jobId: String) async {
+        guard !sliceJobMutationsInFlight.contains(jobId) else { return }
+        let printerId = selectedPrinterId
+        guard !printerId.isEmpty else {
+            setMessage("Select a printer on the Dashboard before reprinting.", .warning)
+            return
+        }
+        sliceJobMutationsInFlight.insert(jobId)
+        defer { sliceJobMutationsInFlight.remove(jobId) }
+        do {
+            let response = try await gatewayClient().printFromJob(
+                jobId: jobId,
+                printerId: printerId
+            )
+            setMessage("Print started: \(response.fileName)", .success)
+            await refreshSliceJobs()
+        } catch {
+            setMessage("Couldn't start print: \(error.localizedDescription)", .error)
+        }
     }
 
     func cancelUpload() async {
