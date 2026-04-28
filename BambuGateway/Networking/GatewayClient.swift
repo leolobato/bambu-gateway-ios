@@ -219,11 +219,11 @@ struct GatewayClient {
             throw mapHTTPError(httpResponse, data: data)
         }
 
-        let response = try decode(SliceJobStatusResponse.self, from: data)
+        let response = try decode(SliceJob.self, from: data)
         return response.jobId
     }
 
-    func fetchSliceJob(jobId: String) async throws -> SliceJobStatusResponse {
+    func fetchSliceJob(jobId: String) async throws -> SliceJob {
         try await get(path: "/api/slice-jobs/\(jobId)")
     }
 

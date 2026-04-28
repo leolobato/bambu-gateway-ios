@@ -318,10 +318,11 @@ struct PreviewResult {
     let estimate: PrintEstimate?
 }
 
-struct SliceJobStatusResponse: Codable {
+struct SliceJob: Codable, Identifiable, Equatable {
     // Decoded via GatewayClient's `convertFromSnakeCase` strategy — do not add
     // explicit `CodingKeys` here. An explicit mapping would shadow the global
-    // strategy and fail to decode `job_id`, `printer_id`, and `auto_print`.
+    // strategy and fail to decode `job_id`, `printer_id`, `auto_print`,
+    // `created_at`, `updated_at`, `output_size`, `has_thumbnail`.
     let jobId: String
     let status: String
     let progress: Int
@@ -330,6 +331,13 @@ struct SliceJobStatusResponse: Codable {
     let printerId: String?
     let autoPrint: Bool
     let error: String?
+    let createdAt: String
+    let updatedAt: String
+    let outputSize: Int?
+    let hasThumbnail: Bool
+    let estimate: PrintEstimate?
+
+    var id: String { jobId }
 
     var isTerminal: Bool {
         switch status {
@@ -339,6 +347,10 @@ struct SliceJobStatusResponse: Codable {
             return false
         }
     }
+}
+
+struct SliceJobListResponse: Codable {
+    let jobs: [SliceJob]
 }
 
 struct GatewayCapabilities: Codable {

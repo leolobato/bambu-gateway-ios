@@ -717,7 +717,7 @@ final class AppViewModel: ObservableObject {
         let client = gatewayClient()
 
         // First fetch — if the job no longer exists on the gateway, drop the memento.
-        let initial: SliceJobStatusResponse
+        let initial: SliceJob
         do {
             initial = try await client.fetchSliceJob(jobId: memento.jobId)
         } catch {

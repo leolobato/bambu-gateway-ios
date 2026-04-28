@@ -1,6 +1,6 @@
 import Foundation
 
-struct PrintEstimate: Decodable, Equatable {
+struct PrintEstimate: Codable, Equatable {
     let totalFilamentMillimeters: Double?
     let totalFilamentGrams: Double?
     let modelFilamentMillimeters: Double?
