@@ -6,6 +6,7 @@ struct PrintTab: View {
 
     @State private var isShowingFileImporter = false
     @State private var isShowingSettings = false
+    @State private var selectedSliceJobId: String?
 
     var body: some View {
         NavigationStack {
@@ -71,6 +72,12 @@ struct PrintTab: View {
                 onDone: { viewModel.dismissPrintSuccessModal() }
             )
         }
+        .sheet(item: Binding(
+            get: { selectedSliceJobId.map { SliceJobIdentifier(id: $0) } },
+            set: { selectedSliceJobId = $0?.id }
+        )) { identifier in
+            SliceJobDetailSheet(viewModel: viewModel, jobId: identifier.id)
+        }
     }
 
     // MARK: - File area
@@ -83,6 +90,10 @@ struct PrintTab: View {
             fileHeaderCard(file: file)
         } else {
             importTilesRow
+            SliceJobsSection(
+                viewModel: viewModel,
+                selectedJobId: $selectedSliceJobId
+            )
         }
     }
 
@@ -844,6 +855,10 @@ private struct PlateThumbnailView: View {
 
 private extension UTType {
     static let threeMF = UTType(importedAs: "org.3mfproject.3mf")
+}
+
+private struct SliceJobIdentifier: Identifiable, Hashable {
+    let id: String
 }
 
 extension UIColor {
