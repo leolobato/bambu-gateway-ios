@@ -206,7 +206,12 @@ private struct SliceJobRow: View {
     }
 
     private var metadataLine: String {
-        let printer = job.printerId?.isEmpty == false ? job.printerId! : "—"
+        let printer: String
+        if let id = job.printerId, !id.isEmpty {
+            printer = id
+        } else {
+            printer = "—"
+        }
         let when = SliceJobRelativeTime.format(job.createdAt)
         return "\(printer) · \(when)"
     }
