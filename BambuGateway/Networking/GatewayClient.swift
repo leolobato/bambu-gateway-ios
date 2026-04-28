@@ -234,6 +234,45 @@ struct GatewayClient {
         )
     }
 
+    /// Fetch every slice job the gateway currently knows about, newest first.
+    func listSliceJobs() async throws -> [SliceJob] {
+        let response: SliceJobListResponse = try await get(path: "/api/slice-jobs")
+        return response.jobs
+    }
+
+    /// Delete a single slice job and its sliced 3MF on disk. 204 No Content.
+    func deleteSliceJob(jobId: String) async throws {
+        _ = try await request(
+            path: "/api/slice-jobs/\(jobId)",
+            method: "DELETE"
+        )
+    }
+
+    /// Clear slice jobs in bulk. Pass nil to clear every terminal job;
+    /// pass a list of statuses (e.g. `["failed"]`) to clear only those.
+    /// Returns the jobs that were removed.
+    @discardableResult
+    func clearSliceJobs(statuses: [String]?) async throws -> [SliceJob] {
+        struct ClearRequest: Encodable {
+            let statuses: [String]?
+        }
+        let body = try JSONEncoder().encode(ClearRequest(statuses: statuses))
+        let (data, _) = try await request(
+            path: "/api/slice-jobs/clear",
+            method: "POST",
+            body: body,
+            contentType: "application/json"
+        )
+        let response: SliceJobListResponse = try decode(SliceJobListResponse.self, from: data)
+        return response.jobs
+    }
+
+    /// URL of the slice-job thumbnail PNG for use with `AsyncImage`.
+    /// Returns nil when the gateway base URL is not yet configured or invalid.
+    func sliceJobThumbnailURL(jobId: String) -> URL? {
+        try? resolveURL(path: "/api/slice-jobs/\(jobId)/thumbnail")
+    }
+
     /// Download the sliced 3MF for a job that has reached `ready`/`printing`.
     func fetchSliceJobOutput(jobId: String, fallbackFileName: String) async throws -> PreviewResult {
         let (data, response) = try await request(
