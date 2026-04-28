@@ -1229,6 +1229,10 @@ final class AppViewModel: ObservableObject {
         }
     }
 
+    func sliceJobThumbnailURL(for jobId: String) -> URL? {
+        gatewayClient().sliceJobThumbnailURL(jobId: jobId)
+    }
+
     /// Submit a print for a slice job that already has output. Always
     /// targets the dashboard's currently selected printer; no-ops otherwise.
     func printSliceJob(jobId: String) async {

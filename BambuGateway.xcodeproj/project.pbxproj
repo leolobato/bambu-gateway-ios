@@ -13,6 +13,7 @@
 		1608695E345525305EF5A5C4 /* MultipartFormDataTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7EB13728279F3D3F30A9151 /* MultipartFormDataTests.swift */; };
 		160AB3CC8EC474155F80A170 /* ShareViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 68FD23DF97AF009395F22F1E /* ShareViewController.swift */; };
 		162927F10FBBE5F4B42564AA /* ToastCenter.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB2F9E774CDDFF1ABAEFCB11 /* ToastCenter.swift */; };
+		1B880450456C628B926E044A /* SliceJobsSection.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3CA2C79ED9B2FE1A5FCBF4EB /* SliceJobsSection.swift */; };
 		213CC43D8270AE62370EF492 /* DashboardColors.swift in Sources */ = {isa = PBXBuildFile; fileRef = A3234ED4CB1DEBAF20C20912 /* DashboardColors.swift */; };
 		2291CCBDE336DA4AED20DE24 /* PrintLiveActivity.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE9094B53DAFDF244C615D34 /* PrintLiveActivity.swift */; };
 		2B35F0A7CBA771FDD9C87DE0 /* CameraFeedView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 60EEE74AFB6EC29279BA25F4 /* CameraFeedView.swift */; };
@@ -120,6 +121,7 @@
 		32780EC48A776B886BDB8B31 /* PrintControlsRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrintControlsRow.swift; sourceTree = "<group>"; };
 		36C28A77CC578F19C3B443A8 /* AppSettingsStoreCameraTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppSettingsStoreCameraTests.swift; sourceTree = "<group>"; };
 		3B46FA0BBEC43DF398153A59 /* MakerWorldBrowserView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MakerWorldBrowserView.swift; sourceTree = "<group>"; };
+		3CA2C79ED9B2FE1A5FCBF4EB /* SliceJobsSection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SliceJobsSection.swift; sourceTree = "<group>"; };
 		450020B566A6C67BC3D57DE2 /* SpeedPickerSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpeedPickerSheet.swift; sourceTree = "<group>"; };
 		47F98F122F17587AC06D257D /* GatewayModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GatewayModels.swift; sourceTree = "<group>"; };
 		596B45CE6BCC0F808017F737 /* NotificationService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationService.swift; sourceTree = "<group>"; };
@@ -331,6 +333,7 @@
 				000CC4A4B6BBD8DE7A68CF34 /* PrintSuccessModal.swift */,
 				25AA0EB97886F4C8EB4AC476 /* PrintTab.swift */,
 				97E5B232DEE3A55BBBF52FD7 /* SettingsView.swift */,
+				3CA2C79ED9B2FE1A5FCBF4EB /* SliceJobsSection.swift */,
 				B52D3475F8383A6C96754E03 /* ToastOverlay.swift */,
 				BFCF654FB2646286A9DBE87D /* Camera */,
 				CBADEE1334EBDB125AD56B65 /* Dashboard */,
@@ -606,6 +609,7 @@
 				4C1A529AD33EE2A149CD9C0E /* PrinterTab.swift in Sources */,
 				91FB314780FCE460E7C2F783 /* PushService.swift in Sources */,
 				DAA6A261BF169E58D43A32F6 /* SettingsView.swift in Sources */,
+				1B880450456C628B926E044A /* SliceJobsSection.swift in Sources */,
 				9838CAA375A45D38455D0394 /* SpeedPickerSheet.swift in Sources */,
 				928BE6B468C5B40955A3B029 /* StatusRow.swift in Sources */,
 				518938796FA05AE905D80267 /* ThreeMFReader.swift in Sources */,
