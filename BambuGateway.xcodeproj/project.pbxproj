@@ -25,6 +25,7 @@
 		5096C194622EACD881757599 /* PrintProgressCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0CACA553E0D70F489079E05 /* PrintProgressCard.swift */; };
 		518938796FA05AE905D80267 /* ThreeMFReader.swift in Sources */ = {isa = PBXBuildFile; fileRef = FFEEE185FB42B56E8BD094C5 /* ThreeMFReader.swift */; };
 		531A4B62990B0E7E59F76C06 /* ToastOverlay.swift in Sources */ = {isa = PBXBuildFile; fileRef = B52D3475F8383A6C96754E03 /* ToastOverlay.swift */; };
+		553FFDB660066B5E9D1B5FB6 /* SliceJobDetailSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = 55B3439E1A118869570FD3A9 /* SliceJobDetailSheet.swift */; };
 		5862EC8951FC76F6FA97B697 /* PrintControlsRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 32780EC48A776B886BDB8B31 /* PrintControlsRow.swift */; };
 		5B1DAF338F92BE18208DB698 /* MakerWorldBrowserView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3B46FA0BBEC43DF398153A59 /* MakerWorldBrowserView.swift */; };
 		5B72FB38118F24AE0B84611B /* PrintEstimationFormattingTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7FFB4F3826F66CCF3B3483F4 /* PrintEstimationFormattingTests.swift */; };
@@ -124,6 +125,7 @@
 		3CA2C79ED9B2FE1A5FCBF4EB /* SliceJobsSection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SliceJobsSection.swift; sourceTree = "<group>"; };
 		450020B566A6C67BC3D57DE2 /* SpeedPickerSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpeedPickerSheet.swift; sourceTree = "<group>"; };
 		47F98F122F17587AC06D257D /* GatewayModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GatewayModels.swift; sourceTree = "<group>"; };
+		55B3439E1A118869570FD3A9 /* SliceJobDetailSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SliceJobDetailSheet.swift; sourceTree = "<group>"; };
 		596B45CE6BCC0F808017F737 /* NotificationService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationService.swift; sourceTree = "<group>"; };
 		5BEBF1713CA6AF40B8331BFA /* BambuGatewayTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BambuGatewayTests.swift; sourceTree = "<group>"; };
 		60EEE74AFB6EC29279BA25F4 /* CameraFeedView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraFeedView.swift; sourceTree = "<group>"; };
@@ -333,6 +335,7 @@
 				000CC4A4B6BBD8DE7A68CF34 /* PrintSuccessModal.swift */,
 				25AA0EB97886F4C8EB4AC476 /* PrintTab.swift */,
 				97E5B232DEE3A55BBBF52FD7 /* SettingsView.swift */,
+				55B3439E1A118869570FD3A9 /* SliceJobDetailSheet.swift */,
 				3CA2C79ED9B2FE1A5FCBF4EB /* SliceJobsSection.swift */,
 				B52D3475F8383A6C96754E03 /* ToastOverlay.swift */,
 				BFCF654FB2646286A9DBE87D /* Camera */,
@@ -609,6 +612,7 @@
 				4C1A529AD33EE2A149CD9C0E /* PrinterTab.swift in Sources */,
 				91FB314780FCE460E7C2F783 /* PushService.swift in Sources */,
 				DAA6A261BF169E58D43A32F6 /* SettingsView.swift in Sources */,
+				553FFDB660066B5E9D1B5FB6 /* SliceJobDetailSheet.swift in Sources */,
 				1B880450456C628B926E044A /* SliceJobsSection.swift in Sources */,
 				9838CAA375A45D38455D0394 /* SpeedPickerSheet.swift in Sources */,
 				928BE6B468C5B40955A3B029 /* StatusRow.swift in Sources */,
