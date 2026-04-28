@@ -1233,6 +1233,14 @@ final class AppViewModel: ObservableObject {
         gatewayClient().sliceJobThumbnailURL(jobId: jobId)
     }
 
+    /// Friendly printer name for a slice-job row; falls back to the raw id
+    /// (or "—" if the job has no printer recorded) when the printer is no
+    /// longer in the dashboard's list.
+    func displayPrinterName(forPrinterId id: String?) -> String {
+        guard let id, !id.isEmpty else { return "—" }
+        return printers.first(where: { $0.id == id })?.name ?? id
+    }
+
     /// Submit a print for a slice job that already has output. Always
     /// targets the dashboard's currently selected printer; no-ops otherwise.
     func printSliceJob(jobId: String) async {

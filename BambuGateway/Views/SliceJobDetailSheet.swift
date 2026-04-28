@@ -113,13 +113,8 @@ struct SliceJobDetailSheet: View {
 
     private func metadataBlock(for job: SliceJob) -> some View {
         VStack(alignment: .leading, spacing: 8) {
-            let printerLabel: String = {
-                if let id = job.printerId, !id.isEmpty {
-                    return id
-                }
-                return "—"
-            }()
-            Label(printerLabel, systemImage: "printer.fill")
+            Label(viewModel.displayPrinterName(forPrinterId: job.printerId),
+                  systemImage: "printer.fill")
                 .font(.subheadline)
                 .foregroundStyle(.secondary)
 
@@ -151,6 +146,7 @@ struct SliceJobDetailSheet: View {
 
         VStack(spacing: 8) {
             if canPrint {
+                let printDisabled = mutationInFlight || viewModel.selectedPrinterId.isEmpty
                 Button {
                     Task { await viewModel.printSliceJob(jobId: job.jobId) }
                 } label: {
@@ -158,11 +154,12 @@ struct SliceJobDetailSheet: View {
                                 systemImage: "printer.fill",
                                 inFlight: mutationInFlight,
                                 tintOnLight: true)
+                        .background(Color.accentBlue)
+                        .foregroundStyle(.white)
+                        .clipShape(RoundedRectangle(cornerRadius: 12))
+                        .opacity(printDisabled ? 0.5 : 1)
                 }
-                .disabled(mutationInFlight || viewModel.selectedPrinterId.isEmpty)
-                .background(Color.accentBlue.opacity(viewModel.selectedPrinterId.isEmpty ? 0.4 : 1))
-                .foregroundStyle(.white)
-                .clipShape(RoundedRectangle(cornerRadius: 12))
+                .disabled(printDisabled)
             }
 
             if canCancel {

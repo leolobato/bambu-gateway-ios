@@ -206,12 +206,7 @@ private struct SliceJobRow: View {
     }
 
     private var metadataLine: String {
-        let printer: String
-        if let id = job.printerId, !id.isEmpty {
-            printer = id
-        } else {
-            printer = "—"
-        }
+        let printer = viewModel.displayPrinterName(forPrinterId: job.printerId)
         let when = SliceJobRelativeTime.format(job.createdAt)
         return "\(printer) · \(when)"
     }
