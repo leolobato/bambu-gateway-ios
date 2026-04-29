@@ -528,14 +528,26 @@ struct GatewayClient {
         guard let header = response.value(forHTTPHeaderField: "Content-Disposition") else {
             return nil
         }
-        // Parse filename="value" from Content-Disposition header
-        let pattern = "filename=\"([^\"]+)\""
+        // Prefer the RFC 5987 `filename*=UTF-8''<percent-encoded>` form so
+        // non-ASCII names (e.g. `小号-多色一体打印版.3mf`) survive — the
+        // legacy `filename="..."` field is ASCII-only and arrives with the
+        // unrepresentable characters replaced by `_`.
+        if let extended = matchFirstGroup(
+            in: header,
+            pattern: #"filename\*=(?:UTF-8|utf-8)''([^;\s]+)"#
+        ), let decoded = extended.removingPercentEncoding {
+            return decoded
+        }
+        return matchFirstGroup(in: header, pattern: #"filename="([^"]+)""#)
+    }
+
+    private func matchFirstGroup(in source: String, pattern: String) -> String? {
         guard let regex = try? NSRegularExpression(pattern: pattern),
-              let match = regex.firstMatch(in: header, range: NSRange(header.startIndex..., in: header)),
-              let range = Range(match.range(at: 1), in: header) else {
+              let match = regex.firstMatch(in: source, range: NSRange(source.startIndex..., in: source)),
+              let range = Range(match.range(at: 1), in: source) else {
             return nil
         }
-        return String(header[range])
+        return String(source[range])
     }
 
     private func decode<T: Decodable>(_ type: T.Type, from data: Data) throws -> T {
