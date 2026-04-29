@@ -547,7 +547,7 @@ final class AppViewModel: ObservableObject {
     }
 
     /// Poll a job until it leaves the queued/slicing/uploading states.
-    /// Returns the job id on `ready`/`printing`; throws on `failed` or `cancelled`.
+    /// Returns the job id on `ready`; throws on `failed` or `cancelled`.
     private func pollUntilReady(
         jobId: String,
         client: GatewayClient
@@ -569,9 +569,6 @@ final class AppViewModel: ObservableObject {
                 case "cancelled":
                     clearPendingSliceJob()
                     throw URLError(.cancelled)
-                case "printing":
-                    // Shouldn't happen with auto_print=false, but treat as success.
-                    return jobId
                 default:
                     clearPendingSliceJob()
                     throw GatewayClientError.serverError(
@@ -739,9 +736,6 @@ final class AppViewModel: ObservableObject {
                 clearPendingSliceJob()
                 return
             case "cancelled":
-                clearPendingSliceJob()
-                return
-            case "printing":
                 clearPendingSliceJob()
                 return
             case "ready":

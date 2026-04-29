@@ -109,16 +109,18 @@ struct SliceJobDetailSheet: View {
                 .lineLimit(2)
                 .truncationMode(.middle)
 
-            let style = SliceJobBadgeStyle.style(for: job.displayStatus)
-            Text(SliceJobBadgeStyle.label(for: job))
-                .font(.caption)
-                .fontWeight(.semibold)
-                .padding(.horizontal, 10)
-                .padding(.vertical, 4)
-                .background(style.background)
-                .foregroundStyle(style.foreground)
-                .clipShape(Capsule())
-                .strikethrough(job.displayStatus == .cancelled)
+            if job.displayStatus != .ready {
+                let style = SliceJobBadgeStyle.style(for: job.displayStatus)
+                Text(SliceJobBadgeStyle.label(for: job))
+                    .font(.caption)
+                    .fontWeight(.semibold)
+                    .padding(.horizontal, 10)
+                    .padding(.vertical, 4)
+                    .background(style.background)
+                    .foregroundStyle(style.foreground)
+                    .clipShape(Capsule())
+                    .strikethrough(job.displayStatus == .cancelled)
+            }
         }
     }
 

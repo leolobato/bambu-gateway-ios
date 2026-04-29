@@ -133,7 +133,9 @@ private struct SliceJobRow: View {
                     thumbnail
                     title
                     Spacer(minLength: 8)
-                    statusPill
+                    if job.displayStatus != .ready {
+                        statusPill
+                    }
                 }
                 if job.displayStatus.isInFlight {
                     ProgressView(value: progressValue, total: 100)

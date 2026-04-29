@@ -322,7 +322,7 @@ struct SliceJob: Codable, Identifiable, Equatable {
     // Decoded via GatewayClient's `convertFromSnakeCase` strategy — do not add
     // explicit `CodingKeys` here. An explicit mapping would shadow the global
     // strategy and fail to decode `job_id`, `printer_id`, `auto_print`,
-    // `created_at`, `updated_at`, `output_size`, `has_thumbnail`.
+    // `created_at`, `updated_at`, `output_size`, `has_thumbnail`, `printed`.
     let jobId: String
     let status: String
     let progress: Int
@@ -336,12 +336,19 @@ struct SliceJob: Codable, Identifiable, Equatable {
     let outputSize: Int?
     let hasThumbnail: Bool
     let estimate: PrintEstimate?
+    /// Optional so older gateway responses (without the field) still decode.
+    /// True once the gateway has handed the sliced file to the printer —
+    /// `status` itself collapses to `ready` whether the user still needs
+    /// to start the print or it's already running.
+    let printed: Bool?
 
     var id: String { jobId }
 
+    var isPrinted: Bool { printed == true }
+
     var isTerminal: Bool {
         switch status {
-        case "ready", "printing", "failed", "cancelled":
+        case "ready", "failed", "cancelled":
             return true
         default:
             return false
@@ -353,9 +360,9 @@ struct SliceJobListResponse: Codable {
     let jobs: [SliceJob]
 }
 
-/// View-side projection of `SliceJob.status`. Collapses the `printing`
-/// raw status into `.ready` so the Print tab's slice-jobs list never
-/// duplicates live print state — the Dashboard tab owns that.
+/// View-side projection of `SliceJob.status`. The legacy `printing` raw
+/// status is treated as `.ready` for backward compatibility with cached
+/// responses or older gateways; current servers never emit it.
 enum SliceJobDisplayStatus: Equatable {
     case queued
     case slicing
@@ -369,7 +376,7 @@ enum SliceJobDisplayStatus: Equatable {
         case "queued": self = .queued
         case "slicing": self = .slicing
         case "uploading": self = .uploading
-        case "printing", "ready": self = .ready
+        case "ready", "printing": self = .ready
         case "failed": self = .failed
         case "cancelled": self = .cancelled
         default: self = .queued

@@ -121,7 +121,7 @@ final class SliceJobDecodingTests: XCTestCase {
     }
 
     func test_isTerminal_classifiesStatuses() {
-        let terminalStatuses = ["ready", "printing", "failed", "cancelled"]
+        let terminalStatuses = ["ready", "failed", "cancelled"]
         let liveStatuses = ["queued", "slicing", "uploading"]
         for raw in terminalStatuses {
             XCTAssertTrue(makeJob(status: raw).isTerminal, "expected \(raw) to be terminal")
@@ -129,6 +129,55 @@ final class SliceJobDecodingTests: XCTestCase {
         for raw in liveStatuses {
             XCTAssertFalse(makeJob(status: raw).isTerminal, "expected \(raw) to be non-terminal")
         }
+    }
+
+    func test_decodes_printedFlag_whenPresent() throws {
+        let json = """
+        {
+          "job_id": "p1",
+          "status": "ready",
+          "progress": 100,
+          "phase": null,
+          "filename": "x.3mf",
+          "printer_id": "P1S-001",
+          "auto_print": true,
+          "error": null,
+          "created_at": "2026-04-28T15:30:00Z",
+          "updated_at": "2026-04-28T15:31:00Z",
+          "output_size": 100,
+          "has_thumbnail": false,
+          "estimate": null,
+          "printed": true
+        }
+        """
+        let job = try decode(json)
+        XCTAssertTrue(job.isPrinted)
+        XCTAssertEqual(job.printed, true)
+    }
+
+    func test_decodes_jobWithoutPrintedField_defaultsIsPrintedFalse() throws {
+        // Older gateways won't include `printed`; the field must remain
+        // optional so decoding doesn't fail.
+        let json = """
+        {
+          "job_id": "old",
+          "status": "ready",
+          "progress": 100,
+          "phase": null,
+          "filename": "x.3mf",
+          "printer_id": null,
+          "auto_print": false,
+          "error": null,
+          "created_at": "2026-04-28T15:30:00Z",
+          "updated_at": "2026-04-28T15:31:00Z",
+          "output_size": 100,
+          "has_thumbnail": false,
+          "estimate": null
+        }
+        """
+        let job = try decode(json)
+        XCTAssertNil(job.printed)
+        XCTAssertFalse(job.isPrinted)
     }
 
     private func makeJob(status: String) -> SliceJob {
@@ -145,7 +194,8 @@ final class SliceJobDecodingTests: XCTestCase {
             updatedAt: "2026-04-28T15:30:00Z",
             outputSize: nil,
             hasThumbnail: false,
-            estimate: nil
+            estimate: nil,
+            printed: nil
         )
     }
 }

@@ -289,7 +289,7 @@ struct GatewayClient {
         return (data, fileName)
     }
 
-    /// Download the sliced 3MF for a job that has reached `ready`/`printing`.
+    /// Download the sliced 3MF for a job that has reached `ready`.
     func fetchSliceJobOutput(jobId: String, fallbackFileName: String) async throws -> PreviewResult {
         let (data, response) = try await request(
             path: "/api/slice-jobs/\(jobId)/output",
