@@ -57,6 +57,10 @@ final class BambuTCPJPEGFeed: CameraFeed {
     private func openConnection() {
         stateContinuation.yield(.connecting)
         hasReceivedFirstFrame = false
+        // Clear framing state so a partial frame from a prior connection
+        // doesn't desync the new stream.
+        buffer = Data()
+        expectedJPEGLength = nil
 
         let tls = NWProtocolTLS.Options()
         sec_protocol_options_set_verify_block(

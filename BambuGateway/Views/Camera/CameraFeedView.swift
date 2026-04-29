@@ -7,6 +7,7 @@ struct CameraFeedView: View {
     @StateObject private var controller: CameraFeedController
     @State private var fullscreenPresented = false
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
+    @Environment(\.scenePhase) private var scenePhase
 
     /// Build a feed view. The `feedBuilder` is invoked once when the view is first created.
     /// To force a new feed (e.g. printer switch), give the parent view a new `.id(...)`.
@@ -27,6 +28,19 @@ struct CameraFeedView: View {
                 frameArea
                     .onAppear { controller.start() }
                     .onDisappear { controller.stop() }
+                    .onChange(of: scenePhase) { _, newPhase in
+                        // SwiftUI doesn't fire .onDisappear when the app
+                        // backgrounds, so the feed keeps a live socket /
+                        // VLC player that iOS then tears down on suspension.
+                        // Cycle the controller explicitly so it reconnects
+                        // on resume instead of staying wedged on a dead
+                        // connection until the user force-quits.
+                        switch newPhase {
+                        case .active: controller.start()
+                        case .background: controller.stop()
+                        default: break
+                        }
+                    }
             }
         }
         .background(Color(.secondarySystemBackground))
