@@ -91,6 +91,7 @@ struct PrintTab: View {
                 viewModel: viewModel,
                 selectedJobId: $selectedSliceJobId
             )
+            .padding(.top, 12)
         }
     }
 

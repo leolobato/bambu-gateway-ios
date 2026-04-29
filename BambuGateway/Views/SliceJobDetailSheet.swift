@@ -6,6 +6,16 @@ struct SliceJobDetailSheet: View {
     @Environment(\.dismiss) private var dismiss
     @State private var showDeleteConfirm = false
     @State private var sliceAgainError: String?
+    /// Which action button is currently awaiting completion. Drives both the
+    /// per-button spinner (only the tapped one shows it) and the
+    /// global-disable on every button while any action is mid-flight.
+    @State private var activeAction: ActionKind?
+
+    private enum ActionKind {
+        case print
+        case sliceAgain
+        case cancel
+    }
 
     private var job: SliceJob? {
         viewModel.sliceJobs.first(where: { $0.jobId == jobId })
@@ -153,7 +163,8 @@ struct SliceJobDetailSheet: View {
 
     @ViewBuilder
     private func actions(for job: SliceJob) -> some View {
-        let mutationInFlight = viewModel.sliceJobMutationsInFlight.contains(job.jobId)
+        let mutationInFlight = activeAction != nil
+            || viewModel.sliceJobMutationsInFlight.contains(job.jobId)
         let canPrint = job.displayStatus == .ready && (job.outputSize ?? 0) > 0
         let canCancel = !job.isTerminal
         let canSliceAgain = job.isTerminal
@@ -162,11 +173,15 @@ struct SliceJobDetailSheet: View {
             if canPrint {
                 let printDisabled = mutationInFlight || viewModel.selectedPrinterId.isEmpty
                 Button {
-                    Task { await viewModel.printSliceJob(jobId: job.jobId) }
+                    Task {
+                        activeAction = .print
+                        await viewModel.printSliceJob(jobId: job.jobId)
+                        activeAction = nil
+                    }
                 } label: {
                     actionLabel(title: "Print",
                                 systemImage: "printer.fill",
-                                inFlight: mutationInFlight,
+                                inFlight: activeAction == .print,
                                 tintOnLight: true)
                         .background(Color.accentBlue)
                         .foregroundStyle(.white)
@@ -179,6 +194,8 @@ struct SliceJobDetailSheet: View {
             if canSliceAgain {
                 Button {
                     Task {
+                        activeAction = .sliceAgain
+                        defer { activeAction = nil }
                         do {
                             try await viewModel.sliceAgain(jobId: job.jobId)
                             dismiss()
@@ -189,7 +206,7 @@ struct SliceJobDetailSheet: View {
                 } label: {
                     actionLabel(title: "Slice again",
                                 systemImage: "scissors",
-                                inFlight: mutationInFlight)
+                                inFlight: activeAction == .sliceAgain)
                 }
                 .disabled(mutationInFlight)
                 .background(Color.accentBlue.opacity(0.15))
@@ -199,11 +216,15 @@ struct SliceJobDetailSheet: View {
 
             if canCancel {
                 Button {
-                    Task { await viewModel.cancelSliceJob(jobId: job.jobId) }
+                    Task {
+                        activeAction = .cancel
+                        await viewModel.cancelSliceJob(jobId: job.jobId)
+                        activeAction = nil
+                    }
                 } label: {
                     actionLabel(title: "Cancel slice",
                                 systemImage: "xmark",
-                                inFlight: mutationInFlight)
+                                inFlight: activeAction == .cancel)
                 }
                 .disabled(mutationInFlight)
                 .background(Color.red.opacity(0.15))
