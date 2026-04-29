@@ -5,6 +5,7 @@ struct SliceJobDetailSheet: View {
     let jobId: String
     @Environment(\.dismiss) private var dismiss
     @State private var showDeleteConfirm = false
+    @State private var sliceAgainError: String?
 
     private var job: SliceJob? {
         viewModel.sliceJobs.first(where: { $0.jobId == jobId })
@@ -26,7 +27,6 @@ struct SliceJobDetailSheet: View {
             }
             .navigationBarTitleDisplayMode(.inline)
         }
-        .presentationDetents([.medium, .large])
     }
 
     // MARK: - Job present
@@ -55,6 +55,17 @@ struct SliceJobDetailSheet: View {
             }
         } message: {
             Text("\(job.filename) and its sliced 3MF will be permanently removed. This can't be undone.")
+        }
+        .alert(
+            "Couldn't load original",
+            isPresented: Binding(
+                get: { sliceAgainError != nil },
+                set: { if !$0 { sliceAgainError = nil } }
+            )
+        ) {
+            Button("OK", role: .cancel) {}
+        } message: {
+            Text(sliceAgainError ?? "")
         }
     }
 
@@ -143,6 +154,7 @@ struct SliceJobDetailSheet: View {
         let mutationInFlight = viewModel.sliceJobMutationsInFlight.contains(job.jobId)
         let canPrint = job.displayStatus == .ready && (job.outputSize ?? 0) > 0
         let canCancel = !job.isTerminal
+        let canSliceAgain = job.isTerminal
 
         VStack(spacing: 8) {
             if canPrint {
@@ -160,6 +172,27 @@ struct SliceJobDetailSheet: View {
                         .opacity(printDisabled ? 0.5 : 1)
                 }
                 .disabled(printDisabled)
+            }
+
+            if canSliceAgain {
+                Button {
+                    Task {
+                        do {
+                            try await viewModel.sliceAgain(jobId: job.jobId)
+                            dismiss()
+                        } catch {
+                            sliceAgainError = error.localizedDescription
+                        }
+                    }
+                } label: {
+                    actionLabel(title: "Slice again",
+                                systemImage: "scissors",
+                                inFlight: mutationInFlight)
+                }
+                .disabled(mutationInFlight)
+                .background(Color.accentBlue.opacity(0.15))
+                .foregroundStyle(Color.accentBlue)
+                .clipShape(RoundedRectangle(cornerRadius: 12))
             }
 
             if canCancel {

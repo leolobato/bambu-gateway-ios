@@ -72,7 +72,7 @@ struct PrintTab: View {
                 onDone: { viewModel.dismissPrintSuccessModal() }
             )
         }
-        .sheet(item: $selectedSliceJobId.asIdentifiable) { identifier in
+        .fullScreenCover(item: $selectedSliceJobId.asIdentifiable) { identifier in
             SliceJobDetailSheet(viewModel: viewModel, jobId: identifier.id)
         }
     }

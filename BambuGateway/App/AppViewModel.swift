@@ -1233,6 +1233,22 @@ final class AppViewModel: ObservableObject {
         gatewayClient().sliceJobThumbnailURL(jobId: jobId)
     }
 
+    /// Fetch the job's original 3MF and load it into the Print tab so the
+    /// user can re-slice it (potentially with different settings). Throws
+    /// if the download or parse fails so the caller can surface the error.
+    func sliceAgain(jobId: String) async throws {
+        guard !sliceJobMutationsInFlight.contains(jobId) else { return }
+        sliceJobMutationsInFlight.insert(jobId)
+        defer { sliceJobMutationsInFlight.remove(jobId) }
+
+        let fallbackName = sliceJobs.first(where: { $0.jobId == jobId })?.filename ?? "model.3mf"
+        let result = try await gatewayClient().fetchSliceJobInput(
+            jobId: jobId,
+            fallbackFileName: fallbackName
+        )
+        await importDownloaded3MF(fileName: result.fileName, data: result.data)
+    }
+
     /// Friendly printer name for a slice-job row; falls back to the raw id
     /// (or "—" if the job has no printer recorded) when the printer is no
     /// longer in the dashboard's list.

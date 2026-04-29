@@ -273,6 +273,22 @@ struct GatewayClient {
         try? resolveURL(path: "/api/slice-jobs/\(jobId)/thumbnail")
     }
 
+    /// Download the original (un-sliced) 3MF the user submitted for a job.
+    /// Returns the raw bytes and the server-provided filename so the caller
+    /// can re-import it into the Print tab as if it had just been picked.
+    func fetchSliceJobInput(jobId: String, fallbackFileName: String) async throws -> (data: Data, fileName: String) {
+        let (data, response) = try await request(
+            path: "/api/slice-jobs/\(jobId)/input",
+            method: "GET",
+            timeout: 120
+        )
+        guard let httpResponse = response as? HTTPURLResponse else {
+            throw GatewayClientError.invalidResponse
+        }
+        let fileName = parseContentDispositionFilename(httpResponse) ?? fallbackFileName
+        return (data, fileName)
+    }
+
     /// Download the sliced 3MF for a job that has reached `ready`/`printing`.
     func fetchSliceJobOutput(jobId: String, fallbackFileName: String) async throws -> PreviewResult {
         let (data, response) = try await request(
