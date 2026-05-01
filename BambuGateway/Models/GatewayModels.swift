@@ -194,6 +194,13 @@ struct PlateInfo: Decodable, Identifiable {
     let id: Int
     let name: String
     let thumbnail: String
+    /// 0-based filament indices this plate prints, sent by the gateway from
+    /// per-object extruder metadata + face-painting scans. `nil` means the
+    /// gateway couldn't determine it (old server, or generic 3MF) and the
+    /// caller should treat every declared filament as potentially used.
+    // Decoded via GatewayClient's `convertFromSnakeCase` strategy — do not
+    // add CodingKeys; `used_filament_indices` maps to `usedFilamentIndices`.
+    let usedFilamentIndices: [Int]?
 }
 
 struct ProjectFilament: Codable, Identifiable, Hashable {

@@ -60,7 +60,16 @@ final class AppViewModel: ObservableObject {
 
     @Published var selectedFile: Imported3MFFile?
     @Published var parsedInfo: ThreeMFInfo?
-    @Published var selectedPlateId: Int = 0
+    @Published var selectedPlateId: Int = 0 {
+        didSet {
+            applyFilamentTrimForSelectedPlate()
+        }
+    }
+
+    /// Filaments as declared in `project_settings.config`, kept untrimmed so we
+    /// can re-derive the active plate's used set whenever `selectedPlateId`
+    /// changes. `parsedInfo.filaments` is the trimmed view shown to the user.
+    private var declaredProjectFilaments: [ProjectFilament] = []
 
     @Published var trayProfileBySlot: [Int: String] = [:]
     @Published var filamentTrayByIndex: [Int: Int] = [:]
@@ -337,6 +346,7 @@ final class AppViewModel: ObservableObject {
         selectedProcessProfileId = ""
         selectedPlateType = ""
         selectedPlateId = 0
+        declaredProjectFilaments = []
         filamentTrayByIndex = [:]
     }
 
@@ -1333,17 +1343,13 @@ final class AppViewModel: ObservableObject {
         selectedProcessProfileId = ""
         selectedPlateType = ""
         selectedPlateId = 0
+        declaredProjectFilaments = []
         filamentMatchesByIndex = [:]
         filamentTrayByIndex = [:]
 
         do {
-            var info = try await gatewayClient().parse3MF(file: selectedFile)
-            info.filaments = trimUnusedFilaments(
-                declared: info.filaments,
-                fileData: selectedFile.data,
-                plate: info.plates.first?.id ?? 1,
-                hasGcode: info.hasGcode
-            )
+            let info = try await gatewayClient().parse3MF(file: selectedFile)
+            declaredProjectFilaments = info.filaments
             parsedInfo = info
             selectedPlateId = info.plates.first?.id ?? 0
             configureProfileOptions(for: info)
@@ -1576,10 +1582,13 @@ final class AppViewModel: ObservableObject {
             return
         }
 
+        // Match against the full declared list, not the plate-trimmed view, so
+        // matches stay valid when the user switches plates without re-fetching.
+        let toMatch = declaredProjectFilaments.isEmpty ? parsedInfo.filaments : declaredProjectFilaments
         do {
             let response = try await gatewayClient().fetchFilamentMatches(
                 printerId: resolvedPrinterId(),
-                filaments: parsedInfo.filaments
+                filaments: toMatch
             )
             filamentMatchesByIndex = Dictionary(
                 uniqueKeysWithValues: response.matches.map { ($0.index, $0) }
@@ -1643,26 +1652,47 @@ final class AppViewModel: ObservableObject {
         return (options, defaultSelection)
     }
 
+    /// Re-derive `parsedInfo.filaments` from the untrimmed declared list using
+    /// the currently selected plate's `usedFilamentIndices` from the gateway.
+    /// Triggered by `selectedPlateId.didSet` so switching plates updates which
+    /// filaments the user can override, and also called once after parse via
+    /// the same `didSet`.
+    private func applyFilamentTrimForSelectedPlate() {
+        guard var info = parsedInfo,
+              !declaredProjectFilaments.isEmpty else {
+            return
+        }
+        let plate = info.plates.first(where: { $0.id == selectedPlateId })
+        info.filaments = trimUnusedFilaments(
+            declared: declaredProjectFilaments,
+            usedIndices: plate?.usedFilamentIndices,
+            hasGcode: info.hasGcode
+        )
+        parsedInfo = info
+        applyFilamentMappingFromCurrentData()
+    }
+
     /// Trim filament slots the active plate doesn't reference, so downstream
     /// calls (`/api/print-preview`, `/api/print`) only send overrides for slots
     /// the model actually uses. Passing extra slots has been observed to fail
-    /// slicing on multi-filament projects where only one slot is used. The
-    /// server (bambu-gateway + orcaslicer-cli) also does its own trim — this
-    /// is defense in depth so an older server still works.
+    /// slicing on multi-filament projects where only one slot is used.
+    ///
+    /// `usedIndices` is the gateway's per-plate map. `nil` means the gateway
+    /// couldn't determine it (older server, generic 3MF) and we keep the full
+    /// declared list — the gateway-side trim still protects the slicer.
     private func trimUnusedFilaments(
         declared: [ProjectFilament],
-        fileData: Data,
-        plate: Int,
+        usedIndices: [Int]?,
         hasGcode: Bool
     ) -> [ProjectFilament] {
         guard !hasGcode, !declared.isEmpty else {
             return declared
         }
-        guard let usedSlots = ThreeMFReader().readUsedFilamentSlots(from: fileData, plate: plate),
-              !usedSlots.isEmpty else {
+        guard let usedIndices, !usedIndices.isEmpty else {
             return declared
         }
-        let filtered = declared.filter { usedSlots.contains($0.index) }
+        let allow = Set(usedIndices)
+        let filtered = declared.filter { allow.contains($0.index) }
         if filtered.count < declared.count && !filtered.isEmpty {
             return filtered
         }
