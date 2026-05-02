@@ -16,6 +16,7 @@ final class LiveActivityService {
         self.client = client
         self.pushService = pushService
         adoptExistingActivities()
+        observeActivityUpdates()
     }
 
     /// Returns true if a Live Activity is currently live for the given printer.
@@ -128,6 +129,27 @@ final class LiveActivityService {
         let printerId = activity.attributes.printerId
         activities[printerId] = activity
         observePushToken(printerId: printerId, activity: activity)
+    }
+
+    /// Observes activities the system creates from a push-to-start. Without
+    /// this, prints kicked off outside the app (e.g. from OrcaSlicer) start
+    /// the Live Activity but never register their per-activity update token,
+    /// so the gateway has nothing to push subsequent updates to.
+    private func observeActivityUpdates() {
+        Task { [weak self] in
+            for await activity in Activity<PrintActivityAttributes>.activityUpdates {
+                await self?.handleActivityUpdate(activity)
+            }
+        }
+    }
+
+    private func handleActivityUpdate(_ activity: Activity<PrintActivityAttributes>) {
+        let printerId = activity.attributes.printerId
+        if let existing = activities[printerId], existing.id == activity.id {
+            return
+        }
+        Self.log.info("activityUpdates: adopting id=\(activity.id, privacy: .public) printerId=\(printerId, privacy: .public)")
+        adopt(activity)
     }
 
     private func observePushToken(printerId: String, activity: Activity<PrintActivityAttributes>) {
