@@ -175,8 +175,11 @@ struct SliceJobDetailSheet: View {
                 Button {
                     Task {
                         activeAction = .print
-                        await viewModel.printSliceJob(jobId: job.jobId)
+                        let started = await viewModel.printSliceJob(jobId: job.jobId)
                         activeAction = nil
+                        if started {
+                            dismiss()
+                        }
                     }
                 } label: {
                     actionLabel(title: "Print",

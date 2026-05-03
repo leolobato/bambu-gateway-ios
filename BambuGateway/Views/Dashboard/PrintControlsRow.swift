@@ -15,7 +15,8 @@ struct PrintControlsRow: View {
 
     var body: some View {
         HStack(spacing: 8) {
-            if state.lowercased() == "printing" {
+            switch state.lowercased() {
+            case "printing":
                 controlButton(
                     action: .pause,
                     title: "Pause",
@@ -27,7 +28,7 @@ struct PrintControlsRow: View {
                         inFlight = nil
                     }
                 }
-            } else {
+            case "paused":
                 controlButton(
                     action: .resume,
                     title: "Resume",
@@ -39,6 +40,8 @@ struct PrintControlsRow: View {
                         inFlight = nil
                     }
                 }
+            default:
+                EmptyView()
             }
 
             controlButton(

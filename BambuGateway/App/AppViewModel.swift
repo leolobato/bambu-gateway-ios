@@ -1263,12 +1263,13 @@ final class AppViewModel: ObservableObject {
 
     /// Submit a print for a slice job that already has output. Always
     /// targets the dashboard's currently selected printer; no-ops otherwise.
-    func printSliceJob(jobId: String) async {
-        guard !sliceJobMutationsInFlight.contains(jobId) else { return }
+    @discardableResult
+    func printSliceJob(jobId: String) async -> Bool {
+        guard !sliceJobMutationsInFlight.contains(jobId) else { return false }
         let printerId = selectedPrinterId
         guard !printerId.isEmpty else {
             setMessage("Select a printer on the Dashboard before reprinting.", .warning)
-            return
+            return false
         }
         sliceJobMutationsInFlight.insert(jobId)
         defer { sliceJobMutationsInFlight.remove(jobId) }
@@ -1277,10 +1278,16 @@ final class AppViewModel: ObservableObject {
                 jobId: jobId,
                 printerId: printerId
             )
-            setMessage("Print started: \(response.fileName)", .success)
+            handlePrintResponse(response, startedContext: nil)
+            lastPrintEstimate = response.estimate
+            let resolvedPrinterId = response.printerId.isEmpty ? printerId : response.printerId
+            lastPrintPrinterName = printerName(for: resolvedPrinterId)
+            showPrintSuccessModal = true
             await refreshSliceJobs()
+            return true
         } catch {
             setMessage("Couldn't start print: \(error.localizedDescription)", .error)
+            return false
         }
     }
 
