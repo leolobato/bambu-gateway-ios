@@ -129,6 +129,7 @@ final class AppViewModel: ObservableObject {
     private var previousStates: [String: String] = [:]
 
     private var uploadPollingTask: Task<Void, Never>?
+    private var parseTask: Task<Void, Never>?
     private var activeUploadId: String?
     private let settingsStore: AppSettingsStore
     private var persistedSettings: PersistedSettings
@@ -287,7 +288,7 @@ final class AppViewModel: ObservableObject {
 
         await loadSetupData()
         if selectedFile != nil && parsedInfo == nil {
-            await parseSelectedFile()
+            await runParseSelectedFile()
         }
     }
 
@@ -310,7 +311,7 @@ final class AppViewModel: ObservableObject {
             let file = try loadFile(url: url)
             startedPrintContext = nil
             selectedFile = file
-            await parseSelectedFile()
+            await runParseSelectedFile()
         } catch {
             setMessage(error.localizedDescription, .error)
         }
@@ -319,7 +320,7 @@ final class AppViewModel: ObservableObject {
     func importDownloaded3MF(fileName: String, data: Data) async {
         startedPrintContext = nil
         selectedFile = Imported3MFFile(fileName: fileName, data: data)
-        await parseSelectedFile()
+        await runParseSelectedFile()
     }
 
     private static let defaultMakerWorldURL = URL(string: "https://makerworld.com")!
@@ -332,6 +333,9 @@ final class AppViewModel: ObservableObject {
 
     func clearFile() {
         uploadPollingTask?.cancel()
+        parseTask?.cancel()
+        parseTask = nil
+        isParsing = false
         uploadProgress = nil
         activeUploadId = nil
         isCancellingUpload = false
@@ -1334,8 +1338,21 @@ final class AppViewModel: ObservableObject {
         )
     }
 
+    private func runParseSelectedFile() async {
+        parseTask?.cancel()
+        let task = Task { [weak self] in
+            guard let self else { return }
+            await self.parseSelectedFile()
+        }
+        parseTask = task
+        await task.value
+        if parseTask == task {
+            parseTask = nil
+        }
+    }
+
     private func parseSelectedFile() async {
-        guard let selectedFile else {
+        guard let fileToParse = selectedFile else {
             return
         }
 
@@ -1355,12 +1372,16 @@ final class AppViewModel: ObservableObject {
         filamentTrayByIndex = [:]
 
         do {
-            let info = try await gatewayClient().parse3MF(file: selectedFile)
+            let info = try await gatewayClient().parse3MF(file: fileToParse)
+            try Task.checkCancellation()
+            guard selectedFile == fileToParse else { return }
             declaredProjectFilaments = info.filaments
             parsedInfo = info
             selectedPlateId = info.plates.first?.id ?? 0
             configureProfileOptions(for: info)
             await refreshFilamentMatches()
+            try Task.checkCancellation()
+            guard selectedFile == fileToParse else { return }
             applyFilamentMappingFromCurrentData()
 
             if info.hasGcode {
@@ -1368,7 +1389,10 @@ final class AppViewModel: ObservableObject {
             } else {
                 setMessage("File parsed: slicing required.", .info)
             }
+        } catch is CancellationError {
+            return
         } catch {
+            guard selectedFile == fileToParse else { return }
             setMessage(error.localizedDescription, .error)
         }
     }
