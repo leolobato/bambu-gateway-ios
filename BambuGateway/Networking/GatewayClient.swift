@@ -76,6 +76,10 @@ struct GatewayClient {
         try await get(path: "/api/options/process")
     }
 
+    func fetchProcessLayout() async throws -> ProcessLayout {
+        try await get(path: "/api/options/process/layout")
+    }
+
     func parse3MF(file: Imported3MFFile) async throws -> ThreeMFInfo {
         var form = MultipartFormData()
         form.addFile(name: "file", fileName: file.fileName, mimeType: "application/octet-stream", data: file.data)

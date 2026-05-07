@@ -33,4 +33,24 @@ final class GatewayClientProcessTests: XCTestCase {
         XCTAssertEqual(cat.options["layer_height"]?.type, .float)
         XCTAssertEqual(URLProtocolStub.requestedPaths, ["/api/options/process"])
     }
+
+    func test_fetchProcessLayout_returnsLayout() async throws {
+        let body = #"""
+        {
+          "version": "2.3.2-41",
+          "allowlist_revision": "2026-05-06.1",
+          "pages": [
+            {"label": "Quality", "optgroups": [
+              {"label": "Layer height", "options": ["layer_height"]}
+            ]}
+          ]
+        }
+        """#.data(using: .utf8)!
+        URLProtocolStub.enqueue(path: "/api/options/process/layout", response: .init(body: body))
+
+        let layout = try await makeClient().fetchProcessLayout()
+
+        XCTAssertEqual(layout.allowlistRevision, "2026-05-06.1")
+        XCTAssertEqual(layout.pages[0].optgroups[0].options, ["layer_height"])
+    }
 }
