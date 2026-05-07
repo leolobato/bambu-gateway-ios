@@ -75,6 +75,7 @@
 		DB447D27A007346EA8C32B6D /* PrintSuccessModal.swift in Sources */ = {isa = PBXBuildFile; fileRef = 000CC4A4B6BBD8DE7A68CF34 /* PrintSuccessModal.swift */; };
 		DEAD44BEADD590651547964E /* ProcessOptionsStoreTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8EA5FE9B4A0C0E5274947D5B /* ProcessOptionsStoreTests.swift */; };
 		E47A2305B530F74D478F50A1 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0F1801F617DE01B7AC244E3E /* AppDelegate.swift */; };
+		E9D95F4833A93B1114C07FCB /* ProcessOptionRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F8B5B9D9174167346D65888 /* ProcessOptionRow.swift */; };
 		EEC0E2CA6D8374B2D161F7DC /* SliceJobDisplayStatusTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9490D22C8082209C193F83D7 /* SliceJobDisplayStatusTests.swift */; };
 		F6321079052D62AF783281E5 /* GatewayModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 47F98F122F17587AC06D257D /* GatewayModels.swift */; };
 		F825FBCBD5B632A2E4E11F16 /* LiveActivityBundle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 863502189CB276B2AC75D17C /* LiveActivityBundle.swift */; };
@@ -144,6 +145,7 @@
 		596B45CE6BCC0F808017F737 /* NotificationService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationService.swift; sourceTree = "<group>"; };
 		5BE301BDA698282EC2343ACF /* ProcessParameter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProcessParameter.swift; sourceTree = "<group>"; };
 		5BEBF1713CA6AF40B8331BFA /* BambuGatewayTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BambuGatewayTests.swift; sourceTree = "<group>"; };
+		5F8B5B9D9174167346D65888 /* ProcessOptionRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProcessOptionRow.swift; sourceTree = "<group>"; };
 		60EEE74AFB6EC29279BA25F4 /* CameraFeedView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraFeedView.swift; sourceTree = "<group>"; };
 		68FD23DF97AF009395F22F1E /* ShareViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShareViewController.swift; sourceTree = "<group>"; };
 		6C9FBB06FD1BF1F413BFE6C8 /* BambuGatewayTests.xctest */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.cfbundle; path = BambuGatewayTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -254,6 +256,14 @@
 				236205CC2F014C4032AF3A1F /* ProcessValueResolution.swift */,
 			);
 			path = Models;
+			sourceTree = "<group>";
+		};
+		2D27421EBC36E9CA42F1FDA7 /* ProcessParameters */ = {
+			isa = PBXGroup;
+			children = (
+				5F8B5B9D9174167346D65888 /* ProcessOptionRow.swift */,
+			);
+			path = ProcessParameters;
 			sourceTree = "<group>";
 		};
 		4949B85738896A29666DE8F1 /* App */ = {
@@ -373,6 +383,7 @@
 				B52D3475F8383A6C96754E03 /* ToastOverlay.swift */,
 				BFCF654FB2646286A9DBE87D /* Camera */,
 				CBADEE1334EBDB125AD56B65 /* Dashboard */,
+				2D27421EBC36E9CA42F1FDA7 /* ProcessParameters */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -659,6 +670,7 @@
 				49397CEDE4D75E47854A886C /* PrinterOfflineCard.swift in Sources */,
 				7FBB60D7C763B1731A6A7368 /* PrinterStatusCard.swift in Sources */,
 				4C1A529AD33EE2A149CD9C0E /* PrinterTab.swift in Sources */,
+				E9D95F4833A93B1114C07FCB /* ProcessOptionRow.swift in Sources */,
 				7ACF8A11E885A953ACD6AFED /* ProcessOptionsStore.swift in Sources */,
 				6C55951A82729971F282CDDA /* ProcessParameter.swift in Sources */,
 				503F97F3CE1A8AE99834FBED /* ProcessValueResolution.swift in Sources */,
