@@ -318,6 +318,182 @@ Unit tests:
 
 UI tests deferred to a follow-up pass once `ui-ux-pro-max` lands the visual treatment.
 
+## Visual specification
+
+Locked via `ui-ux-pro-max`. All values fit the existing app design system; no new tokens introduced.
+
+### Design tokens (existing, reused)
+
+| Token | Light | Dark | Use |
+|---|---|---|---|
+| `Color.dashboardBackground` | `systemGroupedBackground` | `#0F0F1A` | Screen background |
+| `Color.cardBackground` | `systemBackground` | `#1A1A2E` | Card surface |
+| `Color.cardBackgroundInner` | `secondarySystemBackground` | `#13132A` | Nested row inside card |
+| `Color.accentBlue` | system `tintColor` | `#5599FF` | Primary tint, badges, focused inputs |
+| `.orange` (system) | system | system | "User-edited" status |
+| `.secondary` / `.tertiary` | system | system | Secondary text, chevrons |
+
+Status semantics:
+- **3MF-modified** → `Color.accentBlue` 8pt dot.
+- **User-edited** → `.orange` 8pt dot.
+- **Locked / non-allowlisted** → `.tertiary` `lock.fill` glyph, value rendered `.secondary`, no chevron, no Save action.
+- **Unmodified row** (only seen in the All view / page detail) → no leading dot.
+
+### Typography (SwiftUI semantic, Dynamic Type)
+
+| Role | Font | Weight |
+|---|---|---|
+| Card section title ("Process settings") | `.headline` | `.semibold` |
+| Modified-count badge | `.caption2` | `.semibold` |
+| Page row label (All view top level) | `.body` | `.regular` |
+| Page row metadata ("12 options · 2 edited") | `.caption` | `.regular` |
+| Optgroup section header | `.footnote` | `.semibold`, uppercased per iOS list convention |
+| Option row label | `.body` | `.regular` |
+| Option row sidetext ("mm") | `.caption` | `.regular` |
+| Option row value | `.body` | `.medium`, `.monospacedDigit()` for numerics |
+| Editor sheet title | `.title3` | `.semibold` |
+| Editor sheet tooltip | `.subheadline` | `.regular`, `.secondary` |
+| Editor revert footer | `.footnote` | `.regular`, `.secondary` |
+
+### Spacing & radii
+
+- Card outer padding: 14pt; corner radius **12pt** (matches existing cards).
+- Inner row padding: 12pt horizontal, 10pt vertical; row corner radius **10pt** when surfaced as a card-on-card.
+- Card-to-card vertical gap: **12pt** (matches `VStack(spacing: 12)` in `PrintTab`).
+- Editor sheet outer padding: 20pt horizontal, 16pt top.
+- Touch targets: every interactive row ≥ **44pt** tall via padding; `.contentShape(Rectangle())` so the whole row is tappable.
+
+### Iconography (SF Symbols)
+
+| Use | Symbol | Size |
+|---|---|---|
+| Card title leading icon | `slider.horizontal.3` | 14pt, `.medium`, `Color.accentBlue` |
+| "Show all" trailing chevron | `chevron.right` | 12pt, `.semibold`, `.tertiary` |
+| User-edited indicator | `circle.fill` | 8pt, `.orange` |
+| 3MF-modified indicator | `circle.fill` | 8pt, `Color.accentBlue` |
+| Locked / read-only | `lock.fill` | 12pt, `.tertiary` |
+| Revert button | `arrow.uturn.backward` | 13pt, `.medium` |
+| Reset all (toolbar) | `arrow.counterclockwise` | system toolbar item |
+| Search field (top of All view) | system `.searchable` modifier | — |
+| Empty state | `slider.horizontal.below.rectangle` | 28pt, `.tertiary` |
+
+### ProcessParametersCard (in PrintTab)
+
+Layout sketch (descriptive; not a wireframe):
+
+- Header row: `slider.horizontal.3` (14pt, `accentBlue`) + "Process settings" (`.headline.semibold`) on the leading side; on the trailing side, a capsule badge `"\(n) modified"` (`.caption2.semibold` text in `accentBlue`, background `accentBlue.opacity(0.18)`, capsule shape) followed by a 12pt `chevron.right` in `.tertiary`. The whole header is tappable and opens the All view.
+- Body: a vertical stack of `ProcessOptionRow` instances, one per `processModifications.modifiedKeys` (in API order), separated by `Divider().opacity(0.4)`.
+- Trailing button row inside the card: `TonalButtonStyle(tint: Color.accentBlue)` button labeled "Show all settings" with trailing `chevron.right` glyph.
+- Background `Color.cardBackground`, corner radius 12pt, padding 14pt.
+
+**Empty state** (when `modified_keys` is empty):
+- Centered `slider.horizontal.below.rectangle` (28pt, `.tertiary`).
+- One-line copy "No customizations from default profile" (`.subheadline`, `.secondary`).
+- The "Show all settings" tonal button below.
+
+### ProcessAllSettingsView (full-screen cover)
+
+- Root: `NavigationStack` with `.fullScreenCover` presentation.
+- Background: `Color.dashboardBackground`.
+- Toolbar: leading `Done` (text button) — dismisses the cover. Trailing `Reset all` — `arrow.counterclockwise` toolbar item, disabled when `processOverrides.isEmpty`. On tap, presents a `.confirmationDialog` ("Reset all process settings?") before clearing.
+- Search: `.searchable(text:, placement: .navigationBarDrawer(displayMode: .always), prompt: "Search settings")`. While search text is non-empty, the body switches from the page list to a flat results list (one row per matching option, grouped under a "Results" section header). Match heuristic: case-insensitive substring on label + key.
+- Body (no search): `.insetGrouped` `List` of pages from `ProcessLayout.pages`. Each row:
+  - Label (`.body`).
+  - Trailing metadata: `"\(optionCount) options"` always; appended `" · \(editedCount) edited"` in `.orange` `.caption.semibold` only when `editedCount > 0`.
+  - System chevron via `NavigationLink`.
+
+### ProcessPageDetailView (pushed from All view)
+
+- Navigation title = page label.
+- `.insetGrouped` `List`. One `Section` per optgroup, header text `optgroup.label.uppercased()` in `.footnote.semibold` (system inset-grouped header style).
+- Rows are `ProcessOptionRow`. Order matches the layout exactly — no client-side sorting.
+
+### ProcessOptionRow (shared)
+
+- **Leading 12pt-wide gutter** for the status indicator:
+  - `circle.fill` 8pt in `accentBlue` if 3MF-modified and not user-edited.
+  - `circle.fill` 8pt in `.orange` if user-edited (overrides the 3MF dot when both apply).
+  - `lock.fill` 12pt in `.tertiary` if non-allowlisted (read-only).
+  - Empty if neither applies.
+- **Center** column:
+  - Label in `.body`.
+  - Below the label, **only on the All view / page detail** (omitted in the Modified card to keep density tight): the option's tooltip first sentence, `.caption` `.tertiary`, single line, truncated with ellipsis.
+- **Trailing** column:
+  - Current value, `.body.medium.monospacedDigit()` for numerics, `.body.medium` otherwise.
+  - Sidetext suffix in `.caption.tertiary` immediately to the right of the value.
+  - For locked rows: value rendered in `.secondary`; no chevron.
+  - For editable rows: 12pt `chevron.right` in `.tertiary`.
+- Press feedback: a custom `ButtonStyle` overlays `Color.accentBlue.opacity(0.06)` on press, 150ms ease-out fade.
+- Whole row uses `.contentShape(Rectangle())`, tap opens `ProcessOptionEditor` (or a read-only detail variant for locked rows).
+
+### ProcessOptionEditor (sheet)
+
+- Presentation: `.sheet` with `.presentationDetents([.medium, .large])` and `.presentationDragIndicator(.visible)`.
+- Toolbar inside the sheet: title = option label (`.title3.semibold`), trailing `Save` button (`FilledButtonStyle(tint: Color.accentBlue)`).
+- Tooltip block immediately below the title: `.subheadline.secondary`, max 3 lines, with a "More" disclosure if longer (toggles full text inline).
+- Editor body — per-type widget (see table below), centered horizontally with 20pt outer padding.
+- Range hint (only when `min` and/or `max` are known): `.footnote.secondary` line "Range \(min)–\(max) \(sidetext)" beneath the widget.
+- Validation messages: `.footnote` in `.red` beneath the widget; appears on blur, not on every keystroke. Save button disabled while invalid.
+- Footer row pinned to the bottom of the sheet body:
+  - Leading: `Revert` button — `arrow.uturn.backward` glyph + label, `.bordered` style, `.tint(.secondary)`. Disabled when the current input matches the revert target.
+  - Trailing: revert-target copy:
+    - 3MF-modified key → `"From file: \(value)\(sidetext)"`
+    - Non-modified key → `"Default: \(value)\(sidetext)"`
+
+#### Per-type widget styling
+
+| `type` (+ `guiType`) | Widget | Notes |
+|---|---|---|
+| `coBool` | `Toggle("", isOn:)` full-width, `.tint(Color.accentBlue)`, label hidden | Submits `"1"` / `"0"` |
+| `coInt`, `coInts` | `Stepper` + `TextField` with `.keyboardType(.numberPad)` | Stepper step = 1 unless `gui_type=slider` |
+| `coFloat`, `coFloats` | `TextField` `.keyboardType(.decimalPad)` + sidetext suffix | `.monospacedDigit()` |
+| `coPercent`, `coPercents` | Same as float; sidetext fixed `%`; submit `"50%"` | |
+| `coFloatOrPercent`, `coFloatsOrPercents` | `Picker(.segmented)` mm/% + `TextField` | Default segment matches parsed input |
+| `coString`, `coStrings`, `gui_type=one_string` | `TextField` `.keyboardType(.default)`, `.autocapitalization(.never)` | |
+| `coEnum` | `Picker(.menu)` over `enumValues` × `enumLabels` | |
+| `gui_type=color` | `ColorPicker("", selection:)` hidden label | Submit libslic3r-style hex |
+| `gui_type=slider` | `Slider` over `min`–`max` + companion `TextField` for precision | |
+| `coPoint`, `coPoints`, `coPoint3`, `coBools`, `coNone` (v1) | Read-only `Text` of raw value + banner "Editing this option type is not yet supported." | |
+
+### Animation & motion
+
+- All transitions use SwiftUI defaults; no custom curves.
+- Status-dot colour changes use default implicit animation (~200ms ease-out).
+- Sheet present/dismiss: system standard.
+- `.accessibilityReduceMotion` is honoured automatically via system sheet/list behaviours.
+
+### Accessibility
+
+- Every row exposes `.accessibilityLabel` formatted `"<label>, <value> <sidetext>"` and `.accessibilityHint` `"Tap to edit"` (or `"Read only"` for locked rows).
+- Status dots get `.accessibilityHidden(true)`; status is conveyed via `.accessibilityValue` on the row (e.g., "modified by file", "edited by you").
+- Editor `Save` and `Revert` buttons have explicit `.accessibilityLabel`s.
+- The tooltip subheadline is included in the editor's combined accessibility element.
+- Numeric, percent, and float-or-percent editors set `.keyboardType(.decimalPad)` to ensure correct system keyboard.
+- Validation runs on blur (not per-keystroke) to avoid screen-reader spam.
+
+### Copy
+
+| Surface | Copy |
+|---|---|
+| Card title | "Process settings" |
+| Modified badge (n>0) | `"\(n) modified"` |
+| Modified badge (n=0) | hidden (replaced by empty state) |
+| Empty state body | "No customizations from default profile" |
+| Card "Show all" button | "Show all settings" |
+| All view nav title | "Process settings" |
+| All view search placeholder | "Search settings" |
+| All view "Done" button | "Done" |
+| Toolbar reset | "Reset all" |
+| Reset confirmation | "Reset all process settings?" / "Reset" / "Cancel" |
+| Revert footer (3MF) | `"From file: \(value)\(sidetext)"` |
+| Revert footer (default) | `"Default: \(value)\(sidetext)"` |
+| Vector unsupported banner | "Editing this option type is not yet supported." |
+| Loading error | "Couldn't load process settings — Retry" |
+| Drop notice | `"\(applied) settings sent, \(dropped) ignored: \(joined keys)"` |
+| Validation min violation | `"Must be ≥ \(min) \(sidetext)"` |
+| Validation max violation | `"Must be ≤ \(max) \(sidetext)"` |
+| Validation parse error | `"Enter a valid \(type) value"` |
+
 ## Open questions
 
-None blocking the implementation plan. Visual treatment (colour, typography, status iconography, exact copy) is intentionally deferred to `ui-ux-pro-max`.
+None blocking the implementation plan.
