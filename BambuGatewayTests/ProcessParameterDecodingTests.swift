@@ -131,4 +131,47 @@ final class ProcessParameterDecodingTests: XCTestCase {
         XCTAssertEqual(layout.pages.map(\.label), ["Quality", "Strength"])
         XCTAssertEqual(layout.pages[0].optgroups[0].options, ["layer_height", "initial_layer_print_height"])
     }
+
+    func test_decodeProcessModifications_full_succeeds() throws {
+        let json = #"""
+        {
+          "process_setting_id": "Custom 0.20mm Standard",
+          "modified_keys": ["layer_height", "wall_loops"],
+          "values": {
+            "layer_height": "0.16",
+            "wall_loops": "3"
+          }
+        }
+        """#.data(using: .utf8)!
+
+        let mods = try decoder().decode(ProcessModifications.self, from: json)
+
+        XCTAssertEqual(mods.processSettingId, "Custom 0.20mm Standard")
+        XCTAssertEqual(mods.modifiedKeys, ["layer_height", "wall_loops"])
+        XCTAssertEqual(mods.values["layer_height"], "0.16")
+    }
+
+    func test_decodeProcessModifications_emptyValues_succeeds() throws {
+        let json = #"""
+        {"process_setting_id": "", "modified_keys": [], "values": {}}
+        """#.data(using: .utf8)!
+
+        let mods = try decoder().decode(ProcessModifications.self, from: json)
+
+        XCTAssertEqual(mods.processSettingId, "")
+        XCTAssertTrue(mods.modifiedKeys.isEmpty)
+        XCTAssertTrue(mods.values.isEmpty)
+    }
+
+    func test_decodeProcessOverrideApplied_succeeds() throws {
+        let json = #"""
+        [{"key": "layer_height", "value": "0.16", "previous": "0.20"}]
+        """#.data(using: .utf8)!
+
+        let applied = try decoder().decode([ProcessOverrideApplied].self, from: json)
+
+        XCTAssertEqual(applied.count, 1)
+        XCTAssertEqual(applied[0].key, "layer_height")
+        XCTAssertEqual(applied[0].previous, "0.20")
+    }
 }

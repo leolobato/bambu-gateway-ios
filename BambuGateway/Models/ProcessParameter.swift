@@ -58,3 +58,15 @@ struct ProcessLayout: Decodable {
     let allowlistRevision: String
     let pages: [ProcessPage]
 }
+
+struct ProcessModifications: Decodable, Equatable {
+    let processSettingId: String
+    let modifiedKeys: [String]
+    let values: [String: String]
+}
+
+struct ProcessOverrideApplied: Decodable, Hashable {
+    let key: String
+    let value: String
+    let previous: String
+}
