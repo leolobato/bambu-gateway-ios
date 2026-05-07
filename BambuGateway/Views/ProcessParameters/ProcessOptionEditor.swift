@@ -70,7 +70,9 @@ struct ProcessOptionEditor: View {
                 }
                 ToolbarItem(placement: .confirmationAction) {
                     Button("Save") {
-                        if let parsed = validatedValue() {
+                        let result = validate()
+                        validationError = result.error
+                        if let parsed = result.value {
                             onSave(parsed)
                             dismiss()
                         }
@@ -79,6 +81,12 @@ struct ProcessOptionEditor: View {
                 }
             }
             .onAppear { draft = initialValue }
+            .onChange(of: draft) { _, _ in
+                // Refresh the error message as the user types so they see feedback
+                // without having to tap Save. Using the pure `validate()` keeps
+                // body rendering free of state mutation.
+                validationError = validate().error
+            }
         }
         .presentationDetents([.medium, .large])
         .presentationDragIndicator(.visible)
@@ -204,64 +212,65 @@ struct ProcessOptionEditor: View {
 
     // MARK: - Validation
 
-    private var isValid: Bool { validatedValue() != nil }
+    private struct ValidationResult {
+        let value: String?
+        let error: String?
+        static let unchanged = ValidationResult(value: nil, error: nil)
+    }
 
-    private func validatedValue() -> String? {
+    private var isValid: Bool { validate().value != nil }
+
+    private func validate() -> ValidationResult {
         switch option.type {
         case .bool:
-            return (draft == "1" || draft == "0") ? draft : nil
+            if draft == "1" || draft == "0" {
+                return ValidationResult(value: draft, error: nil)
+            }
+            return ValidationResult(value: nil, error: nil)
         case .int, .ints:
             guard let i = Int(draft.trimmingCharacters(in: .whitespaces)) else {
-                validationError = "Enter a whole number."
-                return nil
+                return ValidationResult(value: nil, error: "Enter a whole number.")
             }
             if let lo = option.min, Double(i) < lo {
-                validationError = "Must be ≥ \(Int(lo))\(option.sidetext.isEmpty ? "" : " " + option.sidetext)"
-                return nil
+                return ValidationResult(value: nil, error: "Must be ≥ \(Int(lo))\(option.sidetext.isEmpty ? "" : " " + option.sidetext)")
             }
             if let hi = option.max, Double(i) > hi {
-                validationError = "Must be ≤ \(Int(hi))\(option.sidetext.isEmpty ? "" : " " + option.sidetext)"
-                return nil
+                return ValidationResult(value: nil, error: "Must be ≤ \(Int(hi))\(option.sidetext.isEmpty ? "" : " " + option.sidetext)")
             }
-            validationError = nil
-            return String(i)
+            return ValidationResult(value: String(i), error: nil)
         case .float, .floats:
-            guard let d = Double(draft.replacingOccurrences(of: ",", with: ".")) else {
-                validationError = "Enter a decimal number."
-                return nil
+            let canonical = draft.replacingOccurrences(of: ",", with: ".")
+            guard let d = Double(canonical) else {
+                return ValidationResult(value: nil, error: "Enter a decimal number.")
             }
-            if let lo = option.min, d < lo { validationError = "Must be ≥ \(lo)"; return nil }
-            if let hi = option.max, d > hi { validationError = "Must be ≤ \(hi)"; return nil }
-            validationError = nil
-            return draft
+            if let lo = option.min, d < lo {
+                return ValidationResult(value: nil, error: "Must be ≥ \(lo)")
+            }
+            if let hi = option.max, d > hi {
+                return ValidationResult(value: nil, error: "Must be ≤ \(hi)")
+            }
+            return ValidationResult(value: canonical, error: nil)
         case .percent, .percents:
             let stripped = draft.replacingOccurrences(of: "%", with: "")
             guard !stripped.isEmpty, Double(stripped) != nil else {
-                validationError = "Enter a percent value."
-                return nil
+                return ValidationResult(value: nil, error: "Enter a percent value.")
             }
-            validationError = nil
-            return draft.hasSuffix("%") ? draft : "\(stripped)%"
+            return ValidationResult(value: draft.hasSuffix("%") ? draft : "\(stripped)%", error: nil)
         case .floatOrPercent, .floatsOrPercents:
             let stripped = draft.replacingOccurrences(of: "%", with: "")
             guard !stripped.isEmpty, Double(stripped) != nil else {
-                validationError = "Enter a number."
-                return nil
+                return ValidationResult(value: nil, error: "Enter a number.")
             }
-            validationError = nil
-            return draft
+            return ValidationResult(value: draft, error: nil)
         case .string, .strings:
-            validationError = nil
-            return draft
+            return ValidationResult(value: draft, error: nil)
         case .enum:
             guard option.enumValues?.contains(draft) == true else {
-                validationError = "Select a value."
-                return nil
+                return ValidationResult(value: nil, error: "Select a value.")
             }
-            validationError = nil
-            return draft
+            return ValidationResult(value: draft, error: nil)
         case .point, .points, .point3, .bools, .none:
-            return nil
+            return ValidationResult(value: nil, error: nil)
         }
     }
 }
