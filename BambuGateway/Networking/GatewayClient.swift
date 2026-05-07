@@ -78,11 +78,11 @@ struct GatewayClient {
     }
 
     func fetchProcessOptions() async throws -> ProcessOptionsCatalogue {
-        try await get(path: "/api/options/process")
+        try await get(path: "/api/slicer/options/process")
     }
 
     func fetchProcessLayout() async throws -> ProcessLayout {
-        try await get(path: "/api/options/process/layout")
+        try await get(path: "/api/slicer/options/process/layout")
     }
 
     func fetchProcessProfile(settingId: String) async throws -> ResolvedProcessProfile {
