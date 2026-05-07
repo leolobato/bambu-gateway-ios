@@ -40,6 +40,44 @@ final class AppViewModelProcessOverridesTests: XCTestCase {
         XCTAssertTrue(vm.processOverrides.isEmpty)
         XCTAssertTrue(vm.processBaseline.isEmpty)
     }
+
+    func test_buildSubmission_includesNonEmptyOverrides() {
+        let vm = AppViewModel.makeForTesting()
+        vm.setProcessOverride(key: "layer_height", value: "0.16")
+        vm.primeForBuildSubmissionTest()
+
+        let submission = vm.buildSubmissionForTesting()
+
+        XCTAssertEqual(submission?.processOverrides?["layer_height"], "0.16")
+    }
+
+    func test_buildSubmission_emptyOverrides_omitsField() {
+        let vm = AppViewModel.makeForTesting()
+        vm.primeForBuildSubmissionTest()
+
+        let submission = vm.buildSubmissionForTesting()
+
+        XCTAssertNil(submission?.processOverrides)
+    }
+
+    func test_handlePrintResponse_droppedOverrides_setsWarningMessage() {
+        let vm = AppViewModel.makeForTesting()
+        vm.setProcessOverride(key: "layer_height", value: "0.16")
+        vm.setProcessOverride(key: "phantom_key", value: "x")
+
+        let info = SettingsTransferInfo(
+            status: "applied",
+            transferred: [],
+            filaments: [],
+            processOverridesApplied: [
+                ProcessOverrideApplied(key: "layer_height", value: "0.16", previous: "0.20")
+            ]
+        )
+        vm.surfaceProcessOverridesAppliedForTesting(info: info)
+
+        XCTAssertTrue(vm.message.contains("phantom_key"))
+        XCTAssertEqual(vm.messageLevel, .warning)
+    }
 }
 
 extension AppViewModel {

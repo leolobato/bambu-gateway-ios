@@ -866,7 +866,7 @@ final class AppViewModel: ObservableObject {
             machineProfile: selectedMachineProfileId,
             processProfile: selectedProcessProfileId,
             filamentOverrides: buildFilamentOverrides(for: parsedInfo),
-            processOverrides: nil
+            processOverrides: processOverrides.isEmpty ? nil : processOverrides
         )
     }
 
@@ -890,7 +890,19 @@ final class AppViewModel: ObservableObject {
         if !transfer.isEmpty {
             output += "\n\(transfer)"
         }
-        let level: MessageLevel = hasDiscardedFilamentCustomizations(response.settingsTransfer) ? .warning : .success
+        if let applied = response.settingsTransfer?.processOverridesApplied,
+           !processOverrides.isEmpty {
+            let appliedKeys = Set(applied.map(\.key))
+            let dropped = processOverrides.keys.filter { !appliedKeys.contains($0) }
+            if !dropped.isEmpty {
+                output += "\nProcess overrides ignored: \(dropped.sorted().joined(separator: ", "))"
+            }
+        }
+        let droppedOverrides = (response.settingsTransfer?.processOverridesApplied != nil)
+            && processOverrides.contains(where: { kv in
+                !(response.settingsTransfer?.processOverridesApplied?.contains(where: { $0.key == kv.key }) ?? false)
+            })
+        let level: MessageLevel = (hasDiscardedFilamentCustomizations(response.settingsTransfer) || droppedOverrides) ? .warning : .success
         setMessage(output, level)
 
         if let uploadId = response.uploadId {
@@ -1976,4 +1988,38 @@ final class AppViewModel: ObservableObject {
         processOverrides.removeAll()
         processBaseline.removeAll()
     }
+
+#if DEBUG
+    /// Test-only: prime enough state so `buildSubmission()` returns a non-nil result.
+    func primeForBuildSubmissionTest() {
+        selectedFile = Imported3MFFile(fileName: "x.3mf", data: Data([0x01]))
+        parsedInfo = ThreeMFInfo(
+            plates: [],
+            filaments: [],
+            printProfile: PrintProfileInfo(printSettingsId: "P", layerHeight: "0.2"),
+            printer: PrinterInfo(printerSettingsId: "X", printerModel: "A1", nozzleDiameter: "0.4"),
+            hasGcode: true,
+            processModifications: nil
+        )
+        selectedMachineProfileId = "GM004"
+        selectedProcessProfileId = "GP004"
+    }
+
+    func buildSubmissionForTesting() -> PrintSubmission? {
+        buildSubmission()
+    }
+
+    func surfaceProcessOverridesAppliedForTesting(info: SettingsTransferInfo) {
+        let response = PrintResponse(
+            status: "started",
+            fileName: "x.3mf",
+            printerId: "P1",
+            wasSliced: true,
+            settingsTransfer: info,
+            uploadId: nil,
+            estimate: nil
+        )
+        handlePrintResponse(response, startedContext: nil)
+    }
+#endif
 }
