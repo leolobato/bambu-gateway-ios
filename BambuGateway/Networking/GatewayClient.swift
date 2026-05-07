@@ -72,6 +72,10 @@ struct GatewayClient {
         try await get(path: "/api/slicer/plate-types")
     }
 
+    func fetchProcessOptions() async throws -> ProcessOptionsCatalogue {
+        try await get(path: "/api/options/process")
+    }
+
     func parse3MF(file: Imported3MFFile) async throws -> ThreeMFInfo {
         var form = MultipartFormData()
         form.addFile(name: "file", fileName: file.fileName, mimeType: "application/octet-stream", data: file.data)
