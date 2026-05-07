@@ -44,6 +44,7 @@
 		928BE6B468C5B40955A3B029 /* StatusRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 244EB95AFE2F67045E60788A /* StatusRow.swift */; };
 		96620D20C294E0F910E6ADA9 /* BambuGatewayTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BEBF1713CA6AF40B8331BFA /* BambuGatewayTests.swift */; };
 		9838CAA375A45D38455D0394 /* SpeedPickerSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = 450020B566A6C67BC3D57DE2 /* SpeedPickerSheet.swift */; };
+		9B9105450DC62BEE592FECAC /* SettingsTransferInfoDecodingTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F3474D97C0D0BAC835CC7FBD /* SettingsTransferInfoDecodingTests.swift */; };
 		9D2578A0C71EFA277009170A /* PrinterStatusCameraDecodingTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0EEE85F6636C62884235109 /* PrinterStatusCameraDecodingTests.swift */; };
 		9FC430EBE5876AB11F4B47C0 /* BambuPrinterCameraFeed.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7F5F9FAB3657817D9E6CE4EF /* BambuPrinterCameraFeed.swift */; };
 		A72897F785A9B049880A0A54 /* URLProtocolStub.swift in Sources */ = {isa = PBXBuildFile; fileRef = C514F098C90B69410C6B5A85 /* URLProtocolStub.swift */; };
@@ -182,6 +183,7 @@
 		DBEBCED8EAF681F59258D749 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		E8FBFE3A5340C22D4F4C7981 /* SliceJobDecodingTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SliceJobDecodingTests.swift; sourceTree = "<group>"; };
 		E9D461E5634BC80B7C37747F /* BambuGateway.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = BambuGateway.entitlements; sourceTree = "<group>"; };
+		F3474D97C0D0BAC835CC7FBD /* SettingsTransferInfoDecodingTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsTransferInfoDecodingTests.swift; sourceTree = "<group>"; };
 		FFEEE185FB42B56E8BD094C5 /* ThreeMFReader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ThreeMFReader.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -371,6 +373,7 @@
 				CFF25855CE5E2F502E04B737 /* PrintEstimateDecodingTests.swift */,
 				7FFB4F3826F66CCF3B3483F4 /* PrintEstimationFormattingTests.swift */,
 				55ABCCC281BA256D705F7B45 /* ProcessParameterDecodingTests.swift */,
+				F3474D97C0D0BAC835CC7FBD /* SettingsTransferInfoDecodingTests.swift */,
 				E8FBFE3A5340C22D4F4C7981 /* SliceJobDecodingTests.swift */,
 				9490D22C8082209C193F83D7 /* SliceJobDisplayStatusTests.swift */,
 				95C2C2B1F57EBF9862830C88 /* ThreeMFInfoDecodingTests.swift */,
@@ -588,6 +591,7 @@
 				5B72FB38118F24AE0B84611B /* PrintEstimationFormattingTests.swift in Sources */,
 				9D2578A0C71EFA277009170A /* PrinterStatusCameraDecodingTests.swift in Sources */,
 				AA4573D193ADAB8457578E94 /* ProcessParameterDecodingTests.swift in Sources */,
+				9B9105450DC62BEE592FECAC /* SettingsTransferInfoDecodingTests.swift in Sources */,
 				D5AFDBD382E7C5F0A31BF3FC /* SliceJobDecodingTests.swift in Sources */,
 				EEC0E2CA6D8374B2D161F7DC /* SliceJobDisplayStatusTests.swift in Sources */,
 				C97F7BFE51C4C4166125DD34 /* ThreeMFInfoDecodingTests.swift in Sources */,

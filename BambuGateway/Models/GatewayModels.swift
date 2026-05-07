@@ -279,6 +279,8 @@ struct SettingsTransferInfo: Decodable {
     let status: String
     let transferred: [TransferredSetting]
     let filaments: [FilamentTransferEntry]
+    /// Optional — older gateway responses omit this field.
+    let processOverridesApplied: [ProcessOverrideApplied]?
 }
 
 struct TransferredSetting: Decodable, Hashable {
