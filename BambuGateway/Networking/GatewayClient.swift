@@ -28,6 +28,11 @@ struct PrintSubmission {
     let machineProfile: String
     let processProfile: String
     let filamentOverrides: [Int: FilamentOverrideSelection]
+    /// User-edited process parameter overrides. Stringified per the libslic3r
+    /// config-string convention (booleans `"1"`/`"0"`, percents `"50%"`, enums
+    /// as the enum key). Sent as a single JSON-string multipart field named
+    /// `process_overrides`. nil → field omitted.
+    let processOverrides: [String: String]?
 }
 
 struct GatewayClient {
@@ -142,6 +147,7 @@ struct GatewayClient {
         if !submission.filamentOverrides.isEmpty {
             try addFilamentProfilesField(to: &form, overrides: submission.filamentOverrides)
         }
+        try addProcessOverridesField(to: &form, overrides: submission.processOverrides)
         form.finalize()
 
         let bodyURL = try form.writeBody(toTemporaryFileNamed: "print-preview")
@@ -215,6 +221,7 @@ struct GatewayClient {
         if !submission.filamentOverrides.isEmpty {
             try addFilamentProfilesField(to: &form, overrides: submission.filamentOverrides)
         }
+        try addProcessOverridesField(to: &form, overrides: submission.processOverrides)
         // auto_print stays false; the iOS app drives the print explicitly later.
         form.addField(name: "auto_print", value: "false")
         form.finalize()
@@ -370,6 +377,7 @@ struct GatewayClient {
         if !submission.filamentOverrides.isEmpty {
             try addFilamentProfilesField(to: &form, overrides: submission.filamentOverrides)
         }
+        try addProcessOverridesField(to: &form, overrides: submission.processOverrides)
         form.finalize()
 
         let bodyURL = try form.writeBody(toTemporaryFileNamed: "print")
@@ -583,6 +591,17 @@ struct GatewayClient {
         let json = try JSONEncoder().encode(payload)
         if let string = String(data: json, encoding: .utf8) {
             form.addField(name: "filament_profiles", value: string)
+        }
+    }
+
+    func addProcessOverridesField(
+        to form: inout MultipartFormData,
+        overrides: [String: String]?
+    ) throws {
+        guard let overrides, !overrides.isEmpty else { return }
+        let json = try JSONEncoder().encode(overrides)
+        if let string = String(data: json, encoding: .utf8) {
+            form.addField(name: "process_overrides", value: string)
         }
     }
 }

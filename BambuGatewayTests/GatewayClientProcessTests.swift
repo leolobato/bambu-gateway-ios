@@ -71,4 +71,57 @@ final class GatewayClientProcessTests: XCTestCase {
         XCTAssertEqual(profile.settingId, "Custom 0.20mm Standard")
         XCTAssertEqual(profile.values["layer_height"], "0.20")
     }
+
+    func test_addProcessOverridesField_withValues_writesJsonStringField() throws {
+        var form = MultipartFormData()
+        let client = makeClient()
+
+        try client.addProcessOverridesField(
+            to: &form,
+            overrides: ["layer_height": "0.16", "wall_loops": "3"]
+        )
+        form.finalize()
+
+        let body = String(data: form.body, encoding: .utf8) ?? ""
+        XCTAssertTrue(body.contains("name=\"process_overrides\""), "field name missing in body")
+        XCTAssertTrue(body.contains("\"layer_height\":\"0.16\""), "layer_height missing in JSON value")
+        XCTAssertTrue(body.contains("\"wall_loops\":\"3\""), "wall_loops missing in JSON value")
+    }
+
+    func test_addProcessOverridesField_withNil_omitsField() throws {
+        var form = MultipartFormData()
+        let client = makeClient()
+
+        try client.addProcessOverridesField(to: &form, overrides: nil)
+        form.finalize()
+
+        let body = String(data: form.body, encoding: .utf8) ?? ""
+        XCTAssertFalse(body.contains("name=\"process_overrides\""))
+    }
+
+    func test_addProcessOverridesField_withEmptyDict_omitsField() throws {
+        var form = MultipartFormData()
+        let client = makeClient()
+
+        try client.addProcessOverridesField(to: &form, overrides: [:])
+        form.finalize()
+
+        let body = String(data: form.body, encoding: .utf8) ?? ""
+        XCTAssertFalse(body.contains("name=\"process_overrides\""))
+    }
+
+    func test_printSubmission_initializesWithProcessOverrides() {
+        let submission = PrintSubmission(
+            file: Imported3MFFile(fileName: "x.3mf", data: Data([0x01])),
+            printerId: "P1",
+            plateId: nil,
+            plateType: "",
+            machineProfile: "GM004",
+            processProfile: "GP004",
+            filamentOverrides: [:],
+            processOverrides: ["layer_height": "0.16"]
+        )
+
+        XCTAssertEqual(submission.processOverrides?["layer_height"], "0.16")
+    }
 }

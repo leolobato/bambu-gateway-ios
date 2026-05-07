@@ -854,7 +854,8 @@ final class AppViewModel: ObservableObject {
             plateType: selectedPlateType,
             machineProfile: selectedMachineProfileId,
             processProfile: selectedProcessProfileId,
-            filamentOverrides: buildFilamentOverrides(for: parsedInfo)
+            filamentOverrides: buildFilamentOverrides(for: parsedInfo),
+            processOverrides: nil
         )
     }
 
