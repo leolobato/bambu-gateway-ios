@@ -69,6 +69,7 @@
 		CA1468A89E6DEFF522781031 /* GCodePreviewModal.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5AFFC06CAC383459918EF95 /* GCodePreviewModal.swift */; };
 		CAD4B96276AAC8B63ADE3B20 /* NotificationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 596B45CE6BCC0F808017F737 /* NotificationService.swift */; };
 		CB3388B447DBAD970B907E6B /* AppViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9DB60428FD52299388786225 /* AppViewModel.swift */; };
+		CBBEF4AE9B90C370D74C71D3 /* ProcessPageDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4DB190EA2A9F8BC2F5685B10 /* ProcessPageDetailView.swift */; };
 		CEBE552A3F5C98026899E775 /* GatewayClientProcessTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AE1A28D72B011EF0DACA0946 /* GatewayClientProcessTests.swift */; };
 		D564F45854A8E47724DDA0F4 /* ProcessValueResolutionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C00671734B5EF69E62886985 /* ProcessValueResolutionTests.swift */; };
 		D5AFDBD382E7C5F0A31BF3FC /* SliceJobDecodingTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E8FBFE3A5340C22D4F4C7981 /* SliceJobDecodingTests.swift */; };
@@ -140,6 +141,7 @@
 		3CA2C79ED9B2FE1A5FCBF4EB /* SliceJobsSection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SliceJobsSection.swift; sourceTree = "<group>"; };
 		450020B566A6C67BC3D57DE2 /* SpeedPickerSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpeedPickerSheet.swift; sourceTree = "<group>"; };
 		47F98F122F17587AC06D257D /* GatewayModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GatewayModels.swift; sourceTree = "<group>"; };
+		4DB190EA2A9F8BC2F5685B10 /* ProcessPageDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProcessPageDetailView.swift; sourceTree = "<group>"; };
 		55ABCCC281BA256D705F7B45 /* ProcessParameterDecodingTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProcessParameterDecodingTests.swift; sourceTree = "<group>"; };
 		55B3439E1A118869570FD3A9 /* SliceJobDetailSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SliceJobDetailSheet.swift; sourceTree = "<group>"; };
 		5603694E5ECBBCB86D109186 /* AppViewModelProcessOverridesTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppViewModelProcessOverridesTests.swift; sourceTree = "<group>"; };
@@ -265,6 +267,7 @@
 			children = (
 				A4765231D68406E9BAD3D356 /* ProcessOptionEditor.swift */,
 				5F8B5B9D9174167346D65888 /* ProcessOptionRow.swift */,
+				4DB190EA2A9F8BC2F5685B10 /* ProcessPageDetailView.swift */,
 			);
 			path = ProcessParameters;
 			sourceTree = "<group>";
@@ -676,6 +679,7 @@
 				631DEEA034DF57BF2695A3D8 /* ProcessOptionEditor.swift in Sources */,
 				E9D95F4833A93B1114C07FCB /* ProcessOptionRow.swift in Sources */,
 				7ACF8A11E885A953ACD6AFED /* ProcessOptionsStore.swift in Sources */,
+				CBBEF4AE9B90C370D74C71D3 /* ProcessPageDetailView.swift in Sources */,
 				6C55951A82729971F282CDDA /* ProcessParameter.swift in Sources */,
 				503F97F3CE1A8AE99834FBED /* ProcessValueResolution.swift in Sources */,
 				91FB314780FCE460E7C2F783 /* PushService.swift in Sources */,
