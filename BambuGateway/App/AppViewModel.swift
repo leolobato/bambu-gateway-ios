@@ -55,8 +55,18 @@ final class AppViewModel: ObservableObject {
     @Published var processOptions: [ProfileOption] = []
     @Published var plateTypeOptions: [ProfileOption] = [ProfileOption(id: "", label: "Use file/default")]
     @Published var selectedMachineProfileId: String = ""
-    @Published var selectedProcessProfileId: String = ""
+    @Published var selectedProcessProfileId: String = "" {
+        didSet { onProcessProfileChanged(selectedProcessProfileId) }
+    }
     @Published var selectedPlateType: String = ""
+
+    /// User-edited process overrides for the currently-selected 3MF, keyed by
+    /// allowlisted process-option key. Cleared on file change/drop.
+    @Published var processOverrides: [String: String] = [:]
+    /// Resolved baseline values for the currently-selected process profile,
+    /// fetched lazily from the gateway. Re-resolved when the profile changes;
+    /// cleared on file change/drop.
+    @Published var processBaseline: [String: String] = [:]
 
     @Published var selectedFile: Imported3MFFile?
     @Published var parsedInfo: ThreeMFInfo?
@@ -125,6 +135,7 @@ final class AppViewModel: ObservableObject {
     let notificationService: NotificationService
     let toastCenter: ToastCenter
     let transferService: BackgroundTransferService
+    let processOptionsStore: ProcessOptionsStore
 
     private var previousStates: [String: String] = [:]
 
@@ -167,6 +178,7 @@ final class AppViewModel: ObservableObject {
         self.notificationService = NotificationService()
         self.toastCenter = toast
         self.transferService = transfer
+        self.processOptionsStore = ProcessOptionsStore(client: initialClient)
         AppDelegate.pushService = push
         AppDelegate.toastCenter = toast
         AppDelegate.transferService = transfer
@@ -340,8 +352,7 @@ final class AppViewModel: ObservableObject {
         activeUploadId = nil
         isCancellingUpload = false
         startedPrintContext = nil
-        selectedFile = nil
-        parsedInfo = nil
+        clearSelectedFile()
         filamentMatchesByIndex = [:]
         machineOptions = []
         processOptions = []
@@ -1378,6 +1389,7 @@ final class AppViewModel: ObservableObject {
             guard selectedFile == fileToParse else { return }
             declaredProjectFilaments = info.filaments
             parsedInfo = info
+            onParsedInfoLoaded(info)
             selectedPlateId = info.plates.first?.id ?? 0
             configureProfileOptions(for: info)
             await refreshFilamentMatches()
@@ -1909,5 +1921,57 @@ final class AppViewModel: ObservableObject {
         } catch {
             return []
         }
+    }
+
+    // MARK: - Process overrides
+
+    func setProcessOverride(key: String, value: String) {
+        processOverrides[key] = value
+    }
+
+    func revertProcessOverride(key: String) {
+        processOverrides.removeValue(forKey: key)
+    }
+
+    func resetAllProcessOverrides() {
+        processOverrides.removeAll()
+    }
+
+    /// Called when a new 3MF is parsed successfully. Clears any prior edits
+    /// and seeds the baseline from the file's recorded process profile when
+    /// available.
+    fileprivate func onParsedInfoLoaded(_ info: ThreeMFInfo) {
+        processOverrides.removeAll()
+        processBaseline.removeAll()
+        guard let mods = info.processModifications,
+              !mods.processSettingId.isEmpty else { return }
+        Task { [weak self] in
+            guard let self else { return }
+            if let values = await self.processOptionsStore.profileValues(for: mods.processSettingId) {
+                self.processBaseline = values
+            }
+        }
+    }
+
+    /// Called when the user changes the process profile picker. Re-resolves
+    /// the baseline; user overrides are preserved.
+    fileprivate func onProcessProfileChanged(_ settingId: String) {
+        processBaseline.removeAll()
+        guard !settingId.isEmpty else { return }
+        Task { [weak self] in
+            guard let self else { return }
+            if let values = await self.processOptionsStore.profileValues(for: settingId) {
+                self.processBaseline = values
+            }
+        }
+    }
+
+    /// Called when the selected file is cleared/replaced. Resets the parse
+    /// result alongside any per-file process-override state.
+    func clearSelectedFile() {
+        selectedFile = nil
+        parsedInfo = nil
+        processOverrides.removeAll()
+        processBaseline.removeAll()
     }
 }
