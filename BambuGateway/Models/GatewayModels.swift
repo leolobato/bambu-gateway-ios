@@ -188,6 +188,8 @@ struct ThreeMFInfo: Decodable {
     let printProfile: PrintProfileInfo
     let printer: PrinterInfo
     let hasGcode: Bool
+    /// Optional — older gateway responses (schema_version < 4) omit this field.
+    let processModifications: ProcessModifications?
 }
 
 struct PlateInfo: Decodable, Identifiable {

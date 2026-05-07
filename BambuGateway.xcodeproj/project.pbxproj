@@ -59,6 +59,7 @@
 		C12344BE79B9169E1A13F066 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 9A064996EB0DA8288274EC27 /* Assets.xcassets */; };
 		C44AE3E1C219190C0B100AD0 /* LiveActivityService.swift in Sources */ = {isa = PBXBuildFile; fileRef = BAE8CE9E59006DF49C051762 /* LiveActivityService.swift */; };
 		C880911BE8A314F7BB1CCA8A /* PrintEstimationCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = BD79F6C355656BD9DEEBFF85 /* PrintEstimationCard.swift */; };
+		C97F7BFE51C4C4166125DD34 /* ThreeMFInfoDecodingTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 95C2C2B1F57EBF9862830C88 /* ThreeMFInfoDecodingTests.swift */; };
 		C9B3C4A8EF610EBC59EEDCB2 /* BambuGatewayApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9D5542807513C5701CF0BC3D /* BambuGatewayApp.swift */; };
 		CA1468A89E6DEFF522781031 /* GCodePreviewModal.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5AFFC06CAC383459918EF95 /* GCodePreviewModal.swift */; };
 		CAD4B96276AAC8B63ADE3B20 /* NotificationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 596B45CE6BCC0F808017F737 /* NotificationService.swift */; };
@@ -148,6 +149,7 @@
 		93846A9BFBDF5AA0EF917D85 /* PrintEstimate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrintEstimate.swift; sourceTree = "<group>"; };
 		9490D22C8082209C193F83D7 /* SliceJobDisplayStatusTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SliceJobDisplayStatusTests.swift; sourceTree = "<group>"; };
 		95B3B7F980C0E0EC50EEE372 /* MultipartFormData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MultipartFormData.swift; sourceTree = "<group>"; };
+		95C2C2B1F57EBF9862830C88 /* ThreeMFInfoDecodingTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ThreeMFInfoDecodingTests.swift; sourceTree = "<group>"; };
 		97E5B232DEE3A55BBBF52FD7 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
 		9A064996EB0DA8288274EC27 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		9C133CBD53A0F28997154461 /* AppSettingsStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppSettingsStore.swift; sourceTree = "<group>"; };
@@ -371,6 +373,7 @@
 				55ABCCC281BA256D705F7B45 /* ProcessParameterDecodingTests.swift */,
 				E8FBFE3A5340C22D4F4C7981 /* SliceJobDecodingTests.swift */,
 				9490D22C8082209C193F83D7 /* SliceJobDisplayStatusTests.swift */,
+				95C2C2B1F57EBF9862830C88 /* ThreeMFInfoDecodingTests.swift */,
 				8CA9475DF20E480476158F18 /* Support */,
 			);
 			path = BambuGatewayTests;
@@ -587,6 +590,7 @@
 				AA4573D193ADAB8457578E94 /* ProcessParameterDecodingTests.swift in Sources */,
 				D5AFDBD382E7C5F0A31BF3FC /* SliceJobDecodingTests.swift in Sources */,
 				EEC0E2CA6D8374B2D161F7DC /* SliceJobDisplayStatusTests.swift in Sources */,
+				C97F7BFE51C4C4166125DD34 /* ThreeMFInfoDecodingTests.swift in Sources */,
 				A72897F785A9B049880A0A54 /* URLProtocolStub.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
