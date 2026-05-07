@@ -45,6 +45,7 @@
 		9838CAA375A45D38455D0394 /* SpeedPickerSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = 450020B566A6C67BC3D57DE2 /* SpeedPickerSheet.swift */; };
 		9D2578A0C71EFA277009170A /* PrinterStatusCameraDecodingTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0EEE85F6636C62884235109 /* PrinterStatusCameraDecodingTests.swift */; };
 		9FC430EBE5876AB11F4B47C0 /* BambuPrinterCameraFeed.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7F5F9FAB3657817D9E6CE4EF /* BambuPrinterCameraFeed.swift */; };
+		A72897F785A9B049880A0A54 /* URLProtocolStub.swift in Sources */ = {isa = PBXBuildFile; fileRef = C514F098C90B69410C6B5A85 /* URLProtocolStub.swift */; };
 		A7F2C0EA5DD4EFA272D034BC /* MobileVLCKit in Frameworks */ = {isa = PBXBuildFile; productRef = 4E1548E9D0BF21D3D57713BE /* MobileVLCKit */; };
 		AB2066B52591F2C3AADD9BC1 /* CameraTab.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8C9036F5C817DB069A0DD120 /* CameraTab.swift */; };
 		ABA318F3B31BE90C35C19873 /* PrintEstimate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 93846A9BFBDF5AA0EF917D85 /* PrintEstimate.swift */; };
@@ -164,6 +165,7 @@
 		BD79F6C355656BD9DEEBFF85 /* PrintEstimationCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrintEstimationCard.swift; sourceTree = "<group>"; };
 		C0CACA553E0D70F489079E05 /* PrintProgressCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrintProgressCard.swift; sourceTree = "<group>"; };
 		C0EEE85F6636C62884235109 /* PrinterStatusCameraDecodingTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrinterStatusCameraDecodingTests.swift; sourceTree = "<group>"; };
+		C514F098C90B69410C6B5A85 /* URLProtocolStub.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = URLProtocolStub.swift; sourceTree = "<group>"; };
 		C5AFFC06CAC383459918EF95 /* GCodePreviewModal.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GCodePreviewModal.swift; sourceTree = "<group>"; };
 		C86D1F00D0E5D21411935A5E /* PrinterStatusCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrinterStatusCard.swift; sourceTree = "<group>"; };
 		CAD2B6571B7210AD007472D2 /* LiveActivityExtension.appex */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = "wrapper.app-extension"; path = LiveActivityExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -289,6 +291,14 @@
 			path = Data;
 			sourceTree = "<group>";
 		};
+		8CA9475DF20E480476158F18 /* Support */ = {
+			isa = PBXGroup;
+			children = (
+				C514F098C90B69410C6B5A85 /* URLProtocolStub.swift */,
+			);
+			path = Support;
+			sourceTree = "<group>";
+		};
 		9BDAE05EA0C57DFE8E7377AD /* ThreeMF */ = {
 			isa = PBXGroup;
 			children = (
@@ -355,6 +365,7 @@
 				7FFB4F3826F66CCF3B3483F4 /* PrintEstimationFormattingTests.swift */,
 				E8FBFE3A5340C22D4F4C7981 /* SliceJobDecodingTests.swift */,
 				9490D22C8082209C193F83D7 /* SliceJobDisplayStatusTests.swift */,
+				8CA9475DF20E480476158F18 /* Support */,
 			);
 			path = BambuGatewayTests;
 			sourceTree = "<group>";
@@ -569,6 +580,7 @@
 				9D2578A0C71EFA277009170A /* PrinterStatusCameraDecodingTests.swift in Sources */,
 				D5AFDBD382E7C5F0A31BF3FC /* SliceJobDecodingTests.swift in Sources */,
 				EEC0E2CA6D8374B2D161F7DC /* SliceJobDisplayStatusTests.swift in Sources */,
+				A72897F785A9B049880A0A54 /* URLProtocolStub.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
