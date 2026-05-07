@@ -21,6 +21,7 @@ struct PrintTab: View {
 
                         if viewModel.needsSlicing {
                             slicingSettingsSection
+                            ProcessParametersCard(viewModel: viewModel)
                         }
 
                         filamentsSection
@@ -711,7 +712,7 @@ private struct FilledButtonStyle: ButtonStyle {
     }
 }
 
-private struct TonalButtonStyle: ButtonStyle {
+struct TonalButtonStyle: ButtonStyle {
     let tint: Color
     @Environment(\.isEnabled) private var isEnabled
 

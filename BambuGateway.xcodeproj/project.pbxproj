@@ -39,6 +39,7 @@
 		6F950FB8F2C074ABCF15B58F /* BambuTCPJPEGFeed.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2CD1B0E2E27437689C3D753A /* BambuTCPJPEGFeed.swift */; };
 		70CCAF8C0F42A532EBBB3A10 /* AppSettingsStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9C133CBD53A0F28997154461 /* AppSettingsStore.swift */; };
 		722C07A2FE9F8D32DA14CC11 /* PrintTab.swift in Sources */ = {isa = PBXBuildFile; fileRef = 25AA0EB97886F4C8EB4AC476 /* PrintTab.swift */; };
+		75532CA0560902DA98B1AF6B /* ProcessParametersCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3A513C2236BDDE4E244AC161 /* ProcessParametersCard.swift */; };
 		7ACF8A11E885A953ACD6AFED /* ProcessOptionsStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B901FD090D599251CAC63EB /* ProcessOptionsStore.swift */; };
 		7BF05FE867DD814C8E22E0F6 /* CameraFeedController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 753276AADA566A39C55576DC /* CameraFeedController.swift */; };
 		7FBB60D7C763B1731A6A7368 /* PrinterStatusCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = C86D1F00D0E5D21411935A5E /* PrinterStatusCard.swift */; };
@@ -138,6 +139,7 @@
 		2CD1B0E2E27437689C3D753A /* BambuTCPJPEGFeed.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BambuTCPJPEGFeed.swift; sourceTree = "<group>"; };
 		32780EC48A776B886BDB8B31 /* PrintControlsRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrintControlsRow.swift; sourceTree = "<group>"; };
 		36C28A77CC578F19C3B443A8 /* AppSettingsStoreCameraTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppSettingsStoreCameraTests.swift; sourceTree = "<group>"; };
+		3A513C2236BDDE4E244AC161 /* ProcessParametersCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProcessParametersCard.swift; sourceTree = "<group>"; };
 		3B46FA0BBEC43DF398153A59 /* MakerWorldBrowserView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MakerWorldBrowserView.swift; sourceTree = "<group>"; };
 		3CA2C79ED9B2FE1A5FCBF4EB /* SliceJobsSection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SliceJobsSection.swift; sourceTree = "<group>"; };
 		3F758F11180A2BEE3E8AA429 /* ProcessAllSettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProcessAllSettingsView.swift; sourceTree = "<group>"; };
@@ -271,6 +273,7 @@
 				A4765231D68406E9BAD3D356 /* ProcessOptionEditor.swift */,
 				5F8B5B9D9174167346D65888 /* ProcessOptionRow.swift */,
 				4DB190EA2A9F8BC2F5685B10 /* ProcessPageDetailView.swift */,
+				3A513C2236BDDE4E244AC161 /* ProcessParametersCard.swift */,
 			);
 			path = ProcessParameters;
 			sourceTree = "<group>";
@@ -685,6 +688,7 @@
 				7ACF8A11E885A953ACD6AFED /* ProcessOptionsStore.swift in Sources */,
 				CBBEF4AE9B90C370D74C71D3 /* ProcessPageDetailView.swift in Sources */,
 				6C55951A82729971F282CDDA /* ProcessParameter.swift in Sources */,
+				75532CA0560902DA98B1AF6B /* ProcessParametersCard.swift in Sources */,
 				503F97F3CE1A8AE99834FBED /* ProcessValueResolution.swift in Sources */,
 				91FB314780FCE460E7C2F783 /* PushService.swift in Sources */,
 				DAA6A261BF169E58D43A32F6 /* SettingsView.swift in Sources */,
