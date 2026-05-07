@@ -1947,7 +1947,8 @@ final class AppViewModel: ObservableObject {
               !mods.processSettingId.isEmpty else { return }
         Task { [weak self] in
             guard let self else { return }
-            if let values = await self.processOptionsStore.profileValues(for: mods.processSettingId) {
+            if let values = await self.processOptionsStore.profileValues(for: mods.processSettingId),
+               self.parsedInfo?.processModifications?.processSettingId == mods.processSettingId {
                 self.processBaseline = values
             }
         }
@@ -1960,7 +1961,8 @@ final class AppViewModel: ObservableObject {
         guard !settingId.isEmpty else { return }
         Task { [weak self] in
             guard let self else { return }
-            if let values = await self.processOptionsStore.profileValues(for: settingId) {
+            if let values = await self.processOptionsStore.profileValues(for: settingId),
+               self.selectedProcessProfileId == settingId {
                 self.processBaseline = values
             }
         }
