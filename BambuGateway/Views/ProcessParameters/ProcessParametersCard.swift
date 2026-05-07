@@ -6,24 +6,26 @@ struct ProcessParametersCard: View {
     @State private var editingOptionKey: String?
 
     var body: some View {
-        VStack(spacing: 0) {
-            header
-            if !modifiedKeys.isEmpty {
-                Divider().opacity(0.3)
-                ForEach(modifiedKeys, id: \.self) { key in
-                    optionRow(forKey: key)
-                    if key != modifiedKeys.last {
-                        Divider().opacity(0.3).padding(.leading, 36)
+        VStack(alignment: .leading, spacing: 6) {
+            sectionHeader
+
+            VStack(spacing: 0) {
+                if modifiedKeys.isEmpty {
+                    emptyRow
+                } else {
+                    ForEach(modifiedKeys, id: \.self) { key in
+                        optionRow(forKey: key)
+                        Divider().padding(.leading, 12)
                     }
                 }
-            } else {
-                emptyBody
+                if modifiedKeys.isEmpty {
+                    Divider().padding(.leading, 14)
+                }
+                showAllRow
             }
-            showAllButton
+            .background(Color.cardBackground)
+            .clipShape(RoundedRectangle(cornerRadius: 12))
         }
-        .padding(14)
-        .background(Color.cardBackground)
-        .clipShape(RoundedRectangle(cornerRadius: 12))
         .task {
             await viewModel.processOptionsStore.loadCatalogueIfNeeded()
             await viewModel.processOptionsStore.loadLayoutIfNeeded()
@@ -41,23 +43,19 @@ struct ProcessParametersCard: View {
     }
 
     @ViewBuilder
-    private var header: some View {
-        HStack(spacing: 8) {
-            Image(systemName: "slider.horizontal.3")
-                .font(.system(size: 14, weight: .medium))
-                .foregroundStyle(Color.accentBlue)
-            Text("Process settings")
-                .font(.headline)
+    private var sectionHeader: some View {
+        HStack {
+            Text("Process Settings")
+                .font(.subheadline)
+                .fontWeight(.semibold)
             Spacer()
             if !modifiedKeys.isEmpty {
                 Text("\(modifiedKeys.count) modified")
-                    .font(.caption2.weight(.semibold))
-                    .foregroundStyle(Color.accentBlue)
-                    .padding(.horizontal, 8)
-                    .padding(.vertical, 3)
-                    .background(Color.accentBlue.opacity(0.18), in: Capsule())
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
             }
         }
+        .padding(.top, 4)
     }
 
     @ViewBuilder
@@ -78,7 +76,6 @@ struct ProcessParametersCard: View {
                 action: { editingOptionKey = key }
             )
         } else {
-            // Catalogue missing the key — render the raw value read-only.
             ProcessOptionRow(
                 label: key,
                 value: viewModel.parsedInfo?.processModifications?.values[key] ?? "",
@@ -92,37 +89,38 @@ struct ProcessParametersCard: View {
     }
 
     @ViewBuilder
-    private var emptyBody: some View {
-        VStack(spacing: 8) {
-            Image(systemName: "slider.horizontal.below.rectangle")
-                .font(.system(size: 28))
-                .foregroundStyle(.tertiary)
+    private var emptyRow: some View {
+        HStack {
             Text("No customizations from default profile")
                 .font(.subheadline)
                 .foregroundStyle(.secondary)
-                .multilineTextAlignment(.center)
+            Spacer()
         }
-        .frame(maxWidth: .infinity)
-        .padding(.vertical, 16)
+        .padding(.horizontal, 14)
+        .padding(.vertical, 12)
+        .frame(minHeight: 44)
     }
 
     @ViewBuilder
-    private var showAllButton: some View {
+    private var showAllRow: some View {
         Button {
             showAllSettings = true
         } label: {
-            HStack {
+            HStack(spacing: 8) {
                 Text("Show all settings")
-                    .fontWeight(.semibold)
-                Spacer()
+                    .font(.subheadline)
+                    .fontWeight(.medium)
+                    .foregroundStyle(.primary)
+                Spacer(minLength: 12)
                 Image(systemName: "chevron.right")
-                    .font(.system(size: 12, weight: .semibold))
+                    .font(.system(size: 12, weight: .medium))
+                    .foregroundStyle(.tertiary)
             }
-            .padding(.vertical, 8)
-            .frame(maxWidth: .infinity)
+            .padding(.horizontal, 14)
+            .padding(.vertical, 12)
+            .contentShape(Rectangle())
         }
-        .buttonStyle(TonalButtonStyle(tint: Color.accentBlue))
-        .padding(.top, 10)
+        .buttonStyle(.plain)
     }
 
     private func status(forKey key: String) -> ProcessOptionRow.Status {

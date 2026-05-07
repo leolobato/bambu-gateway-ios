@@ -132,6 +132,12 @@ struct ProcessAllSettingsView: View {
         VStack(spacing: 12) {
             Text("Couldn't load process settings")
                 .font(.headline)
+            if let error = viewModel.processOptionsStore.loadError {
+                Text(error.localizedDescription)
+                    .font(.footnote)
+                    .foregroundStyle(.secondary)
+                    .multilineTextAlignment(.center)
+            }
             Button("Retry") {
                 Task {
                     await viewModel.processOptionsStore.loadCatalogueIfNeeded()
@@ -140,7 +146,12 @@ struct ProcessAllSettingsView: View {
             }
             .buttonStyle(.bordered)
         }
-        .padding()
+        .padding(20)
+        .frame(maxWidth: .infinity)
+        .background(Color.cardBackground)
+        .clipShape(RoundedRectangle(cornerRadius: 16))
+        .padding(.horizontal, 16)
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
     }
 
     private func rowStatus(forKey key: String) -> ProcessOptionRow.Status {
