@@ -32,6 +32,7 @@
 		5EFF38613D9B75AE20535094 /* BackgroundTransferService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9D42A6454693256E2379F8F5 /* BackgroundTransferService.swift */; };
 		6326A5843953FCC43B8311EB /* MultipartFormData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 95B3B7F980C0E0EC50EEE372 /* MultipartFormData.swift */; };
 		67618F9E9456EA482EB1ADB0 /* PrintEstimateDecodingTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = CFF25855CE5E2F502E04B737 /* PrintEstimateDecodingTests.swift */; };
+		6C55951A82729971F282CDDA /* ProcessParameter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BE301BDA698282EC2343ACF /* ProcessParameter.swift */; };
 		6D6F831E399F8EF5C49D1B81 /* GCodePreview in Frameworks */ = {isa = PBXBuildFile; productRef = 85BFD403F2AE24BB83C64D31 /* GCodePreview */; };
 		6F950FB8F2C074ABCF15B58F /* BambuTCPJPEGFeed.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2CD1B0E2E27437689C3D753A /* BambuTCPJPEGFeed.swift */; };
 		70CCAF8C0F42A532EBBB3A10 /* AppSettingsStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9C133CBD53A0F28997154461 /* AppSettingsStore.swift */; };
@@ -47,6 +48,7 @@
 		9FC430EBE5876AB11F4B47C0 /* BambuPrinterCameraFeed.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7F5F9FAB3657817D9E6CE4EF /* BambuPrinterCameraFeed.swift */; };
 		A72897F785A9B049880A0A54 /* URLProtocolStub.swift in Sources */ = {isa = PBXBuildFile; fileRef = C514F098C90B69410C6B5A85 /* URLProtocolStub.swift */; };
 		A7F2C0EA5DD4EFA272D034BC /* MobileVLCKit in Frameworks */ = {isa = PBXBuildFile; productRef = 4E1548E9D0BF21D3D57713BE /* MobileVLCKit */; };
+		AA4573D193ADAB8457578E94 /* ProcessParameterDecodingTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 55ABCCC281BA256D705F7B45 /* ProcessParameterDecodingTests.swift */; };
 		AB2066B52591F2C3AADD9BC1 /* CameraTab.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8C9036F5C817DB069A0DD120 /* CameraTab.swift */; };
 		ABA318F3B31BE90C35C19873 /* PrintEstimate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 93846A9BFBDF5AA0EF917D85 /* PrintEstimate.swift */; };
 		B112E90578486CB35D2277BA /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBEBCED8EAF681F59258D749 /* ContentView.swift */; };
@@ -126,8 +128,10 @@
 		3CA2C79ED9B2FE1A5FCBF4EB /* SliceJobsSection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SliceJobsSection.swift; sourceTree = "<group>"; };
 		450020B566A6C67BC3D57DE2 /* SpeedPickerSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpeedPickerSheet.swift; sourceTree = "<group>"; };
 		47F98F122F17587AC06D257D /* GatewayModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GatewayModels.swift; sourceTree = "<group>"; };
+		55ABCCC281BA256D705F7B45 /* ProcessParameterDecodingTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProcessParameterDecodingTests.swift; sourceTree = "<group>"; };
 		55B3439E1A118869570FD3A9 /* SliceJobDetailSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SliceJobDetailSheet.swift; sourceTree = "<group>"; };
 		596B45CE6BCC0F808017F737 /* NotificationService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationService.swift; sourceTree = "<group>"; };
+		5BE301BDA698282EC2343ACF /* ProcessParameter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProcessParameter.swift; sourceTree = "<group>"; };
 		5BEBF1713CA6AF40B8331BFA /* BambuGatewayTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BambuGatewayTests.swift; sourceTree = "<group>"; };
 		60EEE74AFB6EC29279BA25F4 /* CameraFeedView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraFeedView.swift; sourceTree = "<group>"; };
 		68FD23DF97AF009395F22F1E /* ShareViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShareViewController.swift; sourceTree = "<group>"; };
@@ -230,6 +234,7 @@
 				47F98F122F17587AC06D257D /* GatewayModels.swift */,
 				8E70DDBC904B734FBBB17271 /* PrintActivityAttributes.swift */,
 				93846A9BFBDF5AA0EF917D85 /* PrintEstimate.swift */,
+				5BE301BDA698282EC2343ACF /* ProcessParameter.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -363,6 +368,7 @@
 				C0EEE85F6636C62884235109 /* PrinterStatusCameraDecodingTests.swift */,
 				CFF25855CE5E2F502E04B737 /* PrintEstimateDecodingTests.swift */,
 				7FFB4F3826F66CCF3B3483F4 /* PrintEstimationFormattingTests.swift */,
+				55ABCCC281BA256D705F7B45 /* ProcessParameterDecodingTests.swift */,
 				E8FBFE3A5340C22D4F4C7981 /* SliceJobDecodingTests.swift */,
 				9490D22C8082209C193F83D7 /* SliceJobDisplayStatusTests.swift */,
 				8CA9475DF20E480476158F18 /* Support */,
@@ -578,6 +584,7 @@
 				67618F9E9456EA482EB1ADB0 /* PrintEstimateDecodingTests.swift in Sources */,
 				5B72FB38118F24AE0B84611B /* PrintEstimationFormattingTests.swift in Sources */,
 				9D2578A0C71EFA277009170A /* PrinterStatusCameraDecodingTests.swift in Sources */,
+				AA4573D193ADAB8457578E94 /* ProcessParameterDecodingTests.swift in Sources */,
 				D5AFDBD382E7C5F0A31BF3FC /* SliceJobDecodingTests.swift in Sources */,
 				EEC0E2CA6D8374B2D161F7DC /* SliceJobDisplayStatusTests.swift in Sources */,
 				A72897F785A9B049880A0A54 /* URLProtocolStub.swift in Sources */,
@@ -622,6 +629,7 @@
 				49397CEDE4D75E47854A886C /* PrinterOfflineCard.swift in Sources */,
 				7FBB60D7C763B1731A6A7368 /* PrinterStatusCard.swift in Sources */,
 				4C1A529AD33EE2A149CD9C0E /* PrinterTab.swift in Sources */,
+				6C55951A82729971F282CDDA /* ProcessParameter.swift in Sources */,
 				91FB314780FCE460E7C2F783 /* PushService.swift in Sources */,
 				DAA6A261BF169E58D43A32F6 /* SettingsView.swift in Sources */,
 				553FFDB660066B5E9D1B5FB6 /* SliceJobDetailSheet.swift in Sources */,
