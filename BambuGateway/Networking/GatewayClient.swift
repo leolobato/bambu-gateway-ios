@@ -80,6 +80,11 @@ struct GatewayClient {
         try await get(path: "/api/options/process/layout")
     }
 
+    func fetchProcessProfile(settingId: String) async throws -> ResolvedProcessProfile {
+        let escaped = settingId.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) ?? settingId
+        return try await get(path: "/api/slicer/processes/\(escaped)")
+    }
+
     func parse3MF(file: Imported3MFFile) async throws -> ThreeMFInfo {
         var form = MultipartFormData()
         form.addFile(name: "file", fileName: file.fileName, mimeType: "application/octet-stream", data: file.data)

@@ -488,3 +488,8 @@ struct CameraInfo: Decodable, Hashable {
         case ip, accessCode, transport, chamberLight
     }
 }
+
+struct ResolvedProcessProfile: Decodable {
+    let settingId: String
+    let values: [String: String]
+}

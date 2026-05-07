@@ -53,4 +53,22 @@ final class GatewayClientProcessTests: XCTestCase {
         XCTAssertEqual(layout.allowlistRevision, "2026-05-06.1")
         XCTAssertEqual(layout.pages[0].optgroups[0].options, ["layer_height"])
     }
+
+    func test_fetchProcessProfile_returnsValues() async throws {
+        let body = #"""
+        {
+          "setting_id": "Custom 0.20mm Standard",
+          "values": {"layer_height": "0.20", "wall_loops": "2"}
+        }
+        """#.data(using: .utf8)!
+        URLProtocolStub.enqueue(
+            path: "/api/slicer/processes/Custom%200.20mm%20Standard",
+            response: .init(body: body)
+        )
+
+        let profile = try await makeClient().fetchProcessProfile(settingId: "Custom 0.20mm Standard")
+
+        XCTAssertEqual(profile.settingId, "Custom 0.20mm Standard")
+        XCTAssertEqual(profile.values["layer_height"], "0.20")
+    }
 }
