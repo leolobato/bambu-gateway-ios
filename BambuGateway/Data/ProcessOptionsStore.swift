@@ -8,10 +8,12 @@ final class ProcessOptionsStore: ObservableObject {
     @Published private(set) var allowlistedKeys: Set<String> = []
     @Published private(set) var loadError: Error?
     @Published private(set) var isLoading: Bool = false
+    @Published private(set) var profileBaselines: [String: [String: String]] = [:]
 
     private let client: GatewayClient
     private var catalogueTask: Task<Void, Never>?
     private var layoutTask: Task<Void, Never>?
+    private var profileTasks: [String: Task<[String: String]?, Never>] = [:]
 
     init(client: GatewayClient) {
         self.client = client
@@ -64,5 +66,29 @@ final class ProcessOptionsStore: ObservableObject {
         layoutTask = task
         await task.value
         layoutTask = nil
+    }
+
+    /// Returns the resolved values for a process profile, fetching once and
+    /// caching by setting id. Returns nil on failure (caller may retry later).
+    func profileValues(for settingId: String) async -> [String: String]? {
+        if settingId.isEmpty { return nil }
+        if let cached = profileBaselines[settingId] { return cached }
+        if let task = profileTasks[settingId] {
+            return await task.value
+        }
+        let task = Task { [client] () -> [String: String]? in
+            do {
+                let profile = try await client.fetchProcessProfile(settingId: settingId)
+                self.profileBaselines[settingId] = profile.values
+                return profile.values
+            } catch {
+                self.loadError = error
+                return nil
+            }
+        }
+        profileTasks[settingId] = task
+        let result = await task.value
+        profileTasks[settingId] = nil
+        return result
     }
 }

@@ -98,6 +98,37 @@ final class ProcessOptionsStoreTests: XCTestCase {
         XCTAssertEqual(store.layout?.allowlistRevision, "2026-06-01.1")
     }
 
+    private func enqueueProfile(settingId: String) {
+        let escaped = settingId.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) ?? settingId
+        let body = """
+        {"setting_id": "\(settingId)", "values": {"layer_height": "0.20"}}
+        """.data(using: .utf8)!
+        URLProtocolStub.enqueue(path: "/api/slicer/processes/\(escaped)", response: .init(body: body))
+    }
+
+    func test_loadProfile_storesByKey() async throws {
+        enqueueProfile(settingId: "Custom 0.20mm Standard")
+        let store = ProcessOptionsStore(client: makeClient())
+
+        let values = await store.profileValues(for: "Custom 0.20mm Standard")
+
+        XCTAssertEqual(values?["layer_height"], "0.20")
+    }
+
+    func test_loadProfile_secondCall_doesNotRefetch() async throws {
+        enqueueProfile(settingId: "P")
+        let store = ProcessOptionsStore(client: makeClient())
+
+        _ = await store.profileValues(for: "P")
+        _ = await store.profileValues(for: "P")
+
+        let escaped = "P".addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) ?? "P"
+        XCTAssertEqual(
+            URLProtocolStub.requestedPaths.filter { $0 == "/api/slicer/processes/\(escaped)" }.count,
+            1
+        )
+    }
+
     func test_loadCatalogue_serverError_setsLoadError() async throws {
         URLProtocolStub.enqueue(
             path: "/api/options/process",
