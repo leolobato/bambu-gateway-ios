@@ -60,6 +60,7 @@
 		B30AD4F02ACBB47DD4CAB1AF /* PrintActivityAttributes.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E70DDBC904B734FBBB17271 /* PrintActivityAttributes.swift */; };
 		B51A97CC26FA4B7FEBBF3C93 /* ChamberLightToggle.swift in Sources */ = {isa = PBXBuildFile; fileRef = B61A51F8709BB1DDABDC3650 /* ChamberLightToggle.swift */; };
 		B5431F4CFCEB61B700345680 /* LiveActivityExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = CAD2B6571B7210AD007472D2 /* LiveActivityExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		B56430BA42447B8C60DF7674 /* ProcessAllSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3F758F11180A2BEE3E8AA429 /* ProcessAllSettingsView.swift */; };
 		BACEC0C3302612B1C7A21088 /* ShareExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 8E99C2EC57D9D732AF5FC476 /* ShareExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		C12344BE79B9169E1A13F066 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 9A064996EB0DA8288274EC27 /* Assets.xcassets */; };
 		C44AE3E1C219190C0B100AD0 /* LiveActivityService.swift in Sources */ = {isa = PBXBuildFile; fileRef = BAE8CE9E59006DF49C051762 /* LiveActivityService.swift */; };
@@ -139,6 +140,7 @@
 		36C28A77CC578F19C3B443A8 /* AppSettingsStoreCameraTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppSettingsStoreCameraTests.swift; sourceTree = "<group>"; };
 		3B46FA0BBEC43DF398153A59 /* MakerWorldBrowserView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MakerWorldBrowserView.swift; sourceTree = "<group>"; };
 		3CA2C79ED9B2FE1A5FCBF4EB /* SliceJobsSection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SliceJobsSection.swift; sourceTree = "<group>"; };
+		3F758F11180A2BEE3E8AA429 /* ProcessAllSettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProcessAllSettingsView.swift; sourceTree = "<group>"; };
 		450020B566A6C67BC3D57DE2 /* SpeedPickerSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpeedPickerSheet.swift; sourceTree = "<group>"; };
 		47F98F122F17587AC06D257D /* GatewayModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GatewayModels.swift; sourceTree = "<group>"; };
 		4DB190EA2A9F8BC2F5685B10 /* ProcessPageDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProcessPageDetailView.swift; sourceTree = "<group>"; };
@@ -265,6 +267,7 @@
 		2D27421EBC36E9CA42F1FDA7 /* ProcessParameters */ = {
 			isa = PBXGroup;
 			children = (
+				3F758F11180A2BEE3E8AA429 /* ProcessAllSettingsView.swift */,
 				A4765231D68406E9BAD3D356 /* ProcessOptionEditor.swift */,
 				5F8B5B9D9174167346D65888 /* ProcessOptionRow.swift */,
 				4DB190EA2A9F8BC2F5685B10 /* ProcessPageDetailView.swift */,
@@ -676,6 +679,7 @@
 				49397CEDE4D75E47854A886C /* PrinterOfflineCard.swift in Sources */,
 				7FBB60D7C763B1731A6A7368 /* PrinterStatusCard.swift in Sources */,
 				4C1A529AD33EE2A149CD9C0E /* PrinterTab.swift in Sources */,
+				B56430BA42447B8C60DF7674 /* ProcessAllSettingsView.swift in Sources */,
 				631DEEA034DF57BF2695A3D8 /* ProcessOptionEditor.swift in Sources */,
 				E9D95F4833A93B1114C07FCB /* ProcessOptionRow.swift in Sources */,
 				7ACF8A11E885A953ACD6AFED /* ProcessOptionsStore.swift in Sources */,
