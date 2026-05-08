@@ -446,7 +446,7 @@ final class AppViewModel: ObservableObject {
     }
 
     func submitPreview() async {
-        guard let selectedFile, let parsedInfo else {
+        guard selectedFile != nil, let parsedInfo else {
             setMessage("Select a 3MF file first.", .error)
             return
         }
@@ -456,52 +456,35 @@ final class AppViewModel: ObservableObject {
         defer { isLoadingPreview = false }
 
         do {
-            if parsedInfo.hasGcode {
-                // Already sliced — extract gcode locally
-                let fileData = selectedFile.data
-                let scene = try await Task.detached {
-                    let reader = ThreeMFReader()
-                    let extracted = try reader.extractGCode(
-                        from: fileData,
-                        preferredPlateId: preferredPlateId
-                    )
-                    let parser = GCodeParser()
-                    let model = try parser.parse(extracted.content)
-                    return PrintSceneBuilder().buildScene(from: model)
-                }.value
+            // Preview always re-slices, mirroring the web UI. `has_gcode`
+            // can be true for MakerWorld-style 3MFs that ship slice metadata
+            // without an actual toolpath, so trusting it would fail when the
+            // local extractor finds no `*.gcode` entry.
+            guard let submission = buildSubmission() else { return }
+            let jobId = try await runSliceJob(submission, kind: "preview")
+            let previewResult = try await gatewayClient().fetchSliceJobOutput(
+                jobId: jobId,
+                fallbackFileName: submission.file.fileName
+            )
 
-                previewScene = scene
-                currentJobId = nil
-                isShowingPreview = true
-                setMessage("", .info)
-            } else {
-                // Needs slicing — submit a slice job and poll for progress.
-                guard let submission = buildSubmission() else { return }
-                let jobId = try await runSliceJob(submission, kind: "preview")
-                let previewResult = try await gatewayClient().fetchSliceJobOutput(
-                    jobId: jobId,
-                    fallbackFileName: submission.file.fileName
+            let threeMFData = previewResult.threeMFData
+            let scene = try await Task.detached {
+                let reader = ThreeMFReader()
+                let extracted = try reader.extractGCode(
+                    from: threeMFData,
+                    preferredPlateId: preferredPlateId
                 )
+                let parser = GCodeParser()
+                let model = try parser.parse(extracted.content)
+                return PrintSceneBuilder().buildScene(from: model)
+            }.value
 
-                let threeMFData = previewResult.threeMFData
-                let scene = try await Task.detached {
-                    let reader = ThreeMFReader()
-                    let extracted = try reader.extractGCode(
-                        from: threeMFData,
-                        preferredPlateId: preferredPlateId
-                    )
-                    let parser = GCodeParser()
-                    let model = try parser.parse(extracted.content)
-                    return PrintSceneBuilder().buildScene(from: model)
-                }.value
-
-                previewScene = scene
-                currentJobId = jobId
-                previewEstimate = previewResult.estimate
-                isShowingPreview = true
-                clearPendingSliceJob()
-                setMessage("", .info)
-            }
+            previewScene = scene
+            currentJobId = jobId
+            previewEstimate = previewResult.estimate
+            isShowingPreview = true
+            clearPendingSliceJob()
+            setMessage("", .info)
         } catch let error as URLError where error.code == .cancelled {
             // user-initiated cancel — silent
         } catch {
