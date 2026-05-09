@@ -4,6 +4,9 @@ struct SliceJobsSection: View {
     @ObservedObject var viewModel: AppViewModel
     /// Set by tapping a row; `PrintTab` observes this to present the detail sheet.
     @Binding var selectedJobId: String?
+    // Collapsed by default. Each project (filename bucket) is shown expanded
+    // only when its filename is in this set.
+    @State private var expandedProjects: Set<String> = []
 
     private struct ProjectGroup: Identifiable {
         let id: String   // filename
@@ -58,34 +61,57 @@ struct SliceJobsSection: View {
 
     @ViewBuilder
     private func projectGroup(_ project: ProjectGroup) -> some View {
-        VStack(alignment: .leading, spacing: 6) {
-            HStack(alignment: .firstTextBaseline) {
-                Text(project.filename)
-                    .font(.caption)
-                    .fontWeight(.semibold)
-                    .foregroundStyle(.secondary)
-                    .lineLimit(1)
-                    .truncationMode(.middle)
-                Spacer(minLength: 8)
-                Text("\(project.jobs.count) \(project.jobs.count == 1 ? "job" : "jobs")")
-                    .font(.caption2)
-                    .foregroundStyle(.tertiary)
-            }
-            .padding(.horizontal, 4)
-
-            VStack(spacing: 0) {
-                ForEach(Array(project.jobs.enumerated()), id: \.element.id) { index, job in
-                    if index > 0 {
-                        Divider().padding(.leading, 14)
+        let isExpanded = expandedProjects.contains(project.id)
+        VStack(spacing: 0) {
+            Button {
+                withAnimation(.easeInOut(duration: 0.2)) {
+                    if isExpanded {
+                        expandedProjects.remove(project.id)
+                    } else {
+                        expandedProjects.insert(project.id)
                     }
-                    SliceJobRow(viewModel: viewModel, job: job) {
-                        selectedJobId = job.jobId
+                }
+            } label: {
+                HStack(alignment: .firstTextBaseline, spacing: 8) {
+                    Text(project.filename)
+                        .font(.subheadline)
+                        .fontWeight(.semibold)
+                        .foregroundStyle(.primary)
+                        .lineLimit(1)
+                        .truncationMode(.middle)
+                    Spacer(minLength: 8)
+                    Text("\(project.jobs.count) \(project.jobs.count == 1 ? "job" : "jobs")")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                    Image(systemName: "chevron.right")
+                        .font(.system(size: 12, weight: .semibold))
+                        .foregroundStyle(.tertiary)
+                        .rotationEffect(.degrees(isExpanded ? 90 : 0))
+                }
+                .padding(.horizontal, 14)
+                .padding(.vertical, 12)
+                .contentShape(Rectangle())
+            }
+            .buttonStyle(.plain)
+            .accessibilityLabel("\(project.filename), \(project.jobs.count) \(project.jobs.count == 1 ? "job" : "jobs")")
+            .accessibilityHint(isExpanded ? "Tap to collapse" : "Tap to expand")
+
+            if isExpanded {
+                Divider().padding(.leading, 14)
+                VStack(spacing: 0) {
+                    ForEach(Array(project.jobs.enumerated()), id: \.element.id) { index, job in
+                        if index > 0 {
+                            Divider().padding(.leading, 14)
+                        }
+                        SliceJobRow(viewModel: viewModel, job: job) {
+                            selectedJobId = job.jobId
+                        }
                     }
                 }
             }
-            .background(Color.cardBackground)
-            .clipShape(RoundedRectangle(cornerRadius: 12))
         }
+        .background(Color.cardBackground)
+        .clipShape(RoundedRectangle(cornerRadius: 12))
     }
 
     // MARK: - Header
