@@ -18,6 +18,20 @@ enum ProcessOptionType: String, Decodable {
     case bools = "coBools"
     case `enum` = "coEnum"
     case none = "coNone"
+    // Slicer-emitted catch-all for options whose libslic3r type doesn't
+    // map to a known ConfigOptionType — e.g. `default_nozzle_volume_type`
+    // surfaces as `coUnknown`. Keeping this case explicit (rather than
+    // raising on decode) means a single rogue option can't take down the
+    // whole catalogue parse, and forward-compat with future libslic3r
+    // additions degrades gracefully to read-only display.
+    case unknown = "coUnknown"
+
+    init(from decoder: Decoder) throws {
+        let raw = try decoder.singleValueContainer().decode(String.self)
+        // Fall back to .unknown for any string libslic3r might invent
+        // later — same rationale as the explicit `coUnknown` case above.
+        self = ProcessOptionType(rawValue: raw) ?? .unknown
+    }
 }
 
 struct ProcessOption: Decodable, Hashable {
@@ -36,8 +50,23 @@ struct ProcessOption: Decodable, Hashable {
     let guiType: String
     let nullable: Bool
     let readonly: Bool
+
+    // Explicit CodingKeys so this struct decodes correctly under both
+    // .useDefaultKeys (used for /api/slicer/options/process — see note on
+    // ProcessOptionsCatalogue) and .convertFromSnakeCase. Identity-mapped
+    // names are listed too because explicit CodingKeys are all-or-nothing.
+    private enum CodingKeys: String, CodingKey {
+        case key, label, category, tooltip, type, sidetext, `default`,
+             min, max, mode, nullable, readonly
+        case enumValues = "enum_values"
+        case enumLabels = "enum_labels"
+        case guiType = "gui_type"
+    }
 }
 
+// Decoded with .useDefaultKeys — see GatewayClient.decodeWithRawKeys.
+// .convertFromSnakeCase would mangle the option-id dictionary keys
+// (e.g. "layer_height" → "layerHeight"), breaking lookups by id.
 struct ProcessOptionsCatalogue: Decodable {
     let version: String
     let options: [String: ProcessOption]
@@ -53,10 +82,17 @@ struct ProcessPage: Decodable, Hashable {
     let optgroups: [ProcessOptgroup]
 }
 
+// Decoded with .useDefaultKeys for symmetry with the catalogue, even
+// though the layout has no dict-keyed sub-trees.
 struct ProcessLayout: Decodable {
     let version: String
     let allowlistRevision: String
     let pages: [ProcessPage]
+
+    private enum CodingKeys: String, CodingKey {
+        case version, pages
+        case allowlistRevision = "allowlist_revision"
+    }
 }
 
 struct ProcessModifications: Decodable, Equatable {

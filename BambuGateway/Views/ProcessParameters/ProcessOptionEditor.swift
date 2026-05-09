@@ -158,7 +158,7 @@ struct ProcessOptionEditor: View {
             }
             .pickerStyle(.menu)
 
-        case .point, .points, .point3, .bools, .none:
+        case .point, .points, .point3, .bools, .none, .unknown:
             VStack(alignment: .leading, spacing: 8) {
                 Text(initialValue.isEmpty ? "—" : initialValue)
                     .font(.body.monospaced())
@@ -269,7 +269,7 @@ struct ProcessOptionEditor: View {
                 return ValidationResult(value: nil, error: "Select a value.")
             }
             return ValidationResult(value: draft, error: nil)
-        case .point, .points, .point3, .bools, .none:
+        case .point, .points, .point3, .bools, .none, .unknown:
             return ValidationResult(value: nil, error: nil)
         }
     }

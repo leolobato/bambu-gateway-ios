@@ -78,11 +78,19 @@ struct GatewayClient {
     }
 
     func fetchProcessOptions() async throws -> ProcessOptionsCatalogue {
-        try await get(path: "/api/slicer/options/process")
+        // Catalogue uses .useDefaultKeys: the response's `options` field is
+        // a dict keyed by the option id (e.g. "layer_height"), and Swift's
+        // .convertFromSnakeCase strategy would mangle those id keys to
+        // camelCase, breaking every lookup by id.
+        let (data, _) = try await request(path: "/api/slicer/options/process", method: "GET")
+        return try decodeWithRawKeys(ProcessOptionsCatalogue.self, from: data)
     }
 
     func fetchProcessLayout() async throws -> ProcessLayout {
-        try await get(path: "/api/slicer/options/process/layout")
+        // Layout uses .useDefaultKeys for symmetry; the option ids inside
+        // optgroups[].options are also raw snake_case identifiers.
+        let (data, _) = try await request(path: "/api/slicer/options/process/layout", method: "GET")
+        return try decodeWithRawKeys(ProcessLayout.self, from: data)
     }
 
     func fetchProcessProfile(settingId: String) async throws -> ResolvedProcessProfile {
@@ -574,6 +582,21 @@ struct GatewayClient {
     private func decode<T: Decodable>(_ type: T.Type, from data: Data) throws -> T {
         let decoder = JSONDecoder()
         decoder.keyDecodingStrategy = .convertFromSnakeCase
+        do {
+            return try decoder.decode(type, from: data)
+        } catch {
+            throw GatewayClientError.decodeError
+        }
+    }
+
+    // Decoder that preserves JSON keys verbatim. Used for endpoints whose
+    // response carries snake_case identifiers as dictionary keys (e.g.
+    // /api/slicer/options/process), where .convertFromSnakeCase would
+    // mangle the ids. Models decoded this way must use explicit
+    // CodingKeys for any field that doesn't match its property name.
+    private func decodeWithRawKeys<T: Decodable>(_ type: T.Type, from data: Data) throws -> T {
+        let decoder = JSONDecoder()
+        decoder.keyDecodingStrategy = .useDefaultKeys
         do {
             return try decoder.decode(type, from: data)
         } catch {
