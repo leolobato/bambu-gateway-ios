@@ -2,7 +2,6 @@ import SwiftUI
 
 struct ProcessParametersCard: View {
     @ObservedObject var viewModel: AppViewModel
-    @State private var showAllSettings = false
     @State private var editingOptionKey: String?
 
     var body: some View {
@@ -29,9 +28,6 @@ struct ProcessParametersCard: View {
         .task {
             await viewModel.processOptionsStore.loadCatalogueIfNeeded()
             await viewModel.processOptionsStore.loadLayoutIfNeeded()
-        }
-        .fullScreenCover(isPresented: $showAllSettings) {
-            ProcessAllSettingsView(viewModel: viewModel)
         }
         .sheet(item: editingOptionBinding) { key in
             editorSheet(forKey: key.id)
@@ -63,7 +59,7 @@ struct ProcessParametersCard: View {
         if let option = viewModel.processOptionsStore.catalogue?.options[key] {
             ProcessOptionRow(
                 label: option.label,
-                value: resolveProcessValue(
+                value: displayProcessValue(
                     key: key, option: option,
                     modifications: viewModel.parsedInfo?.processModifications,
                     baseline: viewModel.processBaseline,
@@ -103,8 +99,8 @@ struct ProcessParametersCard: View {
 
     @ViewBuilder
     private var showAllRow: some View {
-        Button {
-            showAllSettings = true
+        NavigationLink {
+            ProcessAllSettingsView(viewModel: viewModel)
         } label: {
             HStack(spacing: 8) {
                 Text("Show all settings")

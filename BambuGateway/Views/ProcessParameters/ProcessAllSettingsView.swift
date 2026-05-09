@@ -2,59 +2,53 @@ import SwiftUI
 
 struct ProcessAllSettingsView: View {
     @ObservedObject var viewModel: AppViewModel
-    @Environment(\.dismiss) private var dismiss
     @State private var search: String = ""
     @State private var showResetConfirm = false
     @State private var editingOptionKey: String?
 
     var body: some View {
-        NavigationStack {
-            Group {
-                if let layout = viewModel.processOptionsStore.layout {
-                    if search.isEmpty {
-                        pageList(layout)
-                    } else {
-                        searchResults(layout)
-                    }
-                } else if viewModel.processOptionsStore.loadError != nil {
-                    errorView
+        Group {
+            if let layout = viewModel.processOptionsStore.layout {
+                if search.isEmpty {
+                    pageList(layout)
                 } else {
-                    ProgressView().progressViewStyle(.circular)
+                    searchResults(layout)
                 }
+            } else if viewModel.processOptionsStore.loadError != nil {
+                errorView
+            } else {
+                ProgressView().progressViewStyle(.circular)
             }
-            .background(Color.dashboardBackground)
-            .navigationTitle("Process settings")
-            .navigationBarTitleDisplayMode(.inline)
-            .searchable(text: $search, placement: .navigationBarDrawer(displayMode: .always), prompt: "Search settings")
-            .toolbar {
-                ToolbarItem(placement: .cancellationAction) {
-                    Button("Done") { dismiss() }
+        }
+        .background(Color.dashboardBackground)
+        .navigationTitle("Process settings")
+        .navigationBarTitleDisplayMode(.inline)
+        .searchable(text: $search, placement: .navigationBarDrawer(displayMode: .always), prompt: "Search settings")
+        .toolbar {
+            ToolbarItem(placement: .primaryAction) {
+                Button {
+                    showResetConfirm = true
+                } label: {
+                    Image(systemName: "arrow.counterclockwise")
                 }
-                ToolbarItem(placement: .primaryAction) {
-                    Button {
-                        showResetConfirm = true
-                    } label: {
-                        Image(systemName: "arrow.counterclockwise")
-                    }
-                    .disabled(viewModel.processOverrides.isEmpty)
-                    .accessibilityLabel("Reset all")
-                }
+                .disabled(viewModel.processOverrides.isEmpty)
+                .accessibilityLabel("Reset all")
             }
-            .confirmationDialog(
-                "Reset all process settings?",
-                isPresented: $showResetConfirm,
-                titleVisibility: .visible
-            ) {
-                Button("Reset", role: .destructive) { viewModel.resetAllProcessOverrides() }
-                Button("Cancel", role: .cancel) { }
-            }
-            .task {
-                await viewModel.processOptionsStore.loadCatalogueIfNeeded()
-                await viewModel.processOptionsStore.loadLayoutIfNeeded()
-            }
-            .sheet(item: editingOptionBinding) { key in
-                editorSheet(forKey: key.id)
-            }
+        }
+        .confirmationDialog(
+            "Reset all process settings?",
+            isPresented: $showResetConfirm,
+            titleVisibility: .visible
+        ) {
+            Button("Reset", role: .destructive) { viewModel.resetAllProcessOverrides() }
+            Button("Cancel", role: .cancel) { }
+        }
+        .task {
+            await viewModel.processOptionsStore.loadCatalogueIfNeeded()
+            await viewModel.processOptionsStore.loadLayoutIfNeeded()
+        }
+        .sheet(item: editingOptionBinding) { key in
+            editorSheet(forKey: key.id)
         }
     }
 
@@ -107,7 +101,7 @@ struct ProcessAllSettingsView: View {
                     if let option = viewModel.processOptionsStore.catalogue?.options[key] {
                         ProcessOptionRow(
                             label: option.label,
-                            value: resolveProcessValue(
+                            value: displayProcessValue(
                                 key: key, option: option,
                                 modifications: viewModel.parsedInfo?.processModifications,
                                 baseline: viewModel.processBaseline,

@@ -14,7 +14,12 @@ struct ProcessPageDetailView: View {
                         if let option = viewModel.processOptionsStore.catalogue?.options[key] {
                             ProcessOptionRow(
                                 label: option.label,
-                                value: resolvedValue(forKey: key, option: option),
+                                value: displayProcessValue(
+                                    key: key, option: option,
+                                    modifications: viewModel.parsedInfo?.processModifications,
+                                    baseline: viewModel.processBaseline,
+                                    overrides: viewModel.processOverrides
+                                ),
                                 sidetext: option.sidetext,
                                 status: status(forKey: key),
                                 showsTooltip: true,

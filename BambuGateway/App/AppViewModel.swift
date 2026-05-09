@@ -1408,6 +1408,13 @@ final class AppViewModel: ObservableObject {
     private func loadSetupData() async {
         let machineFilter = selectedMachineFilterId()
 
+        // Warm the process-options catalogue and layout up front so the
+        // Print tab can render enum value labels (e.g. "No brim" instead
+        // of "no_brim") on first appearance, rather than waiting for the
+        // Process Settings card's `.task` to fetch them on demand.
+        async let processOptionsCatalogue: Void = processOptionsStore.loadCatalogueIfNeeded()
+        async let processOptionsLayout: Void = processOptionsStore.loadLayoutIfNeeded()
+
         async let amsResult = fetchAMSGracefully()
         async let machinesResult = fetchMachinesGracefully()
         async let plateTypesResult = fetchPlateTypesGracefully()
@@ -1437,6 +1444,9 @@ final class AppViewModel: ObservableObject {
         applyPersistedProfileSelections()
         await refreshFilamentMatches()
         applyFilamentMappingFromCurrentData()
+        // Drain the process-options preloads so their errors (if any) bubble
+        // up before this task returns, matching the other fetches above.
+        _ = await (processOptionsCatalogue, processOptionsLayout)
     }
 
     private func applyPrinterSelectionAfterRefresh() {
