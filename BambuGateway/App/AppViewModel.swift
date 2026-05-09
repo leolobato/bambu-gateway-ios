@@ -1507,11 +1507,39 @@ final class AppViewModel: ObservableObject {
         var selections: [Int: String] = [:]
         let persisted = perPrinterSelection()
         let validIds = Set(amsAssignableFilaments.map { $0.settingId })
+        let filamentIdBySettingId = Dictionary(
+            amsAssignableFilaments.compactMap { profile -> (String, String)? in
+                guard !profile.settingId.isEmpty else { return nil }
+                return (profile.settingId, (profile.filamentId ?? "").trimmingCharacters(in: .whitespaces).uppercased())
+            },
+            uniquingKeysWith: { first, _ in first }
+        )
 
         for tray in allTrays {
-            if let persistedId = persisted.trayProfileBySlot[tray.slot],
-               persistedId.isEmpty || validIds.contains(persistedId) {
-                selections[tray.slot] = persistedId
+            // A persisted slot selection is keyed only by AMS slot index. When the user
+            // physically swaps the spool (or relinks it via spool-helper), the tray's
+            // `filamentId` (`tray_info_idx`) changes but the old setting_id can still be
+            // a valid catalog entry — so trusting the persisted choice would keep showing
+            // the previous spool's profile. Compare the persisted profile's filament_id
+            // against the current tray's filament_id and fall through to `matchedFilament`
+            // when they diverge.
+            let trayFilamentId = tray.filamentId.trimmingCharacters(in: .whitespaces).uppercased()
+            let persistedId = persisted.trayProfileBySlot[tray.slot]
+            let persistedIsExplicitEmpty = persistedId == ""
+            let persistedIsValidProfile = persistedId.map { !$0.isEmpty && validIds.contains($0) } ?? false
+            let persistedMatchesTray: Bool = {
+                guard persistedIsValidProfile, let pid = persistedId else { return false }
+                let persistedFilamentId = filamentIdBySettingId[pid] ?? ""
+                // Only invalidate when both sides have non-empty filament_ids that disagree;
+                // an empty tray (no `tray_info_idx`) preserves the user's manual choice.
+                guard !trayFilamentId.isEmpty, !persistedFilamentId.isEmpty else { return true }
+                return trayFilamentId == persistedFilamentId
+            }()
+
+            if persistedIsExplicitEmpty {
+                selections[tray.slot] = ""
+            } else if persistedIsValidProfile, persistedMatchesTray, let pid = persistedId {
+                selections[tray.slot] = pid
             } else if let matched = tray.matchedFilament?.settingId,
                       validIds.contains(matched) {
                 selections[tray.slot] = matched
