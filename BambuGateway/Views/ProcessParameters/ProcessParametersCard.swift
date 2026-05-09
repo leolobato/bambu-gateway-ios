@@ -8,22 +8,41 @@ struct ProcessParametersCard: View {
         VStack(alignment: .leading, spacing: 6) {
             sectionHeader
 
-            VStack(spacing: 0) {
-                if modifiedKeys.isEmpty {
+            if modifiedKeys.isEmpty {
+                VStack(spacing: 0) {
                     emptyRow
-                } else {
-                    ForEach(modifiedKeys, id: \.self) { key in
-                        optionRow(forKey: key)
-                        Divider().padding(.leading, 12)
-                    }
-                }
-                if modifiedKeys.isEmpty {
                     Divider().padding(.leading, 14)
+                    showAllRow
                 }
-                showAllRow
+                .background(Color.cardBackground)
+                .clipShape(RoundedRectangle(cornerRadius: 12))
+            } else {
+                VStack(alignment: .leading, spacing: 12) {
+                    ForEach(groupedKeys, id: \.page) { group in
+                        VStack(alignment: .leading, spacing: 6) {
+                            Text(group.page.uppercased())
+                                .font(.caption2)
+                                .fontWeight(.semibold)
+                                .tracking(0.6)
+                                .foregroundStyle(.secondary)
+                                .padding(.horizontal, 4)
+                            VStack(spacing: 0) {
+                                ForEach(Array(group.keys.enumerated()), id: \.element) { index, key in
+                                    if index > 0 {
+                                        Divider().padding(.leading, 12)
+                                    }
+                                    optionRow(forKey: key)
+                                }
+                            }
+                            .background(Color.cardBackground)
+                            .clipShape(RoundedRectangle(cornerRadius: 12))
+                        }
+                    }
+                    showAllRow
+                        .background(Color.cardBackground)
+                        .clipShape(RoundedRectangle(cornerRadius: 12))
+                }
             }
-            .background(Color.cardBackground)
-            .clipShape(RoundedRectangle(cornerRadius: 12))
         }
         .task {
             await viewModel.processOptionsStore.loadCatalogueIfNeeded()
@@ -45,6 +64,37 @@ struct ProcessParametersCard: View {
             .filter { !fileSet.contains($0) }
             .sorted()
         return fromFile + userOnly
+    }
+
+    /// Bucket `modifiedKeys` by their parent page (Quality / Strength / …)
+    /// in layout order so the card mirrors the All-sheet drill-down. Keys
+    /// the layout doesn't know about land in a trailing "Other" group so
+    /// nothing is dropped.
+    private var groupedKeys: [(page: String, keys: [String])] {
+        guard let layout = viewModel.processOptionsStore.layout else {
+            return modifiedKeys.isEmpty ? [] : [(page: "Other", keys: modifiedKeys)]
+        }
+        var pageByKey: [String: String] = [:]
+        for page in layout.pages {
+            for group in page.optgroups {
+                for key in group.options { pageByKey[key] = page.label }
+            }
+        }
+        var buckets: [String: [String]] = [:]
+        for key in modifiedKeys {
+            let page = pageByKey[key] ?? "Other"
+            buckets[page, default: []].append(key)
+        }
+        var ordered: [(page: String, keys: [String])] = []
+        for page in layout.pages {
+            if let keys = buckets[page.label], !keys.isEmpty {
+                ordered.append((page: page.label, keys: keys))
+            }
+        }
+        if let others = buckets["Other"], !others.isEmpty {
+            ordered.append((page: "Other", keys: others))
+        }
+        return ordered
     }
 
     @ViewBuilder
