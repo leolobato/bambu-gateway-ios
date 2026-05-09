@@ -8,41 +8,27 @@ struct ProcessParametersCard: View {
         VStack(alignment: .leading, spacing: 6) {
             sectionHeader
 
-            if modifiedKeys.isEmpty {
-                VStack(spacing: 0) {
+            VStack(spacing: 0) {
+                if modifiedKeys.isEmpty {
                     emptyRow
                     Divider().padding(.leading, 14)
-                    showAllRow
-                }
-                .background(Color.cardBackground)
-                .clipShape(RoundedRectangle(cornerRadius: 12))
-            } else {
-                VStack(alignment: .leading, spacing: 12) {
-                    ForEach(groupedKeys, id: \.page) { group in
-                        VStack(alignment: .leading, spacing: 6) {
-                            Text(group.page.uppercased())
-                                .font(.caption2)
-                                .fontWeight(.semibold)
-                                .tracking(0.6)
-                                .foregroundStyle(.secondary)
-                                .padding(.horizontal, 4)
-                            VStack(spacing: 0) {
-                                ForEach(Array(group.keys.enumerated()), id: \.element) { index, key in
-                                    if index > 0 {
-                                        Divider().padding(.leading, 12)
-                                    }
-                                    optionRow(forKey: key)
-                                }
-                            }
-                            .background(Color.cardBackground)
-                            .clipShape(RoundedRectangle(cornerRadius: 12))
+                } else {
+                    ForEach(Array(groupedKeys.enumerated()), id: \.element.page) { groupIndex, group in
+                        if groupIndex > 0 {
+                            Divider().padding(.leading, 14)
+                        }
+                        groupHeader(group)
+                        ForEach(group.keys, id: \.self) { key in
+                            Divider().padding(.leading, 14)
+                            optionRow(forKey: key)
                         }
                     }
-                    showAllRow
-                        .background(Color.cardBackground)
-                        .clipShape(RoundedRectangle(cornerRadius: 12))
+                    Divider().padding(.leading, 14)
                 }
+                showAllRow
             }
+            .background(Color.cardBackground)
+            .clipShape(RoundedRectangle(cornerRadius: 12))
         }
         .task {
             await viewModel.processOptionsStore.loadCatalogueIfNeeded()
@@ -51,6 +37,21 @@ struct ProcessParametersCard: View {
         .sheet(item: editingOptionBinding) { key in
             editorSheet(forKey: key.id)
         }
+    }
+
+    @ViewBuilder
+    private func groupHeader(_ group: (page: String, keys: [String])) -> some View {
+        HStack {
+            Text(group.page.uppercased())
+                .font(.caption2)
+                .fontWeight(.semibold)
+                .tracking(0.6)
+                .foregroundStyle(.secondary)
+            Spacer()
+        }
+        .padding(.horizontal, 14)
+        .padding(.top, 10)
+        .padding(.bottom, 4)
     }
 
     // 3MF-authored modifications first (preserving the project's own
