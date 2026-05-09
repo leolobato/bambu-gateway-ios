@@ -5,33 +5,86 @@ struct SliceJobsSection: View {
     /// Set by tapping a row; `PrintTab` observes this to present the detail sheet.
     @Binding var selectedJobId: String?
 
+    private struct ProjectGroup: Identifiable {
+        let id: String   // filename
+        let filename: String
+        let jobs: [SliceJob]
+    }
+
+    /// Bucket jobs by `filename` so re-slices of the same 3MF land together.
+    /// `viewModel.sliceJobs` is already in `createdAt` desc, so the dictionary
+    /// preserves newest-project-first order and within each group the newest
+    /// job is first. Filename collisions across unrelated 3MFs merge —
+    /// accepted trade-off for not adding a server-side project id.
+    private var projects: [ProjectGroup] {
+        var seen: [String] = []
+        var bucket: [String: [SliceJob]] = [:]
+        for job in viewModel.sliceJobs {
+            let key = job.filename.isEmpty ? "(unnamed)" : job.filename
+            if bucket[key] == nil {
+                bucket[key] = [job]
+                seen.append(key)
+            } else {
+                bucket[key]?.append(job)
+            }
+        }
+        return seen.map { ProjectGroup(id: $0, filename: $0, jobs: bucket[$0] ?? []) }
+    }
+
     var body: some View {
-        VStack(alignment: .leading, spacing: 6) {
+        VStack(alignment: .leading, spacing: 12) {
             header
 
-            VStack(spacing: 0) {
-                if viewModel.sliceJobs.isEmpty {
+            if viewModel.sliceJobs.isEmpty {
+                VStack(spacing: 0) {
                     if viewModel.isLoadingSliceJobs {
                         loadingRow
                     } else {
                         emptyRow
                     }
-                } else {
-                    ForEach(Array(viewModel.sliceJobs.enumerated()), id: \.element.id) { index, job in
-                        if index > 0 {
-                            Divider().padding(.leading, 14)
-                        }
-                        SliceJobRow(viewModel: viewModel, job: job) {
-                            selectedJobId = job.jobId
-                        }
+                }
+                .background(Color.cardBackground)
+                .clipShape(RoundedRectangle(cornerRadius: 12))
+            } else {
+                ForEach(projects) { project in
+                    projectGroup(project)
+                }
+            }
+        }
+        .task {
+            await viewModel.runSliceJobsPolling()
+        }
+    }
+
+    @ViewBuilder
+    private func projectGroup(_ project: ProjectGroup) -> some View {
+        VStack(alignment: .leading, spacing: 6) {
+            HStack(alignment: .firstTextBaseline) {
+                Text(project.filename)
+                    .font(.caption)
+                    .fontWeight(.semibold)
+                    .foregroundStyle(.secondary)
+                    .lineLimit(1)
+                    .truncationMode(.middle)
+                Spacer(minLength: 8)
+                Text("\(project.jobs.count) \(project.jobs.count == 1 ? "job" : "jobs")")
+                    .font(.caption2)
+                    .foregroundStyle(.tertiary)
+            }
+            .padding(.horizontal, 4)
+
+            VStack(spacing: 0) {
+                ForEach(Array(project.jobs.enumerated()), id: \.element.id) { index, job in
+                    if index > 0 {
+                        Divider().padding(.leading, 14)
+                    }
+                    SliceJobRow(viewModel: viewModel, job: job) {
+                        selectedJobId = job.jobId
                     }
                 }
             }
             .background(Color.cardBackground)
             .clipShape(RoundedRectangle(cornerRadius: 12))
-        }
-        .task {
-            await viewModel.runSliceJobsPolling()
         }
     }
 
