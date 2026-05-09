@@ -34,8 +34,17 @@ struct ProcessParametersCard: View {
         }
     }
 
+    // 3MF-authored modifications first (preserving the project's own
+    // ordering), then any session overrides the user has added on top —
+    // sorted to keep the list stable across edits. The status badge on
+    // each row distinguishes the two sources visually.
     private var modifiedKeys: [String] {
-        viewModel.parsedInfo?.processModifications?.modifiedKeys ?? []
+        let fromFile = viewModel.parsedInfo?.processModifications?.modifiedKeys ?? []
+        let fileSet = Set(fromFile)
+        let userOnly = viewModel.processOverrides.keys
+            .filter { !fileSet.contains($0) }
+            .sorted()
+        return fromFile + userOnly
     }
 
     @ViewBuilder
