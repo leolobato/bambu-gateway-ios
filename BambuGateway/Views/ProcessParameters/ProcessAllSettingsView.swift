@@ -89,36 +89,54 @@ struct ProcessAllSettingsView: View {
 
     @ViewBuilder
     private func searchResults(_ layout: ProcessLayout) -> some View {
-        let allKeys = layout.pages.flatMap { $0.optgroups.flatMap(\.options) }
-        let matches = allKeys.filter { key in
-            guard let option = viewModel.processOptionsStore.catalogue?.options[key] else { return false }
-            let needle = search.lowercased()
-            return option.label.lowercased().contains(needle) || key.lowercased().contains(needle)
+        // Group matches per page in layout order so the results surface
+        // mirrors the page-detail view: section header per parent page,
+        // matches grouped underneath. Pages with zero matches are skipped.
+        let needle = search.lowercased()
+        let groups: [(label: String, keys: [String])] = layout.pages.compactMap { page in
+            let keys = page.optgroups.flatMap(\.options).filter { key in
+                guard let option = viewModel.processOptionsStore.catalogue?.options[key] else { return false }
+                return option.label.lowercased().contains(needle) || key.lowercased().contains(needle)
+            }
+            return keys.isEmpty ? nil : (label: page.label, keys: keys)
         }
-        List {
-            Section("Results") {
-                ForEach(matches, id: \.self) { key in
-                    if let option = viewModel.processOptionsStore.catalogue?.options[key] {
-                        ProcessOptionRow(
-                            label: option.label,
-                            value: displayProcessValue(
-                                key: key, option: option,
-                                modifications: viewModel.parsedInfo?.processModifications,
-                                baseline: viewModel.processBaseline,
-                                overrides: viewModel.processOverrides
-                            ),
-                            sidetext: option.sidetext,
-                            status: rowStatus(forKey: key),
-                            showsTooltip: false,
-                            tooltip: nil,
-                            action: { editingOptionKey = key }
-                        )
-                        .listRowInsets(EdgeInsets())
+
+        if groups.isEmpty {
+            VStack(spacing: 8) {
+                Text("No matches for \"\(search)\"")
+                    .font(.subheadline)
+                    .foregroundStyle(.secondary)
+            }
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
+            .background(Color.dashboardBackground)
+        } else {
+            List {
+                ForEach(groups, id: \.label) { group in
+                    Section(group.label) {
+                        ForEach(group.keys, id: \.self) { key in
+                            if let option = viewModel.processOptionsStore.catalogue?.options[key] {
+                                ProcessOptionRow(
+                                    label: option.label,
+                                    value: displayProcessValue(
+                                        key: key, option: option,
+                                        modifications: viewModel.parsedInfo?.processModifications,
+                                        baseline: viewModel.processBaseline,
+                                        overrides: viewModel.processOverrides
+                                    ),
+                                    sidetext: option.sidetext,
+                                    status: rowStatus(forKey: key),
+                                    showsTooltip: false,
+                                    tooltip: nil,
+                                    action: { editingOptionKey = key }
+                                )
+                                .listRowInsets(EdgeInsets())
+                            }
+                        }
                     }
                 }
             }
+            .listStyle(.insetGrouped)
         }
-        .listStyle(.insetGrouped)
     }
 
     @ViewBuilder
