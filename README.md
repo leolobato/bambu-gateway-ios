@@ -99,9 +99,9 @@ BambuGateway iOS is the **phone client for Bambu Gateway** in a suite of self-ho
 
 **Self-hosted services**
 
-- **[bambu-gateway](https://github.com/leolobato/bambu-gateway)** — Printer control plane and slicing web app. Talks to printers over MQTT/FTPS to monitor status, send commands, and upload jobs. Slices and prints 3MF files from the browser using `orcaslicer-cli`.
-- **[orcaslicer-cli](https://github.com/leolobato/orcaslicer-cli)** — Headless OrcaSlicer wrapped in a REST API. Owns the filament/process/machine profile catalog (including custom user profiles) and does the actual slicing. Other services in the suite call it for slicing and profile data.
-- **[bambu-spool-helper](https://github.com/leolobato/bambu-spool-helper)** — Bridge between [Spoolman](https://github.com/Donkie/Spoolman) and the printer's AMS. Links real spools to Bambu filament profiles (via `orcaslicer-cli`) and pushes the settings to a chosen tray over MQTT.
+- **[bambu-gateway](https://github.com/leolobato/bambu-gateway)** — Printer control plane and slicing web app. Talks to printers over MQTT/FTPS to monitor status, send commands, and upload jobs. Slices and prints 3MF files from the browser using `orcaslicer-headless`.
+- **[orcaslicer-headless](https://github.com/leolobato/orcaslicer-headless)** — Headless OrcaSlicer wrapped in a REST API. Owns the filament/process/machine profile catalog (including custom user profiles) and does the actual slicing. Other services in the suite call it for slicing and profile data.
+- **[bambu-spool-helper](https://github.com/leolobato/bambu-spool-helper)** — Bridge between [Spoolman](https://github.com/Donkie/Spoolman) and the printer's AMS. Links real spools to Bambu filament profiles (via `orcaslicer-headless`) and pushes the settings to a chosen tray over MQTT.
 
 **iOS apps**
 
