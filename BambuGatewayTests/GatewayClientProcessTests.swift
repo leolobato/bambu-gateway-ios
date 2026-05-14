@@ -119,7 +119,8 @@ final class GatewayClientProcessTests: XCTestCase {
             machineProfile: "GM004",
             processProfile: "GP004",
             filamentOverrides: [:],
-            processOverrides: ["layer_height": "0.16"]
+            processOverrides: ["layer_height": "0.16"],
+            copies: 1
         )
 
         XCTAssertEqual(submission.processOverrides?["layer_height"], "0.16")
