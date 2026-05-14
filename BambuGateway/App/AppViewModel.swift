@@ -849,7 +849,8 @@ final class AppViewModel: ObservableObject {
             machineProfile: selectedMachineProfileId,
             processProfile: selectedProcessProfileId,
             filamentOverrides: buildFilamentOverrides(for: parsedInfo),
-            processOverrides: processOverrides.isEmpty ? nil : processOverrides
+            processOverrides: processOverrides.isEmpty ? nil : processOverrides,
+            copies: 1
         )
     }
 

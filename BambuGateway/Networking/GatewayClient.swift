@@ -33,6 +33,10 @@ struct PrintSubmission {
     /// as the enum key). Sent as a single JSON-string multipart field named
     /// `process_overrides`. nil → field omitted.
     let processOverrides: [String: String]?
+    /// Number of copies of each object on the plate to slice. Default 1.
+    /// Server-side validated 1...100; the iOS UI's stepper enforces the
+    /// same bounds.
+    let copies: Int
 }
 
 struct GatewayClient {
@@ -152,6 +156,7 @@ struct GatewayClient {
         if !submission.plateType.isEmpty {
             form.addField(name: "plate_type", value: submission.plateType)
         }
+        form.addField(name: "copies", value: String(submission.copies))
         if !submission.filamentOverrides.isEmpty {
             try addFilamentProfilesField(to: &form, overrides: submission.filamentOverrides)
         }
@@ -226,6 +231,7 @@ struct GatewayClient {
         if !submission.plateType.isEmpty {
             form.addField(name: "plate_type", value: submission.plateType)
         }
+        form.addField(name: "copies", value: String(submission.copies))
         if !submission.filamentOverrides.isEmpty {
             try addFilamentProfilesField(to: &form, overrides: submission.filamentOverrides)
         }
@@ -382,6 +388,7 @@ struct GatewayClient {
         if !submission.processProfile.isEmpty {
             form.addField(name: "process_profile", value: submission.processProfile)
         }
+        form.addField(name: "copies", value: String(submission.copies))
         if !submission.filamentOverrides.isEmpty {
             try addFilamentProfilesField(to: &form, overrides: submission.filamentOverrides)
         }
