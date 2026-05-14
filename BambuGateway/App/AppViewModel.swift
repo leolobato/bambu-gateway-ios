@@ -59,6 +59,12 @@ final class AppViewModel: ObservableObject {
         didSet { onProcessProfileChanged(selectedProcessProfileId) }
     }
     @Published var selectedPlateType: String = ""
+    @Published var copies: Int = 1 {
+        didSet {
+            if copies < 1 { copies = 1 }
+            if copies > 100 { copies = 100 }
+        }
+    }
 
     /// User-edited process overrides for the currently-selected 3MF, keyed by
     /// allowlisted process-option key. Cleared on file change/drop.
@@ -850,7 +856,7 @@ final class AppViewModel: ObservableObject {
             processProfile: selectedProcessProfileId,
             filamentOverrides: buildFilamentOverrides(for: parsedInfo),
             processOverrides: processOverrides.isEmpty ? nil : processOverrides,
-            copies: 1
+            copies: copies
         )
     }
 

@@ -330,10 +330,35 @@ struct PrintTab: View {
                     ),
                     options: viewModel.plateTypeOptions
                 )
+                Divider().padding(.leading, 14)
+                copiesRow
             }
             .background(Color.cardBackground)
             .clipShape(RoundedRectangle(cornerRadius: 12))
         }
+    }
+
+    private var copiesRow: some View {
+        HStack(spacing: 8) {
+            Text("Copies")
+                .font(.subheadline)
+                .fontWeight(.medium)
+                .foregroundStyle(.primary)
+            Spacer(minLength: 12)
+            Stepper(value: Binding(
+                get: { viewModel.copies },
+                set: { viewModel.copies = $0 }
+            ), in: 1...100) {
+                Text("\(viewModel.copies)")
+                    .font(.subheadline)
+                    .monospacedDigit()
+                    .foregroundStyle(.secondary)
+                    .padding(.trailing, 8)
+            }
+            .labelsHidden()
+        }
+        .padding(.horizontal, 14)
+        .padding(.vertical, 12)
     }
 
     private func profileRow(
