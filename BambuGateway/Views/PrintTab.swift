@@ -345,16 +345,15 @@ struct PrintTab: View {
                 .fontWeight(.medium)
                 .foregroundStyle(.primary)
             Spacer(minLength: 12)
-            Stepper(value: Binding(
+            Text("\(viewModel.copies)")
+                .font(.subheadline)
+                .monospacedDigit()
+                .foregroundStyle(.secondary)
+                .padding(.trailing, 8)
+            Stepper("Copies", value: Binding(
                 get: { viewModel.copies },
                 set: { viewModel.copies = $0 }
-            ), in: 1...100) {
-                Text("\(viewModel.copies)")
-                    .font(.subheadline)
-                    .monospacedDigit()
-                    .foregroundStyle(.secondary)
-                    .padding(.trailing, 8)
-            }
+            ), in: 1...100)
             .labelsHidden()
         }
         .padding(.horizontal, 14)
