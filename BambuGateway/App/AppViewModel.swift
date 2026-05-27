@@ -1309,6 +1309,43 @@ final class AppViewModel: ObservableObject {
         }
     }
 
+    /// Download a ready slice job's sliced 3MF, render it into a `SCNScene`,
+    /// and surface the preview modal. The modal's Print action will reuse the
+    /// same job id via `printFromJob`, matching the live-slice flow.
+    @discardableResult
+    func previewSliceJob(jobId: String) async -> Bool {
+        guard !sliceJobMutationsInFlight.contains(jobId) else { return false }
+        sliceJobMutationsInFlight.insert(jobId)
+        defer { sliceJobMutationsInFlight.remove(jobId) }
+
+        let fallbackName = sliceJobs.first(where: { $0.jobId == jobId })?.filename ?? "preview.3mf"
+        do {
+            let result = try await gatewayClient().fetchSliceJobOutput(
+                jobId: jobId,
+                fallbackFileName: fallbackName
+            )
+            let threeMFData = result.threeMFData
+            let scene = try await Task.detached {
+                let reader = ThreeMFReader()
+                let extracted = try reader.extractGCode(
+                    from: threeMFData,
+                    preferredPlateId: nil
+                )
+                let parser = GCodeParser()
+                let model = try parser.parse(extracted.content)
+                return PrintSceneBuilder().buildScene(from: model)
+            }.value
+            previewScene = scene
+            currentJobId = jobId
+            previewEstimate = result.estimate
+            isShowingPreview = true
+            return true
+        } catch {
+            setMessage("Couldn't load preview: \(error.localizedDescription)", .error)
+            return false
+        }
+    }
+
     func cancelUpload() async {
         guard let uploadId = activeUploadId, !isCancellingUpload else { return }
         isCancellingUpload = true

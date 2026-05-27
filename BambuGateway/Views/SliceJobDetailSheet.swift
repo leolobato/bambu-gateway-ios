@@ -12,6 +12,7 @@ struct SliceJobDetailSheet: View {
     @State private var activeAction: ActionKind?
 
     private enum ActionKind {
+        case preview
         case print
         case sliceAgain
         case cancel
@@ -165,11 +166,35 @@ struct SliceJobDetailSheet: View {
     private func actions(for job: SliceJob) -> some View {
         let mutationInFlight = activeAction != nil
             || viewModel.sliceJobMutationsInFlight.contains(job.jobId)
-        let canPrint = job.displayStatus == .ready && (job.outputSize ?? 0) > 0
+        let canPreview = job.displayStatus == .ready && (job.outputSize ?? 0) > 0
+        let canPrint = canPreview
         let canCancel = !job.isTerminal
         let canSliceAgain = job.isTerminal
 
         VStack(spacing: 8) {
+            if canPreview {
+                Button {
+                    Task {
+                        activeAction = .preview
+                        let opened = await viewModel.previewSliceJob(jobId: job.jobId)
+                        activeAction = nil
+                        if opened {
+                            dismiss()
+                        }
+                    }
+                } label: {
+                    actionLabel(title: "Preview",
+                                systemImage: "cube.transparent",
+                                inFlight: activeAction == .preview,
+                                tintOnLight: true)
+                        .background(Color.accentBlue)
+                        .foregroundStyle(.white)
+                        .clipShape(RoundedRectangle(cornerRadius: 12))
+                        .opacity(mutationInFlight ? 0.5 : 1)
+                }
+                .disabled(mutationInFlight)
+            }
+
             if canPrint {
                 let printDisabled = mutationInFlight || viewModel.selectedPrinterId.isEmpty
                 Button {
@@ -185,9 +210,9 @@ struct SliceJobDetailSheet: View {
                     actionLabel(title: "Print",
                                 systemImage: "printer.fill",
                                 inFlight: activeAction == .print,
-                                tintOnLight: true)
-                        .background(Color.accentBlue)
-                        .foregroundStyle(.white)
+                                tintOnLight: false)
+                        .background(Color.accentBlue.opacity(0.15))
+                        .foregroundStyle(Color.accentBlue)
                         .clipShape(RoundedRectangle(cornerRadius: 12))
                         .opacity(printDisabled ? 0.5 : 1)
                 }
