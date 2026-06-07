@@ -147,6 +147,7 @@ final class AppViewModel: ObservableObject {
 
     private var uploadPollingTask: Task<Void, Never>?
     private var parseTask: Task<Void, Never>?
+    private var sliceResumeTask: Task<Void, Never>?
     private var activeUploadId: String?
     private let settingsStore: AppSettingsStore
     private var persistedSettings: PersistedSettings
@@ -353,6 +354,7 @@ final class AppViewModel: ObservableObject {
         uploadPollingTask?.cancel()
         parseTask?.cancel()
         parseTask = nil
+        resetActiveSliceState()
         isParsing = false
         uploadProgress = nil
         activeUploadId = nil
@@ -729,7 +731,21 @@ final class AppViewModel: ObservableObject {
     /// Resume a slice job persisted from a prior session, if any.
     /// Called from app launch. Polls the gateway for the saved job; once it
     /// reaches `ready`, surfaces the appropriate UI (preview modal or print).
+    /// Runs in a cancellable task so loading a new file can supersede a resume
+    /// that would otherwise hold the slice-progress UI hostage.
     func resumePersistedSliceJob() async {
+        let task = Task { [weak self] in
+            guard let self else { return }
+            await self.performResumePersistedSliceJob()
+        }
+        sliceResumeTask = task
+        await task.value
+        if sliceResumeTask == task {
+            sliceResumeTask = nil
+        }
+    }
+
+    private func performResumePersistedSliceJob() async {
         guard let memento = loadPendingSliceJob() else { return }
         let client = gatewayClient()
 
@@ -785,11 +801,27 @@ final class AppViewModel: ObservableObject {
                 jobId = try await pollUntilReady(jobId: memento.jobId, client: client)
             }
             try await consumeReadyJob(jobId: jobId, kind: memento.kind, client: client)
+        } catch is CancellationError {
+            // Superseded by a new file load — drop silently; the new context
+            // already cleared the persisted job.
         } catch let error as URLError where error.code == .cancelled {
             clearPendingSliceJob()
         } catch {
             setMessage(error.localizedDescription, .error)
         }
+    }
+
+    /// Establish a clean slicing context for a newly selected file: cancel any
+    /// in-flight resume, drop the persisted job, and clear the progress flags so
+    /// stale "Slicing 100%" state can't keep the Preview/Print buttons disabled.
+    func resetActiveSliceState() {
+        sliceResumeTask?.cancel()
+        sliceResumeTask = nil
+        isLoadingPreview = false
+        isSubmitting = false
+        slicingProgress = nil
+        slicingPhase = nil
+        clearPendingSliceJob()
     }
 
     /// Once a job is `ready`, either render its preview or trigger the print,
@@ -1410,6 +1442,7 @@ final class AppViewModel: ObservableObject {
         isParsing = true
         defer { isParsing = false }
 
+        resetActiveSliceState()
         parsedInfo = nil
         machineOptions = []
         processOptions = []
