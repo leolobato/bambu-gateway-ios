@@ -9,10 +9,8 @@ class ShareViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = .clear
-    }
-
-    override func viewDidAppear(_ animated: Bool) {
-        super.viewDidAppear(animated)
+        // Act as early as possible so the host app is foregrounded before the
+        // share sheet finishes animating in — avoids a visible interstitial.
         handleSharedContent()
     }
 
