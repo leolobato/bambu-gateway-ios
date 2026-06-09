@@ -47,6 +47,7 @@
 		80CA2FC95EFD1FA78A919DB4 /* CameraFeed.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF802CF901C59D7640A13BBF /* CameraFeed.swift */; };
 		91FB314780FCE460E7C2F783 /* PushService.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC2E5A494F474B1D3D2EF4B7 /* PushService.swift */; };
 		928BE6B468C5B40955A3B029 /* StatusRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 244EB95AFE2F67045E60788A /* StatusRow.swift */; };
+		9608347CC7045A35539E4A89 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = D846A8AAD3E707E605ADAE6F /* Assets.xcassets */; };
 		96620D20C294E0F910E6ADA9 /* BambuGatewayTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BEBF1713CA6AF40B8331BFA /* BambuGatewayTests.swift */; };
 		9838CAA375A45D38455D0394 /* SpeedPickerSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = 450020B566A6C67BC3D57DE2 /* SpeedPickerSheet.swift */; };
 		9B48B57930E096C0B510C4EE /* AppViewModelProcessOverridesTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5603694E5ECBBCB86D109186 /* AppViewModelProcessOverridesTests.swift */; };
@@ -135,6 +136,7 @@
 		236205CC2F014C4032AF3A1F /* ProcessValueResolution.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProcessValueResolution.swift; sourceTree = "<group>"; };
 		244EB95AFE2F67045E60788A /* StatusRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatusRow.swift; sourceTree = "<group>"; };
 		25AA0EB97886F4C8EB4AC476 /* PrintTab.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrintTab.swift; sourceTree = "<group>"; };
+		29FBBB97D68AAB3A918D1ED1 /* ShareExtension.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = ShareExtension.entitlements; sourceTree = "<group>"; };
 		2ACB1A998B04E9E9154760AE /* PrinterTab.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrinterTab.swift; sourceTree = "<group>"; };
 		2B9A2C955FDC5D3DCDDE04AE /* PrintEstimateFormatters.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrintEstimateFormatters.swift; sourceTree = "<group>"; };
 		2CD1B0E2E27437689C3D753A /* BambuTCPJPEGFeed.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BambuTCPJPEGFeed.swift; sourceTree = "<group>"; };
@@ -204,6 +206,7 @@
 		CE9094B53DAFDF244C615D34 /* PrintLiveActivity.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrintLiveActivity.swift; sourceTree = "<group>"; };
 		CF802CF901C59D7640A13BBF /* CameraFeed.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraFeed.swift; sourceTree = "<group>"; };
 		CFF25855CE5E2F502E04B737 /* PrintEstimateDecodingTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrintEstimateDecodingTests.swift; sourceTree = "<group>"; };
+		D846A8AAD3E707E605ADAE6F /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		DBEBCED8EAF681F59258D749 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		E8FBFE3A5340C22D4F4C7981 /* SliceJobDecodingTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SliceJobDecodingTests.swift; sourceTree = "<group>"; };
 		E9D461E5634BC80B7C37747F /* BambuGateway.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = BambuGateway.entitlements; sourceTree = "<group>"; };
@@ -429,7 +432,9 @@
 		E56CDDD34788FBF5F8CF0381 /* ShareExtension */ = {
 			isa = PBXGroup;
 			children = (
+				D846A8AAD3E707E605ADAE6F /* Assets.xcassets */,
 				7E8DBA7CCF6FB1ACEDDE1120 /* Info.plist */,
+				29FBBB97D68AAB3A918D1ED1 /* ShareExtension.entitlements */,
 				68FD23DF97AF009395F22F1E /* ShareViewController.swift */,
 			);
 			path = ShareExtension;
@@ -539,6 +544,7 @@
 			buildConfigurationList = EF8EF2B78283CFAA1B047AAF /* Build configuration list for PBXNativeTarget "ShareExtension" */;
 			buildPhases = (
 				169B9E77C8C77FB7A3543BD1 /* Sources */,
+				2AA2174F0C43F8DDE5EFD517 /* Resources */,
 			);
 			buildRules = (
 			);
@@ -605,6 +611,14 @@
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
+		2AA2174F0C43F8DDE5EFD517 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				9608347CC7045A35539E4A89 /* Assets.xcassets in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		9613F594A8004DC1BF0ADBA7 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -764,6 +778,8 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = BB6EAF5F859F19DD2BA7568F /* Base.xcconfig */;
 			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = ShareExtension/ShareExtension.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = "$(DEVELOPMENT_TEAM)";
 				GENERATE_INFOPLIST_FILE = NO;
@@ -942,6 +958,8 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = BB6EAF5F859F19DD2BA7568F /* Base.xcconfig */;
 			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = ShareExtension/ShareExtension.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = "$(DEVELOPMENT_TEAM)";
 				GENERATE_INFOPLIST_FILE = NO;

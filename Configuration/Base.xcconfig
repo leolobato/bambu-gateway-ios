@@ -6,5 +6,6 @@ CODE_SIGN_IDENTITY = Apple Development
 APP_BUNDLE_ID = com.example.BambuGateway
 SHARE_EXTENSION_BUNDLE_ID = $(APP_BUNDLE_ID).share-extension
 LIVE_ACTIVITY_BUNDLE_ID = $(APP_BUNDLE_ID).LiveActivity
+APP_GROUP_ID = group.$(APP_BUNDLE_ID)
 
 #include? "LocalSigning.xcconfig"
