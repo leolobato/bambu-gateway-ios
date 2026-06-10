@@ -19,7 +19,10 @@ Build Share Extension only:
 xcodebuild -project BambuGateway.xcodeproj -scheme ShareExtension -destination 'generic/platform=iOS' CODE_SIGNING_ALLOWED=NO build
 ```
 
-No test target exists yet. When adding one, name it `BambuGatewayTests` and use `test_<scenario>_<expectedResult>()` style.
+Unit tests live in `BambuGatewayTests` (`test_<scenario>_<expectedResult>()` style). Run them on the iPhone 16 / iOS 18.6 simulator:
+```
+xcodebuild test -project BambuGateway.xcodeproj -scheme BambuGateway -destination 'platform=iOS Simulator,name=iPhone 16,OS=18.6'
+```
 
 ## Architecture
 
