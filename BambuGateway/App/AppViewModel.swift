@@ -102,6 +102,9 @@ final class AppViewModel: ObservableObject {
     let previewViewer = Viewer()
     @Published var currentJobId: String?
     @Published var previewEstimate: PrintEstimate?
+    /// Monotonic token: each `presentPreview` call bumps it so a superseded
+    /// (older) call can bail instead of clobbering the newer call's state.
+    private var previewGeneration = 0
     /// 0–100 while a slice job is running for this client; nil otherwise.
     @Published var slicingProgress: Int?
     /// Human-readable phase from the gateway (e.g. "Optimizing toolpath").
@@ -478,11 +481,16 @@ final class AppViewModel: ObservableObject {
     /// Fetch a ready job's preview blob + estimate, load it into the shared
     /// viewer, and surface the preview modal.
     private func presentPreview(jobId: String) async throws {
+        previewGeneration += 1
+        let generation = previewGeneration
         let client = gatewayClient()
         let bytes = try await client.fetchSliceJobPreview(jobId: jobId)
         let preview = try await Task.detached { try PreviewData(data: bytes) }.value
+        guard generation == previewGeneration else { return }
         await previewViewer.load(preview)
         let job = try? await client.fetchSliceJob(jobId: jobId)
+        try Task.checkCancellation()
+        guard generation == previewGeneration else { return }
         previewData = preview
         previewEstimate = job?.estimate
         currentJobId = jobId
