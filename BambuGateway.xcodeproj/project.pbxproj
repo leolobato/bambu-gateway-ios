@@ -835,9 +835,6 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				OTHER_LDFLAGS = (
-					"-lz",
-				);
 				PRODUCT_NAME = BambuGateway;
 				SDKROOT = iphoneos;
 				SUPPORTS_MACCATALYST = NO;
@@ -1014,9 +1011,6 @@
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
-				);
-				OTHER_LDFLAGS = (
-					"-lz",
 				);
 				PRODUCT_NAME = BambuGateway;
 				SDKROOT = iphoneos;

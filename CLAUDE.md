@@ -23,7 +23,7 @@ No test target exists yet. When adding one, name it `BambuGatewayTests` and use 
 
 ## Architecture
 
-SwiftUI app (iOS 18+, Swift 5) with no external dependencies (pure Foundation/SwiftUI/SceneKit).
+SwiftUI app (iOS 18+, Swift 5). Only dependency is the local `GCodePreview` Swift package (path: `../GCodePreview`), which provides the Metal-based print preview renderer.
 
 ### Core data flow
 
@@ -36,18 +36,11 @@ The app does NOT talk to Bambu printers directly. It communicates with a **gatew
 1. User imports a `.3mf` file (via Files picker, MakerWorld browser, or Share Extension deep link)
 2. File is uploaded to gateway's `/api/parse-3mf` → returns project metadata and whether it's pre-sliced
 3. User configures filament-to-AMS-tray mappings, machine/process profiles, plate type
-4. Either "Preview" (sends to `/api/print-preview`, receives sliced G-code, renders 3D scene) or "Print" (sends to `/api/print`)
+4. "Preview" runs a slice job (`POST /api/slice-jobs`), then fetches the job's preview blob and estimate; "Print" submits the job to `/api/print`
 
-### GCodeKit pipeline
+### Print preview (GCodePreview v2)
 
-`ThreeMFReader` → `GCodeParser` → `PrintSceneBuilder` → `GCodePreviewView`
-
-- **ThreeMFReader**: Raw ZIP parsing (no Foundation Archive API) to extract G-code from 3MF archives. Scores candidate files by path patterns to pick the best one. Handles deflate via zlib.
-- **GCodeParser**: Converts G-code text into `PrintModel` (list of `Segment` structs). Handles G0/G1/G2/G3, arc linearization, absolute/relative modes, move-type classification from comments, layer detection, retraction tracking.
-- **PrintSceneBuilder**: Converts `PrintModel` into `SCNScene` with ribbon geometry (5 quads per segment), build plate, isometric camera, and 3-point lighting. Uses pre-allocated arrays for performance.
-- **GCodePreviewView**: UIKit/AppKit `SCNView` wrapper with orbit camera.
-
-Heavy work (3MF reading, G-code parsing, scene building) uses `Task.detached` to stay off the main actor.
+Previews are rendered by the **GCodePreview** Swift package (local path package at `../GCodePreview`; Metal renderer). The app downloads the slice job's `Metadata/preview.bin` — a FlatBuffers blob produced server-side — via `GET /api/slice-jobs/{job_id}/preview` (`GatewayClient.fetchSliceJobPreview`), decodes it with `PreviewData(data:)` off the main actor, and loads it into a shared `Viewer` (`AppViewModel.presentPreview(jobId:)`). No G-code parsing happens on device.
 
 ### Share Extension
 
@@ -65,7 +58,10 @@ Receives URLs from iOS Share Sheet, converts to `bambugateway://open?url=...` de
 | `/api/slicer/plate-types` | GET | Build plate options |
 | `/api/parse-3mf` | POST | Upload 3MF, get metadata |
 | `/api/filament-matches` | POST | Suggest AMS slot assignments |
-| `/api/print-preview` | POST | Slice and return preview (600s timeout) |
+| `/api/slice-jobs` | POST | Create a slice job |
+| `/api/slice-jobs` | GET | List slice jobs |
+| `/api/slice-jobs/{job_id}` | GET | Slice job status/details |
+| `/api/slice-jobs/{job_id}/preview` | GET | Download the job's `preview.bin` |
 | `/api/print` | POST | Submit print job |
 
 ## Coding Conventions

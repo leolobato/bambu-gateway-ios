@@ -1788,7 +1788,7 @@ final class AppViewModel: ObservableObject {
     }
 
     /// Trim filament slots the active plate doesn't reference, so downstream
-    /// calls (`/api/print-preview`, `/api/print`) only send overrides for slots
+    /// calls (`/api/slice-jobs`, `/api/print`) only send overrides for slots
     /// the model actually uses. Passing extra slots has been observed to fail
     /// slicing on multi-filament projects where only one slot is used.
     ///
