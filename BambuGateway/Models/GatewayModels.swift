@@ -322,13 +322,6 @@ struct ProfileOption: Identifiable, Hashable {
     let label: String
 }
 
-struct PreviewResult {
-    let threeMFData: Data
-    let previewId: String
-    let fileName: String
-    let estimate: PrintEstimate?
-}
-
 struct SliceJob: Codable, Identifiable, Equatable {
     // Decoded via GatewayClient's `convertFromSnakeCase` strategy — do not add
     // explicit `CodingKeys` here. An explicit mapping would shadow the global

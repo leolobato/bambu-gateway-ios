@@ -24,7 +24,6 @@
 		4C1A529AD33EE2A149CD9C0E /* PrinterTab.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2ACB1A998B04E9E9154760AE /* PrinterTab.swift */; };
 		503F97F3CE1A8AE99834FBED /* ProcessValueResolution.swift in Sources */ = {isa = PBXBuildFile; fileRef = 236205CC2F014C4032AF3A1F /* ProcessValueResolution.swift */; };
 		5096C194622EACD881757599 /* PrintProgressCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0CACA553E0D70F489079E05 /* PrintProgressCard.swift */; };
-		518938796FA05AE905D80267 /* ThreeMFReader.swift in Sources */ = {isa = PBXBuildFile; fileRef = FFEEE185FB42B56E8BD094C5 /* ThreeMFReader.swift */; };
 		531A4B62990B0E7E59F76C06 /* ToastOverlay.swift in Sources */ = {isa = PBXBuildFile; fileRef = B52D3475F8383A6C96754E03 /* ToastOverlay.swift */; };
 		553FFDB660066B5E9D1B5FB6 /* SliceJobDetailSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = 55B3439E1A118869570FD3A9 /* SliceJobDetailSheet.swift */; };
 		5862EC8951FC76F6FA97B697 /* PrintControlsRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 32780EC48A776B886BDB8B31 /* PrintControlsRow.swift */; };
@@ -212,7 +211,6 @@
 		E8FBFE3A5340C22D4F4C7981 /* SliceJobDecodingTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SliceJobDecodingTests.swift; sourceTree = "<group>"; };
 		E9D461E5634BC80B7C37747F /* BambuGateway.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = BambuGateway.entitlements; sourceTree = "<group>"; };
 		F3474D97C0D0BAC835CC7FBD /* SettingsTransferInfoDecodingTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsTransferInfoDecodingTests.swift; sourceTree = "<group>"; };
-		FFEEE185FB42B56E8BD094C5 /* ThreeMFReader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ThreeMFReader.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -351,14 +349,6 @@
 			path = Support;
 			sourceTree = "<group>";
 		};
-		9BDAE05EA0C57DFE8E7377AD /* ThreeMF */ = {
-			isa = PBXGroup;
-			children = (
-				FFEEE185FB42B56E8BD094C5 /* ThreeMFReader.swift */,
-			);
-			path = ThreeMF;
-			sourceTree = "<group>";
-		};
 		BC2C1801A2CBA8A497C1E463 /* Packages */ = {
 			isa = PBXGroup;
 			children = (
@@ -481,7 +471,6 @@
 				79B5EFE814BB7EB4A5290D8D /* Resources */,
 				F5715E5504CD4B726915D1FB /* Services */,
 				E800153965F3EBCD92DBE985 /* Support */,
-				9BDAE05EA0C57DFE8E7377AD /* ThreeMF */,
 				D12BFF5D1AADFDEE431496E9 /* Views */,
 			);
 			path = BambuGateway;
@@ -724,7 +713,6 @@
 				1B880450456C628B926E044A /* SliceJobsSection.swift in Sources */,
 				9838CAA375A45D38455D0394 /* SpeedPickerSheet.swift in Sources */,
 				928BE6B468C5B40955A3B029 /* StatusRow.swift in Sources */,
-				518938796FA05AE905D80267 /* ThreeMFReader.swift in Sources */,
 				162927F10FBBE5F4B42564AA /* ToastCenter.swift in Sources */,
 				531A4B62990B0E7E59F76C06 /* ToastOverlay.swift in Sources */,
 				007AA72398C163EE43F732D2 /* VLCCameraFeed.swift in Sources */,

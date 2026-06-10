@@ -133,61 +133,6 @@ struct GatewayClient {
         return try decode(FilamentMatchResponse.self, from: data)
     }
 
-    func fetchPrintPreview(_ submission: PrintSubmission) async throws -> PreviewResult {
-        guard let transferService else {
-            throw GatewayClientError.serverError("Background transfer service is not available.")
-        }
-
-        var form = MultipartFormData()
-        form.addFile(name: "file", fileName: submission.file.fileName, mimeType: "application/octet-stream", data: submission.file.data)
-
-        if !submission.printerId.isEmpty {
-            form.addField(name: "printer_id", value: submission.printerId)
-        }
-        if !submission.machineProfile.isEmpty {
-            form.addField(name: "machine_profile", value: submission.machineProfile)
-        }
-        if !submission.processProfile.isEmpty {
-            form.addField(name: "process_profile", value: submission.processProfile)
-        }
-        if let plateId = submission.plateId {
-            form.addField(name: "plate_id", value: String(plateId))
-        }
-        if !submission.plateType.isEmpty {
-            form.addField(name: "plate_type", value: submission.plateType)
-        }
-        form.addField(name: "copies", value: String(submission.copies))
-        if !submission.filamentOverrides.isEmpty {
-            try addFilamentProfilesField(to: &form, overrides: submission.filamentOverrides)
-        }
-        try addProcessOverridesField(to: &form, overrides: submission.processOverrides)
-        form.finalize()
-
-        let bodyURL = try form.writeBody(toTemporaryFileNamed: "print-preview")
-        defer { try? FileManager.default.removeItem(at: bodyURL) }
-
-        var request = URLRequest(url: try resolveURL(path: "/api/print-preview"))
-        request.httpMethod = "POST"
-        request.setValue("multipart/form-data; boundary=\(form.boundary)", forHTTPHeaderField: "Content-Type")
-
-        let (data, httpResponse) = try await transferService.upload(request: request, fromFile: bodyURL)
-
-        guard (200 ... 299).contains(httpResponse.statusCode) else {
-            throw mapHTTPError(httpResponse, data: data)
-        }
-
-        guard let previewId = httpResponse.value(forHTTPHeaderField: "X-Preview-Id"),
-              !previewId.isEmpty else {
-            throw GatewayClientError.serverError("Server did not return a preview ID.")
-        }
-
-        let fileName = parseContentDispositionFilename(httpResponse) ?? submission.file.fileName
-        let estimateHeader = httpResponse.value(forHTTPHeaderField: "X-Print-Estimate")
-        let estimate = PrintEstimate.decodeFromHeader(estimateHeader)
-
-        return PreviewResult(threeMFData: data, previewId: previewId, fileName: fileName, estimate: estimate)
-    }
-
     func printFromPreview(previewId: String, printerId: String) async throws -> PrintResponse {
         var form = MultipartFormData()
         form.addField(name: "preview_id", value: previewId)
@@ -323,40 +268,15 @@ struct GatewayClient {
         return (data, fileName)
     }
 
-    /// Download the sliced 3MF for a job that has reached `ready`.
-    func fetchSliceJobOutput(jobId: String, fallbackFileName: String) async throws -> PreviewResult {
-        let (data, response) = try await request(
-            path: "/api/slice-jobs/\(jobId)/output",
-            method: "GET",
-            timeout: 120
-        )
-        guard let httpResponse = response as? HTTPURLResponse else {
-            throw GatewayClientError.invalidResponse
-        }
-        let fileName = parseContentDispositionFilename(httpResponse) ?? fallbackFileName
-        let estimate = PrintEstimate.decodeFromHeader(
-            httpResponse.value(forHTTPHeaderField: "X-Print-Estimate")
-        )
-        return PreviewResult(
-            threeMFData: data,
-            previewId: jobId,
-            fileName: fileName,
-            estimate: estimate
-        )
-    }
-
     /// Download the sliced job's `Metadata/preview.bin` (GCodePreview v2
     /// FlatBuffers blob). 404 means the gateway/slicer doesn't embed
     /// preview data yet.
     func fetchSliceJobPreview(jobId: String) async throws -> Data {
-        let (data, response) = try await request(
+        let (data, _) = try await request(
             path: "/api/slice-jobs/\(jobId)/preview",
             method: "GET",
             timeout: 60
         )
-        guard response is HTTPURLResponse else {
-            throw GatewayClientError.invalidResponse
-        }
         return data
     }
 
