@@ -14,8 +14,7 @@ settings:
     CODE_SIGN_STYLE: Automatic
 packages:
   GCodePreview:
-    url: https://github.com/leolobato/GCodePreview
-    exactVersion: 1.0.1
+    path: ../GCodePreview
   MobileVLCKit:
     url: https://github.com/MobileVLCKit-SPM/MobileVLCKit-SPM
     exactVersion: 3.7.3

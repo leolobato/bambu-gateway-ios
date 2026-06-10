@@ -140,6 +140,7 @@
 		2ACB1A998B04E9E9154760AE /* PrinterTab.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrinterTab.swift; sourceTree = "<group>"; };
 		2B9A2C955FDC5D3DCDDE04AE /* PrintEstimateFormatters.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrintEstimateFormatters.swift; sourceTree = "<group>"; };
 		2CD1B0E2E27437689C3D753A /* BambuTCPJPEGFeed.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BambuTCPJPEGFeed.swift; sourceTree = "<group>"; };
+		32338C1C2ABD2C2409818D31 /* GCodePreview */ = {isa = PBXFileReference; lastKnownFileType = folder; name = GCodePreview; path = ../GCodePreview; sourceTree = SOURCE_ROOT; };
 		32780EC48A776B886BDB8B31 /* PrintControlsRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrintControlsRow.swift; sourceTree = "<group>"; };
 		36C28A77CC578F19C3B443A8 /* AppSettingsStoreCameraTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppSettingsStoreCameraTests.swift; sourceTree = "<group>"; };
 		3A513C2236BDDE4E244AC161 /* ProcessParametersCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProcessParametersCard.swift; sourceTree = "<group>"; };
@@ -319,6 +320,7 @@
 				E34573677577835B31EE039D /* BambuGatewayTests */,
 				7ED3FE26DF1B65569C58C57B /* Configuration */,
 				0AB25DCFFA9C18E411FF6066 /* LiveActivityExtension */,
+				BC2C1801A2CBA8A497C1E463 /* Packages */,
 				E56CDDD34788FBF5F8CF0381 /* ShareExtension */,
 				4B7DEF7A6DC2F87E9DEBBBFF /* Products */,
 			);
@@ -355,6 +357,14 @@
 				FFEEE185FB42B56E8BD094C5 /* ThreeMFReader.swift */,
 			);
 			path = ThreeMF;
+			sourceTree = "<group>";
+		};
+		BC2C1801A2CBA8A497C1E463 /* Packages */ = {
+			isa = PBXGroup;
+			children = (
+				32338C1C2ABD2C2409818D31 /* GCodePreview */,
+			);
+			name = Packages;
 			sourceTree = "<group>";
 		};
 		BFCF654FB2646286A9DBE87D /* Camera */ = {
@@ -595,8 +605,8 @@
 			mainGroup = 7B8B7E735CE5ED862C5955D2;
 			minimizedProjectReferenceProxies = 1;
 			packageReferences = (
-				DD933A013442A429FFF4FB80 /* XCRemoteSwiftPackageReference "GCodePreview" */,
 				A5C2CD4C597FA88745434145 /* XCRemoteSwiftPackageReference "MobileVLCKit-SPM" */,
+				1C479AD988B284314C11FF40 /* XCLocalSwiftPackageReference "../GCodePreview" */,
 			);
 			preferredProjectObjectVersion = 77;
 			projectDirPath = "";
@@ -1125,6 +1135,13 @@
 		};
 /* End XCConfigurationList section */
 
+/* Begin XCLocalSwiftPackageReference section */
+		1C479AD988B284314C11FF40 /* XCLocalSwiftPackageReference "../GCodePreview" */ = {
+			isa = XCLocalSwiftPackageReference;
+			relativePath = ../GCodePreview;
+		};
+/* End XCLocalSwiftPackageReference section */
+
 /* Begin XCRemoteSwiftPackageReference section */
 		A5C2CD4C597FA88745434145 /* XCRemoteSwiftPackageReference "MobileVLCKit-SPM" */ = {
 			isa = XCRemoteSwiftPackageReference;
@@ -1132,14 +1149,6 @@
 			requirement = {
 				kind = exactVersion;
 				version = 3.7.3;
-			};
-		};
-		DD933A013442A429FFF4FB80 /* XCRemoteSwiftPackageReference "GCodePreview" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/leolobato/GCodePreview";
-			requirement = {
-				kind = exactVersion;
-				version = 1.0.1;
 			};
 		};
 /* End XCRemoteSwiftPackageReference section */
@@ -1152,7 +1161,6 @@
 		};
 		85BFD403F2AE24BB83C64D31 /* GCodePreview */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = DD933A013442A429FFF4FB80 /* XCRemoteSwiftPackageReference "GCodePreview" */;
 			productName = GCodePreview;
 		};
 /* End XCSwiftPackageProductDependency section */
