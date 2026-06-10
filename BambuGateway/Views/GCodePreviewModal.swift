@@ -18,8 +18,8 @@ struct GCodePreviewModal: View {
                 ZStack {
                     Color(uiColor: .systemBackground)
 
-                    if let scene = viewModel.previewScene {
-                        GCodePreviewView(scene: scene)
+                    if viewModel.previewData != nil {
+                        GCodePreviewView(viewer: viewModel.previewViewer)
                     } else {
                         ProgressView("Preparing preview...")
                     }
@@ -48,7 +48,7 @@ struct GCodePreviewModal: View {
                             Text("Print")
                         }
                     }
-                    .disabled(viewModel.previewScene == nil || viewModel.isSubmitting)
+                    .disabled(viewModel.previewData == nil || viewModel.isSubmitting)
                 }
             }
         }
