@@ -345,6 +345,21 @@ struct GatewayClient {
         )
     }
 
+    /// Download the sliced job's `Metadata/preview.bin` (GCodePreview v2
+    /// FlatBuffers blob). 404 means the gateway/slicer doesn't embed
+    /// preview data yet.
+    func fetchSliceJobPreview(jobId: String) async throws -> Data {
+        let (data, response) = try await request(
+            path: "/api/slice-jobs/\(jobId)/preview",
+            method: "GET",
+            timeout: 60
+        )
+        guard response is HTTPURLResponse else {
+            throw GatewayClientError.invalidResponse
+        }
+        return data
+    }
+
     /// Trigger a print from a `ready` slice job.
     func printFromJob(jobId: String, printerId: String) async throws -> PrintResponse {
         var form = MultipartFormData()
