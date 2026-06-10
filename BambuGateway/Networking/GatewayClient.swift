@@ -133,25 +133,6 @@ struct GatewayClient {
         return try decode(FilamentMatchResponse.self, from: data)
     }
 
-    func printFromPreview(previewId: String, printerId: String) async throws -> PrintResponse {
-        var form = MultipartFormData()
-        form.addField(name: "preview_id", value: previewId)
-        if !printerId.isEmpty {
-            form.addField(name: "printer_id", value: printerId)
-        }
-        form.finalize()
-
-        let (data, _) = try await request(
-            path: "/api/print",
-            method: "POST",
-            body: form.body,
-            contentType: "multipart/form-data; boundary=\(form.boundary)",
-            timeout: 600
-        )
-
-        return try decode(PrintResponse.self, from: data)
-    }
-
     /// Submit a slice job (auto_print=false). Returns the job id.
     func createSliceJob(_ submission: PrintSubmission) async throws -> String {
         guard let transferService else {

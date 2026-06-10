@@ -484,7 +484,18 @@ final class AppViewModel: ObservableObject {
         previewGeneration += 1
         let generation = previewGeneration
         let client = gatewayClient()
-        let bytes = try await client.fetchSliceJobPreview(jobId: jobId)
+        let bytes: Data
+        do {
+            bytes = try await client.fetchSliceJobPreview(jobId: jobId)
+        } catch GatewayClientError.serverError(let detail)
+            where detail == "Not Found" || detail == "Request failed with HTTP 404." {
+            // An old gateway without GET /api/slice-jobs/{id}/preview returns
+            // FastAPI's bare default 404 ("Not Found"). Newer gateways send a
+            // specific detail for missing preview data, which passes through.
+            throw GatewayClientError.serverError(
+                "Preview data not available — the gateway/slicer may need an update."
+            )
+        }
         let preview = try await Task.detached { try PreviewData(data: bytes) }.value
         guard generation == previewGeneration else { return }
         await previewViewer.load(preview)
