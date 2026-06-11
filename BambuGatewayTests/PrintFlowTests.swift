@@ -125,6 +125,32 @@ final class PrintFlowTests: XCTestCase {
         vm.stopUploadPollingForTests()  // defensive — polling should already be cancelled
     }
 
+    func test_pollFailed_clearsStartedPrintContext() {
+        let vm = AppViewModel.makeForTesting()
+        vm.seedStartedPrintContextForTests()
+        vm.printFlow = .uploading(progress: 50)
+
+        let terminal = vm.applyUploadPoll(makeUploadState(status: "failed", progress: 50, error: "boom"))
+
+        XCTAssertTrue(terminal)
+        XCTAssertFalse(vm.hasStartedPrintContextForTests)
+    }
+
+    func test_printSliceJobFailure_setsFailedFlow() async {
+        // Fresh test settings have an empty gateway URL, so the POST fails
+        // fast with `GatewayClientError.invalidURL` — no network involved.
+        let vm = AppViewModel.makeForTesting()
+        vm.selectedPrinterId = "p1"
+
+        let started = await vm.printSliceJob(jobId: "job-1")
+
+        XCTAssertFalse(started)
+        guard case .failed = vm.printFlow else {
+            XCTFail("Expected .failed, got \(String(describing: vm.printFlow))")
+            return
+        }
+    }
+
     func test_dismissPrintFlow_clearsEstimateAndPrinterName() {
         let vm = AppViewModel.makeForTesting()
         vm.printFlow = .success

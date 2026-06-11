@@ -519,28 +519,41 @@ final class AppViewModel: ObservableObject {
 
     func confirmPreviewPrint() async {
         let startedContext = currentPrintContext()
+        let jobId = currentJobId
         isSubmitting = true
         defer { isSubmitting = false }
 
+        // Dismiss the preview cover BEFORE the network round-trip so the
+        // fullScreenCover dismissal and the progress modal's presentation
+        // never land in the same SwiftUI transaction (same pattern as
+        // SliceJobDetailSheet). Errors then surface in the progress modal.
         do {
-            if let jobId = currentJobId {
+            if let jobId {
                 // Was sliced via the slice-job flow — use the job id
+                let printerId = resolvedPrinterId()
+                dismissPreview()
                 let response = try await gatewayClient().printFromJob(
                     jobId: jobId,
-                    printerId: resolvedPrinterId()
+                    printerId: printerId
                 )
-                dismissPreview()
                 handlePrintResponse(response, startedContext: startedContext)
+                lastPrintEstimate = response.estimate
+                let resolvedId = response.printerId.isEmpty ? printerId : response.printerId
+                lastPrintPrinterName = printerName(for: resolvedId)
             } else {
                 // Already sliced — use regular print
                 guard let submission = buildSubmission() else { return }
-                let response = try await gatewayClient().submitPrint(submission)
                 dismissPreview()
+                let response = try await gatewayClient().submitPrint(submission)
                 handlePrintResponse(response, startedContext: startedContext ?? printContext(for: submission))
+                lastPrintEstimate = response.estimate
+                let resolvedId = response.printerId.isEmpty ? submission.printerId : response.printerId
+                lastPrintPrinterName = printerName(for: resolvedId)
             }
         } catch let error as URLError where error.code == .cancelled {
             // user-initiated cancel — silent
         } catch {
+            printFlow = .failed(error.localizedDescription)
             setMessage(error.localizedDescription, .error)
         }
     }
@@ -1208,6 +1221,7 @@ final class AppViewModel: ObservableObject {
             return true
         case "failed":
             finishUploadPolling()
+            startedPrintContext = nil
             if case .uploading = printFlow {
                 printFlow = .failed(state.error ?? "Upload failed.")
             }
@@ -1228,6 +1242,26 @@ final class AppViewModel: ObservableObject {
     /// post-print handling (`startedContext` is a private type).
     func handlePrintResponseForTests(_ response: PrintResponse) {
         handlePrintResponse(response, startedContext: nil)
+    }
+
+    /// Test hook: seeds a dummy started-print context (the type is private)
+    /// so tests can observe terminal upload states clearing it.
+    func seedStartedPrintContextForTests() {
+        startedPrintContext = StartedPrintContext(
+            printerId: "p1",
+            fileName: "test.3mf",
+            fileSize: 1,
+            plateId: nil,
+            plateType: "",
+            machineProfile: "",
+            processProfile: "",
+            filamentOverrides: [:]
+        )
+    }
+
+    /// Test hook: whether a started-print context is currently recorded.
+    var hasStartedPrintContextForTests: Bool {
+        startedPrintContext != nil
     }
     #endif
 
@@ -1378,6 +1412,7 @@ final class AppViewModel: ObservableObject {
             await refreshSliceJobs()
             return true
         } catch {
+            printFlow = .failed(error.localizedDescription)
             setMessage("Couldn't start print: \(error.localizedDescription)", .error)
             return false
         }
