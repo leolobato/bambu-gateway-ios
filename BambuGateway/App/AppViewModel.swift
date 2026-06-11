@@ -370,6 +370,8 @@ final class AppViewModel: ObservableObject {
         uploadProgress = nil
         activeUploadId = nil
         isCancellingUpload = false
+        // No poll will ever advance the flow once polling is torn down.
+        if case .uploading = printFlow { printFlow = nil }
         startedPrintContext = nil
         clearSelectedFile()
         filamentMatchesByIndex = [:]
@@ -929,6 +931,11 @@ final class AppViewModel: ObservableObject {
 
         if let uploadId = response.uploadId {
             startUploadPolling(uploadId: uploadId)
+        } else if activeUploadId != nil {
+            // A cloud print can land while an older LAN upload is still polling;
+            // stop the stale poll so it can't touch the new flow's state.
+            uploadPollingTask?.cancel()
+            finishUploadPolling()
         }
 
         // LAN prints upload in the background — show honest progress.
@@ -1169,6 +1176,8 @@ final class AppViewModel: ObservableObject {
                 guard !Task.isCancelled else { return }
                 do {
                     let state = try await gatewayClient().fetchUploadProgress(uploadId: uploadId)
+                    // A superseded task must not apply its stale tick to the new upload's state.
+                    guard !Task.isCancelled, activeUploadId == uploadId else { return }
                     if applyUploadPoll(state) { return }
                 } catch {
                     // ignore transient network errors
@@ -1209,6 +1218,7 @@ final class AppViewModel: ObservableObject {
         }
     }
 
+    #if DEBUG
     /// Test hook: stops the background upload-polling task.
     func stopUploadPollingForTests() {
         uploadPollingTask?.cancel()
@@ -1219,6 +1229,7 @@ final class AppViewModel: ObservableObject {
     func handlePrintResponseForTests(_ response: PrintResponse) {
         handlePrintResponse(response, startedContext: nil)
     }
+    #endif
 
     private func finishUploadPolling() {
         uploadProgress = nil

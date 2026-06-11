@@ -92,6 +92,39 @@ final class PrintFlowTests: XCTestCase {
         XCTAssertNil(vm.printFlow)
     }
 
+    func test_secondPrintWhileUploading_resetsToFreshUploading() {
+        let vm = AppViewModel.makeForTesting()
+        vm.handlePrintResponseForTests(makePrintResponse(uploadId: "u1"))
+        vm.applyUploadPoll(makeUploadState(status: "uploading", progress: 42))
+
+        vm.handlePrintResponseForTests(makePrintResponse(uploadId: "u2"))
+
+        XCTAssertEqual(vm.printFlow, .uploading(progress: nil))
+        vm.stopUploadPollingForTests()
+    }
+
+    func test_pollFailedAfterDismiss_staysDismissedButSetsErrorMessage() {
+        let vm = AppViewModel.makeForTesting()
+        vm.printFlow = nil  // user dismissed the modal mid-upload
+
+        let terminal = vm.applyUploadPoll(makeUploadState(status: "failed", progress: 50, error: "boom"))
+
+        XCTAssertTrue(terminal)
+        XCTAssertNil(vm.printFlow)
+        XCTAssertTrue(vm.message.contains("boom"))
+    }
+
+    func test_cloudPrintWhileUploading_cancelsStalePollingAndShowsSuccess() {
+        let vm = AppViewModel.makeForTesting()
+        vm.handlePrintResponseForTests(makePrintResponse(uploadId: "u1"))
+
+        vm.handlePrintResponseForTests(makePrintResponse(uploadId: nil))
+
+        XCTAssertEqual(vm.printFlow, .success)
+        XCTAssertNil(vm.uploadProgress)
+        vm.stopUploadPollingForTests()  // defensive — polling should already be cancelled
+    }
+
     func test_dismissPrintFlow_clearsEstimateAndPrinterName() {
         let vm = AppViewModel.makeForTesting()
         vm.printFlow = .success
