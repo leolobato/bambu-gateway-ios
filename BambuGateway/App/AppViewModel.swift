@@ -4,6 +4,14 @@ import OSLog
 import SwiftUI
 import UIKit
 
+enum PrintFlowState: Equatable {
+    /// Gateway accepted the print and is uploading to the printer.
+    /// `progress` is nil until the first poll lands.
+    case uploading(progress: Double?)
+    case success
+    case failed(String)
+}
+
 @MainActor
 final class AppViewModel: ObservableObject {
     private struct StartedPrintContext: Equatable {
@@ -118,10 +126,10 @@ final class AppViewModel: ObservableObject {
     @Published private(set) var sliceJobMutationsInFlight: Set<String> = []
     @Published private(set) var clearFailedInFlight: Bool = false
     @Published private(set) var clearCompletedInFlight: Bool = false
-    /// Drives the one-shot success sheet shown after a direct print.
-    /// Set together with `lastPrintEstimate` and `lastPrintPrinterName` in `submitPrint`;
-    /// cleared together by `dismissPrintSuccessModal()`.
-    @Published var showPrintSuccessModal: Bool = false
+    /// Send-to-printer flow state driving the root-level PrintProgressModal.
+    /// nil = no modal. Set by `handlePrintResponse` (all print paths funnel
+    /// through it); advanced by `applyUploadPoll`; cleared by `dismissPrintFlow()`.
+    @Published var printFlow: PrintFlowState?
     @Published var message: String = ""
     @Published var messageLevel: MessageLevel = .info
     @Published var uploadProgress: Double? = nil
@@ -448,7 +456,6 @@ final class AppViewModel: ObservableObject {
             lastPrintEstimate = response.estimate
             let resolvedPrinterId = response.printerId.isEmpty ? printContext.printerId : response.printerId
             lastPrintPrinterName = printerName(for: resolvedPrinterId)
-            showPrintSuccessModal = true
         } catch let error as URLError where error.code == .cancelled {
             // user-initiated cancel — silent
         } catch {
@@ -604,8 +611,11 @@ final class AppViewModel: ObservableObject {
         }
     }
 
-    func dismissPrintSuccessModal() {
-        showPrintSuccessModal = false
+    /// Closes the print progress/success modal. Does NOT cancel an in-flight
+    /// upload — polling keeps feeding `uploadProgress` (Print-tab card), but
+    /// the modal is not re-presented when the upload later completes.
+    func dismissPrintFlow() {
+        printFlow = nil
         lastPrintEstimate = nil
         lastPrintPrinterName = nil
     }
@@ -852,7 +862,6 @@ final class AppViewModel: ObservableObject {
             lastPrintEstimate = response.estimate
             let resolvedId = response.printerId.isEmpty ? printerId : response.printerId
             lastPrintPrinterName = printerName(for: resolvedId)
-            showPrintSuccessModal = true
             clearPendingSliceJob()
         }
     }
@@ -921,6 +930,10 @@ final class AppViewModel: ObservableObject {
         if let uploadId = response.uploadId {
             startUploadPolling(uploadId: uploadId)
         }
+
+        // LAN prints upload in the background — show honest progress.
+        // Cloud prints come back already confirmed (`status: "printing"`).
+        printFlow = response.uploadId != nil ? .uploading(progress: nil) : .success
 
         let printerId = response.printerId.isEmpty ? (startedContext?.printerId ?? "") : response.printerId
         if !printerId.isEmpty {
@@ -1156,27 +1169,55 @@ final class AppViewModel: ObservableObject {
                 guard !Task.isCancelled else { return }
                 do {
                     let state = try await gatewayClient().fetchUploadProgress(uploadId: uploadId)
-                    uploadProgress = state.progress
-                    if state.status == "completed" {
-                        finishUploadPolling()
-                        return
-                    }
-                    if state.status == "cancelled" {
-                        finishUploadPolling()
-                        startedPrintContext = nil
-                        setMessage("Upload cancelled.", .info)
-                        return
-                    }
-                    if state.status == "failed" {
-                        finishUploadPolling()
-                        setMessage(state.error ?? "Upload failed.", .error)
-                        return
-                    }
+                    if applyUploadPoll(state) { return }
                 } catch {
                     // ignore transient network errors
                 }
             } while !Task.isCancelled
         }
+    }
+
+    /// Applies one upload-progress poll to published state. Returns true when
+    /// the upload reached a terminal state (polling should stop). The
+    /// `if case .uploading` guards keep a user-dismissed modal dismissed.
+    @discardableResult
+    func applyUploadPoll(_ state: UploadProgressResponse) -> Bool {
+        uploadProgress = state.progress
+        if case .uploading = printFlow {
+            printFlow = .uploading(progress: state.progress)
+        }
+        switch state.status {
+        case "completed":
+            finishUploadPolling()
+            if case .uploading = printFlow { printFlow = .success }
+            return true
+        case "cancelled":
+            finishUploadPolling()
+            startedPrintContext = nil
+            if case .uploading = printFlow { printFlow = nil }
+            setMessage("Upload cancelled.", .info)
+            return true
+        case "failed":
+            finishUploadPolling()
+            if case .uploading = printFlow {
+                printFlow = .failed(state.error ?? "Upload failed.")
+            }
+            setMessage(state.error ?? "Upload failed.", .error)
+            return true
+        default:
+            return false
+        }
+    }
+
+    /// Test hook: stops the background upload-polling task.
+    func stopUploadPollingForTests() {
+        uploadPollingTask?.cancel()
+    }
+
+    /// Test hook: feeds a crafted print response through the shared
+    /// post-print handling (`startedContext` is a private type).
+    func handlePrintResponseForTests(_ response: PrintResponse) {
+        handlePrintResponse(response, startedContext: nil)
     }
 
     private func finishUploadPolling() {
@@ -1323,7 +1364,6 @@ final class AppViewModel: ObservableObject {
             lastPrintEstimate = response.estimate
             let resolvedPrinterId = response.printerId.isEmpty ? printerId : response.printerId
             lastPrintPrinterName = printerName(for: resolvedPrinterId)
-            showPrintSuccessModal = true
             await refreshSliceJobs()
             return true
         } catch {

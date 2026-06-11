@@ -53,6 +53,7 @@
 		9B48B57930E096C0B510C4EE /* AppViewModelProcessOverridesTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5603694E5ECBBCB86D109186 /* AppViewModelProcessOverridesTests.swift */; };
 		9B9105450DC62BEE592FECAC /* SettingsTransferInfoDecodingTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F3474D97C0D0BAC835CC7FBD /* SettingsTransferInfoDecodingTests.swift */; };
 		9D2578A0C71EFA277009170A /* PrinterStatusCameraDecodingTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0EEE85F6636C62884235109 /* PrinterStatusCameraDecodingTests.swift */; };
+		9E3B9F4FA059FAA2F7044C99 /* PrintFlowTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16147E8FDEE112D7A35B26E1 /* PrintFlowTests.swift */; };
 		9FC430EBE5876AB11F4B47C0 /* BambuPrinterCameraFeed.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7F5F9FAB3657817D9E6CE4EF /* BambuPrinterCameraFeed.swift */; };
 		A72897F785A9B049880A0A54 /* URLProtocolStub.swift in Sources */ = {isa = PBXBuildFile; fileRef = C514F098C90B69410C6B5A85 /* URLProtocolStub.swift */; };
 		A7F2C0EA5DD4EFA272D034BC /* MobileVLCKit in Frameworks */ = {isa = PBXBuildFile; productRef = 4E1548E9D0BF21D3D57713BE /* MobileVLCKit */; };
@@ -133,6 +134,7 @@
 		04CB9E2D394BC045B08ADAC9 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		0B901FD090D599251CAC63EB /* ProcessOptionsStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProcessOptionsStore.swift; sourceTree = "<group>"; };
 		0F1801F617DE01B7AC244E3E /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
+		16147E8FDEE112D7A35B26E1 /* PrintFlowTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrintFlowTests.swift; sourceTree = "<group>"; };
 		1F95784351CF8ED3265FC5AF /* BambuGateway.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = BambuGateway.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		236205CC2F014C4032AF3A1F /* ProcessValueResolution.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProcessValueResolution.swift; sourceTree = "<group>"; };
 		244EB95AFE2F67045E60788A /* StatusRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatusRow.swift; sourceTree = "<group>"; };
@@ -430,6 +432,7 @@
 				C0EEE85F6636C62884235109 /* PrinterStatusCameraDecodingTests.swift */,
 				CFF25855CE5E2F502E04B737 /* PrintEstimateDecodingTests.swift */,
 				7FFB4F3826F66CCF3B3483F4 /* PrintEstimationFormattingTests.swift */,
+				16147E8FDEE112D7A35B26E1 /* PrintFlowTests.swift */,
 				8EA5FE9B4A0C0E5274947D5B /* ProcessOptionsStoreTests.swift */,
 				55ABCCC281BA256D705F7B45 /* ProcessParameterDecodingTests.swift */,
 				C00671734B5EF69E62886985 /* ProcessValueResolutionTests.swift */,
@@ -673,6 +676,7 @@
 				F00759ADEB68E0C98DFF3C69 /* PreviewDataFixtureTests.swift in Sources */,
 				67618F9E9456EA482EB1ADB0 /* PrintEstimateDecodingTests.swift in Sources */,
 				5B72FB38118F24AE0B84611B /* PrintEstimationFormattingTests.swift in Sources */,
+				9E3B9F4FA059FAA2F7044C99 /* PrintFlowTests.swift in Sources */,
 				9D2578A0C71EFA277009170A /* PrinterStatusCameraDecodingTests.swift in Sources */,
 				DEAD44BEADD590651547964E /* ProcessOptionsStoreTests.swift in Sources */,
 				AA4573D193ADAB8457578E94 /* ProcessParameterDecodingTests.swift in Sources */,
