@@ -32,6 +32,12 @@ struct ContentView: View {
                 }
             }
         }
+        .sheet(isPresented: Binding(
+            get: { viewModel.printFlow != nil },
+            set: { if !$0 { viewModel.dismissPrintFlow() } }
+        )) {
+            PrintProgressModal(viewModel: viewModel)
+        }
         .overlay(alignment: .top) {
             ToastOverlay(center: viewModel.toastCenter)
         }

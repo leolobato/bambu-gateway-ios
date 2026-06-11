@@ -662,11 +662,12 @@ struct PrintTab: View {
         }
     }
 
-    /// Slicing phase string when a slice job is currently in flight for the
-    /// active Preview or Print submission. Hidden once the job settles.
+    /// Subtitle under the submit buttons: the gateway's slicing phase while a
+    /// slice job is in flight, or a generic "Preparing…" in the busy gaps
+    /// before slicing starts and between slice-ready and the print response.
     private var currentSlicingPhase: String? {
         guard viewModel.isLoadingPreview || viewModel.isSubmitting else { return nil }
-        guard let phase = viewModel.slicingPhase, !phase.isEmpty else { return nil }
+        guard let phase = viewModel.slicingPhase, !phase.isEmpty else { return "Preparing…" }
         return phase
     }
 
