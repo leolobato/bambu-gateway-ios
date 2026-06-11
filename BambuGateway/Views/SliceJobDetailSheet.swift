@@ -13,7 +13,6 @@ struct SliceJobDetailSheet: View {
 
     private enum ActionKind {
         case preview
-        case print
         case sliceAgain
         case cancel
     }
@@ -198,18 +197,15 @@ struct SliceJobDetailSheet: View {
             if canPrint {
                 let printDisabled = mutationInFlight || viewModel.selectedPrinterId.isEmpty
                 Button {
-                    Task {
-                        activeAction = .print
-                        let started = await viewModel.printSliceJob(jobId: job.jobId)
-                        activeAction = nil
-                        if started {
-                            dismiss()
-                        }
-                    }
+                    // Dismiss first so the root-level PrintProgressModal can
+                    // present — a still-visible cover would block the sheet.
+                    let jobId = job.jobId
+                    dismiss()
+                    Task { await viewModel.printSliceJob(jobId: jobId) }
                 } label: {
                     actionLabel(title: "Print",
                                 systemImage: "printer.fill",
-                                inFlight: activeAction == .print,
+                                inFlight: false,
                                 tintOnLight: false)
                         .background(Color.accentBlue.opacity(0.15))
                         .foregroundStyle(Color.accentBlue)

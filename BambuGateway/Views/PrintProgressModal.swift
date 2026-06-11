@@ -5,17 +5,21 @@ import SwiftUI
 /// success summary when the upload completes (or an error state on failure).
 struct PrintProgressModal: View {
     @ObservedObject var viewModel: AppViewModel
+    /// Last non-nil flow state, so the dismiss animation keeps rendering the
+    /// state the user actually saw (e.g. cancel mid-upload sets `printFlow`
+    /// to nil — without this cache the sheet would flash the success view).
+    @State private var lastFlow: PrintFlowState = .success
 
     var body: some View {
         NavigationStack {
             ScrollView {
                 VStack(spacing: 20) {
-                    switch viewModel.printFlow {
+                    switch viewModel.printFlow ?? lastFlow {
                     case .uploading(let progress):
                         uploadingContent(progress: progress)
                     case .failed(let message):
                         failedContent(message: message)
-                    case .success, .none:
+                    case .success:
                         successContent
                     }
 
@@ -26,10 +30,15 @@ struct PrintProgressModal: View {
             .safeAreaInset(edge: .bottom) { doneButton }
             .navigationBarTitleDisplayMode(.inline)
         }
-        .presentationDetents([.medium])
+        .presentationDetents([.medium, .large])
         .presentationDragIndicator(.visible)
-        .interactiveDismissDisabled(false)
         .animation(.easeInOut(duration: 0.2), value: viewModel.printFlow)
+        .onAppear {
+            if let flow = viewModel.printFlow { lastFlow = flow }
+        }
+        .onChange(of: viewModel.printFlow) { _, new in
+            if let new { lastFlow = new }
+        }
     }
 
     // MARK: - Uploading
