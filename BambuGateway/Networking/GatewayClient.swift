@@ -59,8 +59,9 @@ struct GatewayClient {
         return response.printers
     }
 
-    func fetchAMS() async throws -> AMSResponse {
-        try await get(path: "/api/ams")
+    func fetchAMS(printerId: String? = nil) async throws -> AMSResponse {
+        let query: [URLQueryItem] = (printerId ?? "").isEmpty ? [] : [URLQueryItem(name: "printer_id", value: printerId)]
+        return try await get(path: "/api/ams", queryItems: query)
     }
 
     func fetchSlicerMachines() async throws -> [SlicerProfile] {

@@ -2053,7 +2053,7 @@ final class AppViewModel: ObservableObject {
 
     private func fetchAMSGracefully() async -> AMSResponse? {
         do {
-            return try await gatewayClient().fetchAMS()
+            return try await gatewayClient().fetchAMS(printerId: selectedPrinter?.id)
         } catch {
             return nil
         }

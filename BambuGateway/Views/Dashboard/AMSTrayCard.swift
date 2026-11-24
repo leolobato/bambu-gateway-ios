@@ -8,7 +8,7 @@ struct AMSTrayCard<Destination: View>: View {
     let destination: () -> Destination
 
     private var isEmpty: Bool {
-        tray.trayType.isEmpty && tray.filamentId.isEmpty
+        tray.trayType.isEmpty && tray.filamentId.isEmpty && tray.remainingGrams == nil
     }
 
     var body: some View {
