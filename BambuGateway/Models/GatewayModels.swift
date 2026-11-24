@@ -142,6 +142,9 @@ struct AMSTray: Decodable, Identifiable, Hashable {
     let traySubBrands: String
     let filamentId: String
     let remain: Int
+    /// Usable remaining-filament estimate; nil when the printer doesn't know
+    /// (older gateways never send it).
+    let remainingGrams: Int?
     let matchedFilament: SlicerProfile?
 
     init(from decoder: Decoder) throws {
@@ -154,11 +157,12 @@ struct AMSTray: Decodable, Identifiable, Hashable {
         traySubBrands = try container.decodeIfPresent(String.self, forKey: .traySubBrands) ?? ""
         filamentId = try container.decodeIfPresent(String.self, forKey: .filamentId) ?? ""
         remain = try container.decodeIfPresent(Int.self, forKey: .remain) ?? -1
+        remainingGrams = try container.decodeIfPresent(Int.self, forKey: .remainingGrams)
         matchedFilament = try container.decodeIfPresent(SlicerProfile.self, forKey: .matchedFilament)
     }
 
     private enum CodingKeys: String, CodingKey {
-        case slot, amsId, trayId, trayType, trayColor, traySubBrands, filamentId, remain, matchedFilament
+        case slot, amsId, trayId, trayType, trayColor, traySubBrands, filamentId, remain, remainingGrams, matchedFilament
     }
 }
 

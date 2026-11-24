@@ -98,27 +98,26 @@ struct AMSTrayCard<Destination: View>: View {
             .background(Color.accentBlue, in: Capsule())
     }
 
-    @ViewBuilder
     private var secondaryLabel: some View {
         let type = tray.trayType.isEmpty ? "-" : tray.trayType
-        if !tray.filamentId.isEmpty {
-            Text("\(type) \u{00B7} \(tray.filamentId)")
-                .font(.caption)
-                .foregroundStyle(.secondary)
-        } else {
-            Text(type)
-                .font(.caption)
-                .foregroundStyle(.secondary)
-        }
+        let parts = [type, tray.filamentId, remainingText].filter { !$0.isEmpty }
+        return Text(parts.joined(separator: " \u{00B7} "))
+            .font(.caption)
+            .foregroundStyle(.secondary)
+    }
+
+    private var remainingText: String {
+        guard let grams = tray.remainingGrams else { return "" }
+        return "~\(grams) g"
     }
 
     private var accessibilityText: String {
         let prefix = isInUse ? "In Use, " : ""
         if isEmpty { return "\(prefix)\(label), empty" }
         let type = tray.trayType.isEmpty ? "unknown type" : tray.trayType
-        if !tray.filamentId.isEmpty {
-            return "\(prefix)\(label), \(type), \(tray.filamentId)"
-        }
-        return "\(prefix)\(label), \(type)"
+        var parts = ["\(prefix)\(label)", type]
+        if !tray.filamentId.isEmpty { parts.append(tray.filamentId) }
+        if let grams = tray.remainingGrams { parts.append("about \(grams) grams left") }
+        return parts.joined(separator: ", ")
     }
 }

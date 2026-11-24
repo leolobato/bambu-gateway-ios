@@ -19,6 +19,7 @@
 		2291CCBDE336DA4AED20DE24 /* PrintLiveActivity.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE9094B53DAFDF244C615D34 /* PrintLiveActivity.swift */; };
 		2B35F0A7CBA771FDD9C87DE0 /* CameraFeedView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 60EEE74AFB6EC29279BA25F4 /* CameraFeedView.swift */; };
 		3170F3853AFAEC0D89898D09 /* AMSTrayCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = A90C3D6C3090D51A24960C1F /* AMSTrayCard.swift */; };
+		39A0A95FA382724B926F3163 /* AMSTrayDecodingTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 46EB568241A0FA97D8EB7D65 /* AMSTrayDecodingTests.swift */; };
 		4276A894BB7CE53680394377 /* AppSettingsStoreCameraTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 36C28A77CC578F19C3B443A8 /* AppSettingsStoreCameraTests.swift */; };
 		44B56515793C2BB83F5F6D4A /* PrintEstimateFormatters.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B9A2C955FDC5D3DCDDE04AE /* PrintEstimateFormatters.swift */; };
 		49397CEDE4D75E47854A886C /* PrinterOfflineCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1A82C8C3C49F519579B64E2 /* PrinterOfflineCard.swift */; };
@@ -150,6 +151,7 @@
 		3F758F11180A2BEE3E8AA429 /* ProcessAllSettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProcessAllSettingsView.swift; sourceTree = "<group>"; };
 		44EC033ED738670D74C406FF /* simple.preview.bin */ = {isa = PBXFileReference; lastKnownFileType = archive.macbinary; path = simple.preview.bin; sourceTree = "<group>"; };
 		450020B566A6C67BC3D57DE2 /* SpeedPickerSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpeedPickerSheet.swift; sourceTree = "<group>"; };
+		46EB568241A0FA97D8EB7D65 /* AMSTrayDecodingTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AMSTrayDecodingTests.swift; sourceTree = "<group>"; };
 		47F98F122F17587AC06D257D /* GatewayModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GatewayModels.swift; sourceTree = "<group>"; };
 		499EDB21BA19B396DBF19FBF /* AppViewModelSliceStateResetTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppViewModelSliceStateResetTests.swift; sourceTree = "<group>"; };
 		4DB190EA2A9F8BC2F5685B10 /* ProcessPageDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProcessPageDetailView.swift; sourceTree = "<group>"; };
@@ -412,6 +414,7 @@
 		E34573677577835B31EE039D /* BambuGatewayTests */ = {
 			isa = PBXGroup;
 			children = (
+				46EB568241A0FA97D8EB7D65 /* AMSTrayDecodingTests.swift */,
 				36C28A77CC578F19C3B443A8 /* AppSettingsStoreCameraTests.swift */,
 				5603694E5ECBBCB86D109186 /* AppViewModelProcessOverridesTests.swift */,
 				499EDB21BA19B396DBF19FBF /* AppViewModelSliceStateResetTests.swift */,
@@ -657,6 +660,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				39A0A95FA382724B926F3163 /* AMSTrayDecodingTests.swift in Sources */,
 				4276A894BB7CE53680394377 /* AppSettingsStoreCameraTests.swift in Sources */,
 				9B48B57930E096C0B510C4EE /* AppViewModelProcessOverridesTests.swift in Sources */,
 				5EBF8C4523A53DB841A77CD0 /* AppViewModelSliceStateResetTests.swift in Sources */,
